@@ -19,6 +19,7 @@ const QUERY = `
             countryCode
           }
           customer {
+            id
             firstName
             lastName
           }

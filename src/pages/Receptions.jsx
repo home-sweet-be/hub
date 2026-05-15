@@ -162,6 +162,11 @@ export default function Receptions() {
     setPending('markReady')
     setFeedback(null)
     try {
+      const customerIds = [
+        ...new Set(
+          selectedOrders.map((o) => o.customer?.id).filter(Boolean)
+        ),
+      ]
       const r = await fetch('/api/shopify/orders/tags', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -169,11 +174,16 @@ export default function Receptions() {
           orderIds: selectedOrders.map((o) => o.id),
           remove: ['SentToSupplier'],
           add: ['PretPourLaLivraison'],
+          customerIds,
+          customerAdd: ['SendingBookingEmail'],
         }),
       })
       const data = await r.json()
       if (!r.ok || data.hasErrors) {
-        const messages = (data.results || [])
+        const messages = [
+          ...(data.orderResults || []),
+          ...(data.customerResults || []),
+        ]
           .flatMap((x) => [...(x.addErrors || []), ...(x.removeErrors || [])])
           .map((e) => e.message)
         throw new Error(messages.join(' · ') || `HTTP ${r.status}`)

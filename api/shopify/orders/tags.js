@@ -47,6 +47,23 @@ async function readJsonBody(req) {
   })
 }
 
+async function applyTags(domain, token, ids, addTags, removeTags) {
+  const out = []
+  for (const id of ids) {
+    const r = { id, addErrors: [], removeErrors: [] }
+    if (removeTags.length > 0) {
+      const { json } = await shopifyGraphql(domain, token, TAGS_REMOVE, { id, tags: removeTags })
+      r.removeErrors = json.errors || json.data?.tagsRemove?.userErrors || []
+    }
+    if (addTags.length > 0) {
+      const { json } = await shopifyGraphql(domain, token, TAGS_ADD, { id, tags: addTags })
+      r.addErrors = json.errors || json.data?.tagsAdd?.userErrors || []
+    }
+    out.push(r)
+  }
+  return out
+}
+
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     res.setHeader('Allow', 'POST')
@@ -70,31 +87,36 @@ export default async function handler(req, res) {
   const add = Array.isArray(body.add) ? body.add : []
   const remove = Array.isArray(body.remove) ? body.remove : []
 
-  if (orderIds.length === 0 || (add.length === 0 && remove.length === 0)) {
+  const customerIds = Array.isArray(body.customerIds)
+    ? [...new Set(body.customerIds.filter(Boolean))]
+    : []
+  const customerAdd = Array.isArray(body.customerAdd) ? body.customerAdd : []
+  const customerRemove = Array.isArray(body.customerRemove) ? body.customerRemove : []
+
+  const hasOrderWork = orderIds.length > 0 && (add.length > 0 || remove.length > 0)
+  const hasCustomerWork =
+    customerIds.length > 0 && (customerAdd.length > 0 || customerRemove.length > 0)
+
+  if (!hasOrderWork && !hasCustomerWork) {
     return res.status(400).json({
-      error: 'orderIds and at least one of add/remove are required',
+      error: 'Provide orderIds+add/remove, customerIds+customerAdd/customerRemove, or both',
     })
   }
 
-  const results = []
-  for (const id of orderIds) {
-    const r = { id, addErrors: [], removeErrors: [] }
-    if (remove.length > 0) {
-      const { json } = await shopifyGraphql(domain, token, TAGS_REMOVE, { id, tags: remove })
-      r.removeErrors =
-        json.errors || json.data?.tagsRemove?.userErrors || []
-    }
-    if (add.length > 0) {
-      const { json } = await shopifyGraphql(domain, token, TAGS_ADD, { id, tags: add })
-      r.addErrors =
-        json.errors || json.data?.tagsAdd?.userErrors || []
-    }
-    results.push(r)
-  }
+  const orderResults = hasOrderWork
+    ? await applyTags(domain, token, orderIds, add, remove)
+    : []
+  const customerResults = hasCustomerWork
+    ? await applyTags(domain, token, customerIds, customerAdd, customerRemove)
+    : []
 
-  const hasErrors = results.some(
+  const hasErrors = [...orderResults, ...customerResults].some(
     (r) => (r.addErrors?.length || 0) + (r.removeErrors?.length || 0) > 0
   )
 
-  return res.status(hasErrors ? 207 : 200).json({ results, hasErrors })
+  return res.status(hasErrors ? 207 : 200).json({
+    orderResults,
+    customerResults,
+    hasErrors,
+  })
 }
