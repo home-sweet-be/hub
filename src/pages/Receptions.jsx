@@ -44,14 +44,22 @@ function formatDate(iso) {
   })
 }
 
+function effectiveQuantity(li) {
+  return li.currentQuantity ?? li.quantity ?? 0
+}
+
+function activeLineItems(order) {
+  return order.lineItems.filter((li) => effectiveQuantity(li) > 0)
+}
+
 function articleLine(li) {
-  const parts = [`${li.quantity}× ${li.title}`]
+  const parts = [`${effectiveQuantity(li)}× ${li.title}`]
   if (li.variantTitle) parts.push(`/ ${li.variantTitle}`)
   return parts.join(' ')
 }
 
 function productsSummary(items) {
-  return items.map((li) => `${li.quantity}× ${li.title}`).join(', ')
+  return items.map((li) => `${effectiveQuantity(li)}× ${li.title}`).join(', ')
 }
 
 export default function Receptions() {
@@ -124,11 +132,11 @@ export default function Receptions() {
     try {
       const items = []
       for (const o of selectedOrders) {
-        for (const li of o.lineItems) {
-          if (li.variant?.inventoryItem?.id && li.quantity > 0) {
+        for (const li of activeLineItems(o)) {
+          if (li.variant?.inventoryItem?.id) {
             items.push({
               inventoryItemId: li.variant.inventoryItem.id,
-              delta: li.quantity,
+              delta: effectiveQuantity(li),
             })
           }
         }
@@ -259,7 +267,7 @@ export default function Receptions() {
                       </span>
                     </td>
                     <td className="reception-cart__products">
-                      {productsSummary(o.lineItems)}
+                      {productsSummary(activeLineItems(o))}
                     </td>
                     <td>
                       <button
@@ -354,6 +362,7 @@ export default function Receptions() {
                   {filtered.map((o) => {
                     const zone = extractZone(o.tags)
                     const isSelected = selectedIds.has(o.id)
+                    const items = activeLineItems(o)
                     return (
                       <tr key={o.id} className={isSelected ? 'is-selected' : ''}>
                         <td>
@@ -371,7 +380,7 @@ export default function Receptions() {
                         </td>
                         <td>
                           <div className="reception-thumbs">
-                            {o.lineItems.slice(0, 4).map((li, idx) =>
+                            {items.slice(0, 4).map((li, idx) =>
                               li.image?.url ? (
                                 <img
                                   key={idx}
@@ -403,7 +412,7 @@ export default function Receptions() {
                           {formatDate(o.createdAt)}
                         </td>
                         <td className="reception-articles">
-                          {o.lineItems.map((li) => articleLine(li)).join(' · ')}
+                          {items.map((li) => articleLine(li)).join(' · ')}
                         </td>
                       </tr>
                     )

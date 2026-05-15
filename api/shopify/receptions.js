@@ -29,6 +29,7 @@ const QUERY = `
                 id
                 title
                 quantity
+                currentQuantity
                 variantTitle
                 vendor
                 sku
