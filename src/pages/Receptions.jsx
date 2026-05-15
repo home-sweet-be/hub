@@ -403,9 +403,7 @@ export default function Receptions() {
                           {formatDate(o.createdAt)}
                         </td>
                         <td className="reception-articles">
-                          {o.lineItems.map((li, i) => (
-                            <div key={i}>{articleLine(li)}</div>
-                          ))}
+                          {o.lineItems.map((li) => articleLine(li)).join(' · ')}
                         </td>
                       </tr>
                     )
