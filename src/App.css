@@ -364,7 +364,7 @@
 
 .reception__panes {
   display: grid;
-  grid-template-columns: minmax(280px, 1fr) minmax(0, 2.5fr);
+  grid-template-columns: minmax(280px, 45fr) minmax(0, 55fr);
   gap: 16px;
   align-items: start;
 }
