@@ -62,7 +62,7 @@ export default async function handler(req, res) {
   const first = Math.min(Number(req.query.first) || 250, 250)
   const filter =
     req.query.q ||
-    '(tag:SentToSupplier OR tag:ProduitEnStock) AND NOT fulfillment_status:fulfilled AND NOT financial_status:refunded'
+    '(tag:SentToSupplier OR tag:ProduitEnStock) AND NOT fulfillment_status:fulfilled AND NOT financial_status:refunded AND total_price:>1'
 
   try {
     const response = await fetch(
@@ -96,21 +96,23 @@ export default async function handler(req, res) {
         .json({ error: 'GraphQL errors', errors: data.errors })
     }
 
-    const orders = (data.data?.orders?.edges || []).map((edge) => {
-      const o = edge.node
-      return {
-        id: o.id,
-        name: o.name,
-        createdAt: o.createdAt,
-        tags: o.tags,
-        total: o.totalPriceSet?.shopMoney?.amount,
-        currency: o.totalPriceSet?.shopMoney?.currencyCode,
-        financialStatus: o.displayFinancialStatus,
-        shippingAddress: o.shippingAddress,
-        customer: o.customer,
-        lineItems: (o.lineItems?.edges || []).map((le) => le.node),
-      }
-    })
+    const orders = (data.data?.orders?.edges || [])
+      .map((edge) => {
+        const o = edge.node
+        return {
+          id: o.id,
+          name: o.name,
+          createdAt: o.createdAt,
+          tags: o.tags,
+          total: o.totalPriceSet?.shopMoney?.amount,
+          currency: o.totalPriceSet?.shopMoney?.currencyCode,
+          financialStatus: o.displayFinancialStatus,
+          shippingAddress: o.shippingAddress,
+          customer: o.customer,
+          lineItems: (o.lineItems?.edges || []).map((le) => le.node),
+        }
+      })
+      .filter((o) => Number(o.total) > 1)
 
     res.setHeader('Cache-Control', 'private, max-age=10')
     return res.status(200).json({
