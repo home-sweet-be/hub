@@ -25,11 +25,18 @@ const QUERY = `
           lineItems(first: 20) {
             edges {
               node {
+                id
                 title
                 quantity
                 variantTitle
                 vendor
+                sku
                 image { url altText }
+                variant {
+                  id
+                  sku
+                  inventoryItem { id }
+                }
               }
             }
           }
