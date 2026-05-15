@@ -238,7 +238,7 @@ export default function Receptions() {
             <table className="reception-cart__table">
               <thead>
                 <tr>
-                  <th>Commande</th>
+                  <th>N°</th>
                   <th>Produit</th>
                   <th aria-label="action" />
                 </tr>

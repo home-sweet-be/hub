@@ -403,7 +403,8 @@
 
 .reception-cart__table th:nth-child(1),
 .reception-cart__table td:nth-child(1) {
-  width: 80px;
+  width: 60px;
+  border-right: 1px solid rgba(28, 28, 30, 0.08);
 }
 
 .reception-cart__table th:nth-child(3),
