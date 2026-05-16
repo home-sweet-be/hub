@@ -2,13 +2,10 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { supabase } from '../lib/supabase'
 import SlotModal from '../components/SlotModal'
 
-const DAY_LABELS = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim']
+const DAY_LABELS_BY_DOW = ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam']
 
-function startOfWeek(date) {
-  const d = new Date(date)
-  const day = d.getDay()
-  const diff = day === 0 ? -6 : 1 - day
-  d.setDate(d.getDate() + diff)
+function startOfToday() {
+  const d = new Date()
   d.setHours(0, 0, 0, 0)
   return d
 }
@@ -49,7 +46,7 @@ function zoneShort(z) {
 }
 
 export default function Livraisons() {
-  const [weekStart, setWeekStart] = useState(() => startOfWeek(new Date()))
+  const [weekStart, setWeekStart] = useState(() => startOfToday())
   const [slots, setSlots] = useState(null)
   const [bookings, setBookings] = useState({})
   const [error, setError] = useState(null)
@@ -134,7 +131,7 @@ export default function Livraisons() {
           <button
             type="button"
             className="livraisons__nav-btn livraisons__nav-btn--today"
-            onClick={() => setWeekStart(startOfWeek(new Date()))}
+            onClick={() => setWeekStart(startOfToday())}
           >
             Aujourd'hui
           </button>
@@ -168,7 +165,7 @@ export default function Livraisons() {
               className={'livraisons__day' + (isToday(d) ? ' is-today' : '')}
             >
               <header className="livraisons__day-head">
-                <span className="livraisons__day-name">{DAY_LABELS[i]}</span>
+                <span className="livraisons__day-name">{DAY_LABELS_BY_DOW[d.getDay()]}</span>
                 <span className="livraisons__day-date">{fmtDay(d)}</span>
               </header>
 
