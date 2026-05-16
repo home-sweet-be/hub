@@ -30,8 +30,8 @@ function zoneLabel(zone) {
   return zone.replace(/^[A-Z]{2}-/, '').replace(/-/g, ' ')
 }
 
-// ~300 km radius. 1° latitude ≈ 111 km, so 2.7° ≈ 300 km.
-const BBOX_DEG = 2.7
+// ~200 km radius. 1° latitude ≈ 111 km, so 1.8° ≈ 200 km.
+const BBOX_DEG = 1.8
 
 function osmEmbed(lat, lon) {
   const left = lon - BBOX_DEG
@@ -161,11 +161,30 @@ export default function ZoneModal({
         <header className="zone-modal__header">
           <div>
             <h3 id="zone-modal-title">Changer la zone de livraison</h3>
-            {(orderName || customerName) && (
+            {(orderName || customerName || flatAddress) && (
               <p className="zone-modal__subtitle">
                 {orderName && <span>{orderName}</span>}
                 {orderName && customerName && <span> · </span>}
                 {customerName && <span>{customerName}</span>}
+                {(orderName || customerName) && flatAddress && (
+                  <span> · </span>
+                )}
+                {flatAddress && (
+                  <span className="zone-modal__inline-address">
+                    {flatAddress}
+                  </span>
+                )}
+                {(flatAddress || hasCoords) && (
+                  <a
+                    href={gmapsLink(lat, lon, flatAddress)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="zone-modal__gmaps-btn"
+                    title="Ouvrir dans Google Maps"
+                  >
+                    Google Maps ↗
+                  </a>
+                )}
               </p>
             )}
           </div>
@@ -186,7 +205,7 @@ export default function ZoneModal({
                 href={osmLink(lat, lon)}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="zone-modal__map"
+                className="zone-modal__map zone-modal__map--full"
                 title="Ouvrir dans OpenStreetMap"
               >
                 <iframe
@@ -197,40 +216,8 @@ export default function ZoneModal({
                 />
               </a>
             ) : (
-              <div className="zone-modal__no-map">
+              <div className="zone-modal__no-map zone-modal__no-map--full">
                 Coordonnées GPS indisponibles
-              </div>
-            )}
-            {address && (
-              <div className="zone-modal__address">
-                {address.name && (
-                  <div className="zone-modal__address-name">
-                    {address.name}
-                  </div>
-                )}
-                {addressLines.map((l, i) => (
-                  <div key={i}>{l}</div>
-                ))}
-                <div className="zone-modal__address-actions">
-                  <a
-                    href={gmapsLink(lat, lon, flatAddress)}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="zone-modal__address-link"
-                  >
-                    Google Maps
-                  </a>
-                  {hasCoords && (
-                    <a
-                      href={osmLink(lat, lon)}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="zone-modal__address-link"
-                    >
-                      OpenStreetMap
-                    </a>
-                  )}
-                </div>
               </div>
             )}
           </aside>
