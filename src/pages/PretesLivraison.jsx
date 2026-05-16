@@ -116,10 +116,11 @@ export default function PretesLivraison() {
 
   const sorted = useMemo(() => {
     if (!orders) return []
-    return [...orders].sort(
-      (a, b) =>
-        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-    )
+    const numericId = (o) => {
+      const n = parseInt(String(o.name).replace(/^#/, ''), 10)
+      return Number.isFinite(n) ? n : 0
+    }
+    return [...orders].sort((a, b) => numericId(a) - numericId(b))
   }, [orders])
 
   return (
