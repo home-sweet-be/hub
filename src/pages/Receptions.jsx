@@ -1,4 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
+import { ZoneFlag, zoneCode } from '../components/ZoneFlag'
+import ZoneModal from '../components/ZoneModal'
 
 const ZONE_TAG_PATTERN = /^(BE|FR|LU|NL|DE)(-|$)/i
 
@@ -39,58 +41,6 @@ function extractZone(order) {
   return find(order?.tags) || find(order?.customer?.tags) || null
 }
 
-function ZoneFlag({ code }) {
-  const cls = 'zone-badge__flag'
-  switch (code) {
-    case 'BE':
-      return (
-        <svg className={cls} viewBox="0 0 3 2" aria-hidden="true">
-          <rect width="1" height="2" x="0" fill="#000" />
-          <rect width="1" height="2" x="1" fill="#fae042" />
-          <rect width="1" height="2" x="2" fill="#ed2939" />
-        </svg>
-      )
-    case 'FR':
-      return (
-        <svg className={cls} viewBox="0 0 3 2" aria-hidden="true">
-          <rect width="1" height="2" x="0" fill="#0055a4" />
-          <rect width="1" height="2" x="1" fill="#fff" />
-          <rect width="1" height="2" x="2" fill="#ef4135" />
-        </svg>
-      )
-    case 'LU':
-      return (
-        <svg className={cls} viewBox="0 0 3 2" aria-hidden="true">
-          <rect width="3" height="0.667" y="0" fill="#ed2939" />
-          <rect width="3" height="0.667" y="0.667" fill="#fff" />
-          <rect width="3" height="0.666" y="1.333" fill="#00a1de" />
-        </svg>
-      )
-    case 'NL':
-      return (
-        <svg className={cls} viewBox="0 0 3 2" aria-hidden="true">
-          <rect width="3" height="0.667" y="0" fill="#ae1c28" />
-          <rect width="3" height="0.667" y="0.667" fill="#fff" />
-          <rect width="3" height="0.666" y="1.333" fill="#21468b" />
-        </svg>
-      )
-    case 'DE':
-      return (
-        <svg className={cls} viewBox="0 0 3 2" aria-hidden="true">
-          <rect width="3" height="0.667" y="0" fill="#000" />
-          <rect width="3" height="0.667" y="0.667" fill="#dd0000" />
-          <rect width="3" height="0.666" y="1.333" fill="#ffce00" />
-        </svg>
-      )
-    default:
-      return null
-  }
-}
-
-function zoneCode(zone) {
-  if (!zone) return null
-  return zone.slice(0, 2).toUpperCase()
-}
 
 function formatDate(iso) {
   if (!iso) return ''
@@ -154,6 +104,7 @@ export default function Receptions() {
   const [selectedIds, setSelectedIds] = useState(() => new Set())
   const [pending, setPending] = useState(null) // 'adjust' | 'markReady' | null
   const [feedback, setFeedback] = useState(null) // { type, message }
+  const [zoneEditing, setZoneEditing] = useState(null) // order being edited
 
   const load = useCallback(() => {
     setOrders(null)
@@ -740,16 +691,24 @@ export default function Receptions() {
                           )}
                           {isFirst && (
                             <td rowSpan={span}>
-                              {zone ? (
-                                <span className="zone-badge">
-                                  <ZoneFlag code={zoneCode(zone)} />
-                                  {zone}
-                                </span>
-                              ) : (
-                                <span className="zone-badge zone-badge--undefined">
-                                  Non défini
-                                </span>
-                              )}
+                              <button
+                                type="button"
+                                className={
+                                  'zone-badge zone-badge--button' +
+                                  (!zone ? ' zone-badge--undefined' : '')
+                                }
+                                onClick={() => setZoneEditing(o)}
+                                title="Changer la zone"
+                              >
+                                {zone ? (
+                                  <>
+                                    <ZoneFlag code={zoneCode(zone)} />
+                                    {zone}
+                                  </>
+                                ) : (
+                                  'Non défini'
+                                )}
+                              </button>
                             </td>
                           )}
                           {isFirst && (
@@ -813,6 +772,17 @@ export default function Receptions() {
         </section>
       </div>
       </div>
+
+      <ZoneModal
+        open={!!zoneEditing}
+        currentZone={zoneEditing ? extractZone(zoneEditing) : null}
+        customerId={zoneEditing?.customer?.id || null}
+        customerName={
+          zoneEditing ? customerName(zoneEditing.customer) : null
+        }
+        onClose={() => setZoneEditing(null)}
+        onChanged={() => load()}
+      />
     </div>
   )
 }
