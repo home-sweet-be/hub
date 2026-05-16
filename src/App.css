@@ -832,8 +832,9 @@
 
 .reception-suboption__branch {
   color: rgba(28, 28, 30, 0.18);
-  font-size: 14px;
-  line-height: 1;
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
 }
 
 .reception-suboption__bubble {

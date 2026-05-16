@@ -498,12 +498,18 @@ export default function Receptions() {
                           <td className="reception-articles">
                             {isSubLine ? (
                               <span className="reception-suboption">
-                                <span
+                                <svg
                                   className="reception-suboption__branch"
+                                  viewBox="0 0 14 14"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  strokeWidth="1.4"
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
                                   aria-hidden="true"
                                 >
-                                  └
-                                </span>
+                                  <path d="M3 1 V 7 L 12 12" />
+                                </svg>
                                 <span className="reception-suboption__bubble">
                                   {row.kind === 'attr'
                                     ? `${row.attr.key}: ${row.attr.value}`
