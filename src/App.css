@@ -802,6 +802,29 @@
   color: var(--text-muted);
 }
 
+.reception-meta {
+  white-space: nowrap;
+  font-size: 12px;
+}
+
+.reception-meta__chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--text);
+}
+
+.reception-meta__emoji {
+  font-size: 11px;
+  opacity: 0.75;
+  line-height: 1;
+}
+
+.reception-meta__chip--wait {
+  font-variant-numeric: tabular-nums;
+  color: var(--text-muted);
+}
+
 .reception-articles {
   font-size: 12.5px;
   max-width: 320px;

@@ -100,6 +100,17 @@ function formatDate(iso) {
   })
 }
 
+function daysSince(iso) {
+  if (!iso) return 0
+  const ms = Date.now() - new Date(iso).getTime()
+  return Math.max(0, Math.floor(ms / 86400000))
+}
+
+function customerName(c) {
+  if (!c) return ''
+  return [c.firstName, c.lastName].filter(Boolean).join(' ').trim()
+}
+
 function effectiveQuantity(li) {
   return li.currentQuantity ?? li.quantity ?? 0
 }
@@ -521,13 +532,16 @@ export default function Receptions() {
                     <th>Produit</th>
                     <th>N°</th>
                     <th>Zone</th>
+                    <th>Client</th>
+                    <th>Ville</th>
+                    <th>Attente</th>
                     <th>Date</th>
                   </tr>
                 </thead>
                 <tbody>
                   {filtered.length === 0 && (
                     <tr>
-                      <td colSpan={6} className="reception-table__empty">
+                      <td colSpan={9} className="reception-table__empty">
                         Aucune commande dans cet onglet.
                       </td>
                     </tr>
@@ -708,6 +722,38 @@ export default function Receptions() {
                                   Non défini
                                 </span>
                               )}
+                            </td>
+                          )}
+                          {isFirst && (
+                            <td className="reception-meta" rowSpan={span}>
+                              {customerName(o.customer) ? (
+                                <span className="reception-meta__chip">
+                                  <span className="reception-meta__emoji">👤</span>
+                                  {customerName(o.customer)}
+                                </span>
+                              ) : (
+                                <span className="reception-table__muted">—</span>
+                              )}
+                            </td>
+                          )}
+                          {isFirst && (
+                            <td className="reception-meta" rowSpan={span}>
+                              {o.shippingAddress?.city ? (
+                                <span className="reception-meta__chip">
+                                  <span className="reception-meta__emoji">📍</span>
+                                  {o.shippingAddress.city}
+                                </span>
+                              ) : (
+                                <span className="reception-table__muted">—</span>
+                              )}
+                            </td>
+                          )}
+                          {isFirst && (
+                            <td className="reception-meta" rowSpan={span}>
+                              <span className="reception-meta__chip reception-meta__chip--wait">
+                                <span className="reception-meta__emoji">⏱️</span>
+                                {daysSince(o.createdAt)} j
+                              </span>
                             </td>
                           )}
                           {isFirst && (
