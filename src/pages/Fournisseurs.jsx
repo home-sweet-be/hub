@@ -138,7 +138,7 @@ export default function Fournisseurs() {
     return fetch(
       '/api/shopify/receptions?q=' +
         encodeURIComponent(
-          'NOT tag:SentToSupplier AND NOT tag:ProduitEnStock AND NOT fulfillment_status:fulfilled AND NOT financial_status:refunded AND NOT financial_status:partially_refunded AND total_price:>1'
+          'NOT tag:SentToSupplier AND NOT tag:ProduitEnStock AND NOT tag:removed AND NOT fulfillment_status:fulfilled AND NOT financial_status:refunded AND NOT financial_status:partially_refunded AND total_price:>1'
         ) +
         '&first=250'
     )

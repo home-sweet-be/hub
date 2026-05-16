@@ -73,7 +73,7 @@ export default async function handler(req, res) {
   const first = Math.min(Number(req.query.first) || 250, 250)
   const filter =
     req.query.q ||
-    '(tag:SentToSupplier OR tag:ProduitEnStock) AND NOT fulfillment_status:fulfilled AND NOT financial_status:refunded AND NOT financial_status:partially_refunded AND total_price:>1'
+    '(tag:SentToSupplier OR tag:ProduitEnStock) AND NOT tag:removed AND NOT fulfillment_status:fulfilled AND NOT financial_status:refunded AND NOT financial_status:partially_refunded AND total_price:>1'
 
   try {
     const response = await fetch(
