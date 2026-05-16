@@ -790,16 +790,15 @@
 }
 
 /* "Sub-tree" line for line items without image */
+.reception-table tr.is-row-sub {
+  transform: translateY(-12px);
+}
+
 .reception-table tr.is-row-sub td {
   height: 10px;
   padding-top: 0;
   padding-bottom: 0;
   vertical-align: top;
-}
-
-.reception-table tr.is-row-sub .reception-suboption {
-  display: inline-flex;
-  margin-top: -12px;
 }
 
 .reception-table tr.is-row-sub .reception-articles {
