@@ -797,6 +797,11 @@
   vertical-align: top;
 }
 
+.reception-table tr.is-row-sub .reception-suboption {
+  display: inline-flex;
+  margin-top: -12px;
+}
+
 .reception-table tr.is-row-sub .reception-articles {
   padding-left: 30px;
 }
