@@ -875,14 +875,14 @@
 
 .reception-num__link:hover::before {
   background: rgba(149, 191, 71, 0.18);
-  left: -23px;
+  left: -18px;
 }
 
 .reception-num__icon-wrap {
   position: absolute;
   top: 50%;
   right: 100%;
-  margin-right: 3px;
+  margin-right: -2px;
   transform: translateY(-50%);
   pointer-events: none;
 }
