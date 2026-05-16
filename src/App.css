@@ -1716,9 +1716,9 @@
   display: inline-flex;
   align-items: center;
   gap: 0;
-  border: 1px solid rgba(28, 28, 30, 0.12);
+  border: 1px solid rgba(52, 199, 89, 0.6);
   border-radius: 8px;
-  background: #fff;
+  background: rgba(52, 199, 89, 0.18);
   overflow: hidden;
 }
 
@@ -1726,16 +1726,16 @@
   width: 24px;
   height: 26px;
   border: none;
-  background: rgba(28, 28, 30, 0.04);
+  background: transparent;
   font-size: 14px;
   font-weight: 600;
-  color: var(--text);
+  color: #1f7c39;
   cursor: pointer;
   transition: background 0.12s ease;
 }
 
 .stock-modal__delta-btn:hover:not(:disabled) {
-  background: rgba(28, 28, 30, 0.1);
+  background: rgba(52, 199, 89, 0.3);
 }
 
 .stock-modal__delta-btn:disabled {
@@ -1747,8 +1747,8 @@
   width: 46px;
   height: 26px;
   border: none;
-  border-left: 1px solid rgba(28, 28, 30, 0.1);
-  border-right: 1px solid rgba(28, 28, 30, 0.1);
+  border-left: 1px solid rgba(52, 199, 89, 0.4);
+  border-right: 1px solid rgba(52, 199, 89, 0.4);
   background: transparent;
   text-align: center;
   font: inherit;
