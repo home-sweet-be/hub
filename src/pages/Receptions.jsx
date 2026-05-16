@@ -197,18 +197,24 @@ export default function Receptions() {
     setAdjustItems([...byInv.values()])
   }
 
-  const applyStockAdjust = async () => {
-    if (!adjustItems || adjustItems.length === 0) return
+  const applyStockAdjust = async (itemsFromModal) => {
+    const list = itemsFromModal || adjustItems
+    if (!list || list.length === 0) {
+      setAdjustItems(null)
+      return
+    }
     setPending('adjust')
     try {
       const r = await fetch('/api/shopify/inventory/adjust', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          items: adjustItems.map((it) => ({
-            inventoryItemId: it.inventoryItemId,
-            delta: it.delta,
-          })),
+          items: list
+            .filter((it) => Number(it.delta) !== 0)
+            .map((it) => ({
+              inventoryItemId: it.inventoryItemId,
+              delta: Number(it.delta),
+            })),
           reason: 'received',
         }),
       })

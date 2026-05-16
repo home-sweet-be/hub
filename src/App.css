@@ -1709,26 +1709,81 @@
 }
 
 .stock-modal__arrow {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  color: var(--text-muted);
   padding: 8px 4px !important;
 }
 
-.stock-modal__arrow svg {
-  width: 14px;
-  height: 14px;
+.stock-modal__delta-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 0;
+  border: 1px solid rgba(28, 28, 30, 0.12);
+  border-radius: 8px;
+  background: #fff;
+  overflow: hidden;
 }
 
-.stock-modal__delta {
-  font-size: 10.5px;
+.stock-modal__delta-btn {
+  width: 24px;
+  height: 26px;
+  border: none;
+  background: rgba(28, 28, 30, 0.04);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+  cursor: pointer;
+  transition: background 0.12s ease;
+}
+
+.stock-modal__delta-btn:hover:not(:disabled) {
+  background: rgba(28, 28, 30, 0.1);
+}
+
+.stock-modal__delta-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.stock-modal__delta-input {
+  width: 46px;
+  height: 26px;
+  border: none;
+  border-left: 1px solid rgba(28, 28, 30, 0.1);
+  border-right: 1px solid rgba(28, 28, 30, 0.1);
+  background: transparent;
+  text-align: center;
+  font: inherit;
+  font-size: 12.5px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  outline: none;
+  -moz-appearance: textfield;
+}
+
+.stock-modal__delta-input::-webkit-outer-spin-button,
+.stock-modal__delta-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.stock-modal__delta-input.is-positive {
+  color: #1f7c39;
+}
+
+.stock-modal__delta-input.is-negative {
+  color: #c43b30;
+}
+
+.stock-modal__delta-input.is-zero {
+  color: var(--text-muted);
+}
+
+.stock-modal__subtitle strong {
   font-weight: 600;
   color: #1f7c39;
-  background: rgba(52, 199, 89, 0.16);
-  padding: 1px 6px;
-  border-radius: 999px;
+}
+
+.stock-modal__subtitle strong.is-negative {
+  color: #c43b30;
 }
 
 .stock-modal__error {

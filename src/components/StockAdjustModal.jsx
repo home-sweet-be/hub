@@ -9,6 +9,13 @@ export default function StockAdjustModal({
 }) {
   const [pending, setPending] = useState(false)
   const [error, setError] = useState(null)
+  const [editedItems, setEditedItems] = useState([])
+
+  useEffect(() => {
+    if (open && Array.isArray(items)) {
+      setEditedItems(items.map((it) => ({ ...it })))
+    }
+  }, [open, items])
 
   useEffect(() => {
     if (!open) return
@@ -34,11 +41,29 @@ export default function StockAdjustModal({
 
   if (!open) return null
 
+  const setDelta = (idx, raw) => {
+    const n = parseInt(raw, 10)
+    setEditedItems((prev) =>
+      prev.map((it, i) =>
+        i === idx ? { ...it, delta: Number.isFinite(n) ? n : 0 } : it
+      )
+    )
+  }
+
+  const bumpDelta = (idx, by) => {
+    setEditedItems((prev) =>
+      prev.map((it, i) =>
+        i === idx ? { ...it, delta: (it.delta || 0) + by } : it
+      )
+    )
+  }
+
   const handleConfirm = async () => {
     setPending(true)
     setError(null)
     try {
-      await onConfirm?.()
+      const toApply = editedItems.filter((it) => it.delta !== 0)
+      await onConfirm?.(toApply)
     } catch (e) {
       setError(e.message || String(e))
       setPending(false)
@@ -47,7 +72,7 @@ export default function StockAdjustModal({
     }
   }
 
-  const total = items.reduce((s, it) => s + it.delta, 0)
+  const total = editedItems.reduce((s, it) => s + (it.delta || 0), 0)
 
   return createPortal(
     <div
@@ -66,8 +91,13 @@ export default function StockAdjustModal({
           <div>
             <h3 id="stock-modal-title">Ajuster les entrées en stock</h3>
             <p className="stock-modal__subtitle">
-              {items.length} référence{items.length > 1 ? 's' : ''} · {total}{' '}
-              unité{total > 1 ? 's' : ''} à ajouter
+              {editedItems.length} référence
+              {editedItems.length > 1 ? 's' : ''} · delta total{' '}
+              <strong className={total < 0 ? 'is-negative' : ''}>
+                {total > 0 ? '+' : ''}
+                {total}
+              </strong>{' '}
+              unité{Math.abs(total) > 1 ? 's' : ''}
             </p>
           </div>
           <button
@@ -97,10 +127,17 @@ export default function StockAdjustModal({
                 </tr>
               </thead>
               <tbody>
-                {items.map((it) => {
+                {editedItems.map((it, idx) => {
                   const before = it.before
+                  const delta = it.delta || 0
                   const after =
-                    typeof before === 'number' ? before + it.delta : null
+                    typeof before === 'number' ? before + delta : null
+                  const deltaClass =
+                    delta > 0
+                      ? 'stock-modal__delta-input is-positive'
+                      : delta < 0
+                      ? 'stock-modal__delta-input is-negative'
+                      : 'stock-modal__delta-input is-zero'
                   return (
                     <tr key={it.inventoryItemId}>
                       <td className="stock-modal__img-cell">
@@ -123,21 +160,33 @@ export default function StockAdjustModal({
                         {typeof before === 'number' ? before : '—'}
                       </td>
                       <td className="stock-modal__arrow">
-                        <span className="stock-modal__delta">
-                          +{it.delta}
-                        </span>
-                        <svg
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="1.8"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          aria-hidden="true"
-                        >
-                          <path d="M5 12h14" />
-                          <path d="M13 5l7 7-7 7" />
-                        </svg>
+                        <div className="stock-modal__delta-group">
+                          <button
+                            type="button"
+                            className="stock-modal__delta-btn"
+                            onClick={() => bumpDelta(idx, -1)}
+                            disabled={pending}
+                            aria-label="Diminuer"
+                          >
+                            −
+                          </button>
+                          <input
+                            type="number"
+                            className={deltaClass}
+                            value={delta}
+                            onChange={(e) => setDelta(idx, e.target.value)}
+                            disabled={pending}
+                          />
+                          <button
+                            type="button"
+                            className="stock-modal__delta-btn"
+                            onClick={() => bumpDelta(idx, 1)}
+                            disabled={pending}
+                            aria-label="Augmenter"
+                          >
+                            +
+                          </button>
+                        </div>
                       </td>
                       <td className="stock-modal__num stock-modal__after">
                         {after !== null ? after : '—'}
