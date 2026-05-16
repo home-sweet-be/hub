@@ -663,10 +663,7 @@
   vertical-align: middle;
   white-space: nowrap;
   background: rgba(255, 255, 255, 0.7);
-}
-
-.reception-table tbody tr {
-  box-shadow: 0 2px 4px -2px rgba(28, 28, 30, 0.08);
+  box-shadow: inset 0 -3px 4px -3px rgba(28, 28, 30, 0.18);
 }
 
 /* Sticky first column ("+" button) */
