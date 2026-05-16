@@ -92,10 +92,13 @@ export default function Commandes() {
   const load = useCallback(() => {
     setOrders(null)
     setError(null)
+    const cutoff = new Date(Date.now() - 150 * 86400000)
+      .toISOString()
+      .slice(0, 10)
     return fetch(
       '/api/shopify/receptions?q=' +
         encodeURIComponent(
-          'created_at:>=2024-01-01 AND NOT financial_status:refunded AND status:open'
+          `created_at:>=${cutoff} AND NOT financial_status:refunded AND status:open`
         ) +
         '&first=100'
     )
