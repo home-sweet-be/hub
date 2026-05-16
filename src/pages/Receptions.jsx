@@ -387,15 +387,32 @@ export default function Receptions() {
                     const isSelected = selectedIds.has(o.id)
                     const items = activeLineItems(o)
                     if (items.length === 0) return []
-                    const span = items.length
-                    return items.map((li, idx) => {
+
+                    // Build a flat list of rows: each line item, followed by
+                    // its visible custom attributes (which render like a
+                    // separate sub-line / cheap unimaged line item).
+                    const rows = []
+                    items.forEach((li) => {
+                      rows.push({ kind: 'line', li })
+                      for (const attr of li.customAttributes || []) {
+                        if (!attr.key || attr.key.startsWith('_')) continue
+                        if (!attr.value) continue
+                        rows.push({ kind: 'attr', attr })
+                      }
+                    })
+                    const span = rows.length
+
+                    return rows.map((row, idx) => {
                       const isFirst = idx === 0
                       const isLast = idx === span - 1
-                      const hasImage = !!li.image?.url
-                      const lineAmount = Number(
-                        li.discountedTotalSet?.shopMoney?.amount || 0
-                      )
-                      const isSubLine = !hasImage && lineAmount < 590
+                      const li = row.kind === 'line' ? row.li : null
+                      const hasImage = !!li?.image?.url
+                      const lineAmount = li
+                        ? Number(li.discountedTotalSet?.shopMoney?.amount || 0)
+                        : 0
+                      const isSubLine =
+                        row.kind === 'attr' ||
+                        (li && !hasImage && lineAmount < 590)
                       const rowCls = [
                         isSelected ? 'is-selected' : '',
                         span > 1 && !isLast ? 'is-row-mid' : '',
@@ -424,13 +441,13 @@ export default function Receptions() {
                             </td>
                           )}
                           <td className="reception-img-cell">
-                            {hasImage ? (
+                            {row.kind === 'line' && hasImage ? (
                               <img
                                 src={li.image.url}
                                 alt={li.image.altText || li.title}
                                 className="reception-thumb"
                               />
-                            ) : isSubLine ? null : (
+                            ) : isSubLine ? null : row.kind === 'line' ? (
                               <div
                                 className="reception-thumb reception-thumb--placeholder"
                                 aria-hidden="true"
@@ -448,7 +465,7 @@ export default function Receptions() {
                                   <path d="M21 8 L21 17 L12 22 L12 13 Z" />
                                 </svg>
                               </div>
-                            )}
+                            ) : null}
                           </td>
                           <td className="reception-articles">
                             {isSubLine ? (
@@ -460,7 +477,9 @@ export default function Receptions() {
                                   └
                                 </span>
                                 <span className="reception-suboption__bubble">
-                                  {li.title}
+                                  {row.kind === 'attr'
+                                    ? `${row.attr.key}: ${row.attr.value}`
+                                    : li.title}
                                 </span>
                               </span>
                             ) : (

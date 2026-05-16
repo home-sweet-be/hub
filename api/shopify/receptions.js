@@ -36,6 +36,7 @@ const QUERY = `
                 image { url altText }
                 discountedTotalSet { shopMoney { amount currencyCode } }
                 originalUnitPriceSet { shopMoney { amount } }
+                customAttributes { key value }
                 variant {
                   id
                   sku
