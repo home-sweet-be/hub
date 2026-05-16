@@ -600,7 +600,7 @@
   border-bottom: none;
 }
 
-.reception-table tbody tr.is-row-mid td {
+.reception-table tbody tr.is-row-mid td:not([rowspan]) {
   border-bottom: none;
 }
 
