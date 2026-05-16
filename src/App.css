@@ -1547,3 +1547,216 @@
   border-color: rgba(10, 132, 255, 0.35);
 }
 
+/* StockAdjustModal */
+.stock-modal__backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(28, 28, 30, 0.35);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 24px;
+  animation: zone-modal-fade 0.18s ease-out;
+}
+
+.stock-modal__card {
+  width: 100%;
+  max-width: 760px;
+  max-height: 88vh;
+  display: flex;
+  flex-direction: column;
+  background: #ffffff;
+  border-radius: 18px;
+  box-shadow:
+    0 20px 60px -20px rgba(28, 28, 30, 0.4),
+    0 1px 0 rgba(255, 255, 255, 0.5) inset;
+  animation: zone-modal-pop 0.2s cubic-bezier(0.2, 0.9, 0.3, 1.1);
+  overflow: hidden;
+}
+
+.stock-modal__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 20px 22px 14px;
+  border-bottom: 1px solid rgba(28, 28, 30, 0.08);
+}
+
+.stock-modal__header h3 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--text);
+}
+
+.stock-modal__subtitle {
+  margin: 4px 0 0;
+  font-size: 12.5px;
+  color: var(--text-muted);
+}
+
+.stock-modal__close {
+  background: rgba(28, 28, 30, 0.06);
+  border: none;
+  border-radius: 999px;
+  width: 30px;
+  height: 30px;
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+  color: var(--text-soft);
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.stock-modal__close:hover:not(:disabled) {
+  background: rgba(255, 59, 48, 0.12);
+  color: #c43b30;
+}
+
+.stock-modal__body {
+  padding: 14px 22px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.stock-modal__empty {
+  padding: 30px;
+  text-align: center;
+  color: var(--text-muted);
+}
+
+.stock-modal__table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.stock-modal__table thead th {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-soft);
+  text-align: left;
+  padding: 6px 10px;
+  border-bottom: 1px solid rgba(28, 28, 30, 0.08);
+}
+
+.stock-modal__table tbody td {
+  padding: 8px 10px;
+  border-bottom: 1px solid rgba(28, 28, 30, 0.05);
+  vertical-align: middle;
+}
+
+.stock-modal__table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.stock-modal__img-cell {
+  width: 44px;
+  padding: 4px !important;
+}
+
+.stock-modal__img-cell img {
+  width: 36px;
+  height: 36px;
+  object-fit: cover;
+  border-radius: 6px;
+  display: block;
+}
+
+.stock-modal__img-placeholder {
+  width: 36px;
+  height: 36px;
+  border-radius: 6px;
+  background: #f1f1f3;
+}
+
+.stock-modal__title {
+  font-weight: 500;
+  color: var(--text);
+}
+
+.stock-modal__variant {
+  font-size: 10px;
+  color: var(--text-muted);
+  margin-top: 2px;
+  letter-spacing: -0.3px;
+}
+
+.stock-modal__sku {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 11px;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.stock-modal__num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  font-weight: 500;
+  min-width: 50px;
+}
+
+.stock-modal__after {
+  color: #1f7c39;
+  font-weight: 600;
+}
+
+.stock-modal__arrow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  color: var(--text-muted);
+  padding: 8px 4px !important;
+}
+
+.stock-modal__arrow svg {
+  width: 14px;
+  height: 14px;
+}
+
+.stock-modal__delta {
+  font-size: 10.5px;
+  font-weight: 600;
+  color: #1f7c39;
+  background: rgba(52, 199, 89, 0.16);
+  padding: 1px 6px;
+  border-radius: 999px;
+}
+
+.stock-modal__error {
+  margin: 0 22px 12px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: rgba(255, 59, 48, 0.12);
+  color: #8a0e07;
+  font-size: 12.5px;
+}
+
+.stock-modal__footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 14px 22px 20px;
+  border-top: 1px solid rgba(28, 28, 30, 0.08);
+}
+
+.btn--ghost {
+  background: rgba(28, 28, 30, 0.05);
+  color: var(--text);
+  box-shadow: none;
+}
+
+.btn--ghost:hover:not(:disabled) {
+  background: rgba(28, 28, 30, 0.1);
+  transform: none;
+  box-shadow: none;
+}
+

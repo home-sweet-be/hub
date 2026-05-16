@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { ZoneFlag, zoneCode } from '../components/ZoneFlag'
 import ZoneModal from '../components/ZoneModal'
 import AddressModal from '../components/AddressModal'
+import StockAdjustModal from '../components/StockAdjustModal'
 
 const ZONE_TAG_PATTERN = /^(BE|FR|LU|NL|DE|LIV)(-|$)/i
 
@@ -107,6 +108,7 @@ export default function Receptions() {
   const [feedback, setFeedback] = useState(null) // { type, message }
   const [zoneEditing, setZoneEditing] = useState(null) // order being edited
   const [addressViewing, setAddressViewing] = useState(null) // order whose address is shown
+  const [adjustItems, setAdjustItems] = useState(null) // null = closed, [] = open
 
   const load = useCallback(() => {
     setOrders(null)
@@ -163,26 +165,52 @@ export default function Receptions() {
     })
   }
 
-  const handleAdjustStock = async () => {
+  const handleAdjustStock = () => {
     if (selectedOrders.length === 0) return
-    setPending('adjust')
     setFeedback(null)
-    try {
-      const items = []
-      for (const o of selectedOrders) {
-        for (const li of activeLineItems(o)) {
-          if (li.variant?.inventoryItem?.id) {
-            items.push({
-              inventoryItemId: li.variant.inventoryItem.id,
-              delta: effectiveQuantity(li),
-            })
-          }
+    // Aggregate by inventoryItemId across all selected orders
+    const byInv = new Map()
+    for (const o of selectedOrders) {
+      for (const li of activeLineItems(o)) {
+        const invId = li.variant?.inventoryItem?.id
+        if (!invId) continue
+        const prev = byInv.get(invId)
+        if (prev) {
+          prev.delta += effectiveQuantity(li)
+        } else {
+          byInv.set(invId, {
+            inventoryItemId: invId,
+            sku: li.sku || li.variant?.sku || '',
+            title: li.title,
+            variantTitle: li.variantTitle && !/texture/i.test(li.variantTitle)
+              ? li.variantTitle
+              : null,
+            imageUrl: li.image?.url || null,
+            before: typeof li.variant?.inventoryQuantity === 'number'
+              ? li.variant.inventoryQuantity
+              : null,
+            delta: effectiveQuantity(li),
+          })
         }
       }
+    }
+    setAdjustItems([...byInv.values()])
+  }
+
+  const applyStockAdjust = async () => {
+    if (!adjustItems || adjustItems.length === 0) return
+    setPending('adjust')
+    try {
       const r = await fetch('/api/shopify/inventory/adjust', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ items, reason: 'received' }),
+        body: JSON.stringify({
+          items: adjustItems.map((it) => ({
+            inventoryItemId: it.inventoryItemId,
+            delta: it.delta,
+          })),
+          reason: 'received',
+        }),
       })
       const data = await r.json()
       if (!r.ok || data.ok === false) {
@@ -196,8 +224,10 @@ export default function Receptions() {
         type: 'ok',
         message: `Stock ajusté pour ${data.applied?.length || 0} référence(s).`,
       })
+      setAdjustItems(null)
+      await load()
     } catch (e) {
-      setFeedback({ type: 'err', message: e.message })
+      throw e
     } finally {
       setPending(null)
     }
@@ -809,6 +839,13 @@ export default function Receptions() {
         }
         orderName={addressViewing?.name || null}
         onClose={() => setAddressViewing(null)}
+      />
+
+      <StockAdjustModal
+        open={adjustItems !== null}
+        items={adjustItems || []}
+        onClose={() => setAdjustItems(null)}
+        onConfirm={applyStockAdjust}
       />
     </div>
   )

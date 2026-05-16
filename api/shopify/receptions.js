@@ -47,6 +47,7 @@ const QUERY = `
                 variant {
                   id
                   sku
+                  inventoryQuantity
                   inventoryItem { id }
                 }
               }
