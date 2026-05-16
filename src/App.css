@@ -802,6 +802,10 @@
   overflow: visible;
 }
 
+.reception-table tr.is-row-sub--last td {
+  height: 2px;
+}
+
 .reception-table tr.is-row-sub .reception-suboption {
   position: relative;
   top: -12px;

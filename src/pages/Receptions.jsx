@@ -430,6 +430,7 @@ export default function Receptions() {
                         span > 1 && !isLast ? 'is-row-mid' : '',
                         span > 1 && !isFirst ? 'is-row-cont' : '',
                         isSubLine ? 'is-row-sub' : '',
+                        isSubLine && isLast ? 'is-row-sub--last' : '',
                       ]
                         .filter(Boolean)
                         .join(' ')
