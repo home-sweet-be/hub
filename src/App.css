@@ -696,7 +696,7 @@
 
 .reception-articles {
   font-size: 12.5px;
-  max-width: 250px;
+  max-width: 320px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
