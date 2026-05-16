@@ -233,6 +233,7 @@ export default function Receptions() {
         ))}
       </div>
 
+      <div className="reception__body">
       <div className="reception__panes">
         {/* ---------- Left: reception cart ---------- */}
         <aside className="reception__left">
@@ -418,6 +419,7 @@ export default function Receptions() {
             </div>
           )}
         </section>
+      </div>
       </div>
     </div>
   )
