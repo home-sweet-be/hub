@@ -668,7 +668,7 @@
 /* Soft drop shadow only at the bottom of each ORDER, not per line item */
 .reception-table tbody tr:not(.is-row-mid) td:not([rowspan]),
 .reception-table tbody td[rowspan] {
-  box-shadow: inset 0 -3px 4px -3px rgba(28, 28, 30, 0.18);
+  box-shadow: inset 0 -4px 8px -4px rgba(28, 28, 30, 0.11);
 }
 
 /* Sticky first column ("+" button) */
