@@ -829,8 +829,8 @@
 .reception-meta__chip--wait {
   padding: 3px 10px;
   border-radius: 999px;
-  background: rgba(28, 28, 30, 0.08);
-  color: var(--text);
+  background: rgba(10, 132, 255, 0.14);
+  color: #0a5fb8;
   font-size: 14px;
   font-weight: 600;
   letter-spacing: -0.5px;
