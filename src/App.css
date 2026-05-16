@@ -2592,6 +2592,72 @@
   font-weight: 600;
 }
 
+/* Réservations sub-page: two stacked sections with action column */
+.reservations__section {
+  margin-top: 28px;
+}
+
+.reservations-action-cell {
+  width: 56px;
+  text-align: center;
+}
+
+.reservations-action {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 1.5px solid transparent;
+  background: rgba(28, 28, 30, 0.04);
+  color: var(--text-soft);
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 1;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease,
+    transform 0.08s ease;
+  font-family: inherit;
+}
+
+.reservations-action:hover:not(:disabled) {
+  transform: scale(1.08);
+}
+
+.reservations-action:active:not(:disabled) {
+  transform: scale(0.94);
+}
+
+.reservations-action:disabled {
+  opacity: 0.55;
+  cursor: progress;
+}
+
+.reservations-action--add {
+  background: rgba(10, 132, 255, 0.1);
+  border-color: rgba(10, 132, 255, 0.22);
+  color: #0a5fb8;
+}
+
+.reservations-action--add:hover:not(:disabled) {
+  background: #0a84ff;
+  border-color: #0a84ff;
+  color: #fff;
+}
+
+.reservations-action--remove {
+  background: rgba(255, 159, 10, 0.1);
+  border-color: rgba(255, 159, 10, 0.28);
+  color: #c47a00;
+}
+
+.reservations-action--remove:hover:not(:disabled) {
+  background: #ff9f0a;
+  border-color: #ff9f0a;
+  color: #fff;
+}
+
 /* Wider landscape modal: Date | Zones | Horaires */
 .slot-modal__card {
   max-width: 1020px;
