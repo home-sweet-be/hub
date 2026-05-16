@@ -34,6 +34,8 @@ const QUERY = `
                 vendor
                 sku
                 image { url altText }
+                discountedTotalSet { shopMoney { amount currencyCode } }
+                originalUnitPriceSet { shopMoney { amount } }
                 variant {
                   id
                   sku

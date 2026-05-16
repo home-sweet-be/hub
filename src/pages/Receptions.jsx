@@ -392,11 +392,15 @@ export default function Receptions() {
                       const isFirst = idx === 0
                       const isLast = idx === span - 1
                       const hasImage = !!li.image?.url
+                      const lineAmount = Number(
+                        li.discountedTotalSet?.shopMoney?.amount || 0
+                      )
+                      const isSubLine = !hasImage && lineAmount < 590
                       const rowCls = [
                         isSelected ? 'is-selected' : '',
                         span > 1 && !isLast ? 'is-row-mid' : '',
                         span > 1 && !isFirst ? 'is-row-cont' : '',
-                        !hasImage ? 'is-row-sub' : '',
+                        isSubLine ? 'is-row-sub' : '',
                       ]
                         .filter(Boolean)
                         .join(' ')
@@ -420,16 +424,46 @@ export default function Receptions() {
                             </td>
                           )}
                           <td className="reception-img-cell">
-                            {hasImage && (
+                            {hasImage ? (
                               <img
                                 src={li.image.url}
                                 alt={li.image.altText || li.title}
                                 className="reception-thumb"
                               />
+                            ) : isSubLine ? null : (
+                              <div
+                                className="reception-thumb reception-thumb--placeholder"
+                                aria-hidden="true"
+                              >
+                                <svg
+                                  viewBox="0 0 24 24"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  strokeWidth="1.4"
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                >
+                                  <path d="M12 3 L3 8 L12 13 L21 8 Z" />
+                                  <path d="M3 8 L3 17 L12 22 L12 13 Z" />
+                                  <path d="M21 8 L21 17 L12 22 L12 13 Z" />
+                                </svg>
+                              </div>
                             )}
                           </td>
                           <td className="reception-articles">
-                            {hasImage ? (
+                            {isSubLine ? (
+                              <span className="reception-suboption">
+                                <span
+                                  className="reception-suboption__branch"
+                                  aria-hidden="true"
+                                >
+                                  └
+                                </span>
+                                <span className="reception-suboption__bubble">
+                                  {li.title}
+                                </span>
+                              </span>
+                            ) : (
                               <>
                                 <span className="reception-qty">
                                   {effectiveQuantity(li)}×
@@ -443,15 +477,6 @@ export default function Receptions() {
                                   </span>
                                 )}
                               </>
-                            ) : (
-                              <span className="reception-suboption">
-                                <span className="reception-suboption__branch" aria-hidden="true">
-                                  └
-                                </span>
-                                <span className="reception-suboption__bubble">
-                                  {li.title}
-                                </span>
-                              </span>
                             )}
                           </td>
                           {isFirst && (
