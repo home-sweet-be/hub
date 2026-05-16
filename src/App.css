@@ -445,6 +445,10 @@
   line-height: 1.4;
 }
 
+.reception-cart__product + .reception-cart__product {
+  margin-top: 4px;
+}
+
 .reception-cart__footer {
   display: flex;
   flex-direction: column;

@@ -264,7 +264,21 @@ export default function Receptions() {
                       </span>
                     </td>
                     <td className="reception-cart__products">
-                      {productsSummary(activeLineItems(o))}
+                      {activeLineItems(o).map((li, idx) => (
+                        <div className="reception-cart__product" key={idx}>
+                          <span className="reception-qty">
+                            {effectiveQuantity(li)}×
+                          </span>
+                          <span className="reception-article__title">
+                            {li.title}
+                          </span>
+                          {li.variantTitle && (
+                            <span className="reception-article__variant">
+                              {li.variantTitle}
+                            </span>
+                          )}
+                        </div>
+                      ))}
                     </td>
                     <td>
                       <button
