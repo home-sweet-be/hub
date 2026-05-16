@@ -910,7 +910,7 @@
 .zone-badge {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
+  gap: 5px;
   padding: 3px 9px;
   border-radius: 999px;
   font-size: 11px;
@@ -918,4 +918,13 @@
   background: rgba(255, 184, 184, 0.45);
   color: #8b3232;
   white-space: nowrap;
+}
+
+.zone-badge__flag {
+  width: 13px;
+  height: 9px;
+  border-radius: 1.5px;
+  box-shadow: 0 0 0 0.5px rgba(0, 0, 0, 0.1);
+  flex-shrink: 0;
+  display: block;
 }

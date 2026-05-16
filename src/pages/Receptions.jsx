@@ -38,18 +38,57 @@ function extractZone(tags = []) {
   return tags.find((t) => ZONE_TAG_PATTERN.test(t)) || null
 }
 
-const ZONE_FLAGS = {
-  BE: '🇧🇪',
-  FR: '🇫🇷',
-  LU: '🇱🇺',
-  NL: '🇳🇱',
-  DE: '🇩🇪',
+function ZoneFlag({ code }) {
+  const cls = 'zone-badge__flag'
+  switch (code) {
+    case 'BE':
+      return (
+        <svg className={cls} viewBox="0 0 3 2" aria-hidden="true">
+          <rect width="1" height="2" x="0" fill="#000" />
+          <rect width="1" height="2" x="1" fill="#fae042" />
+          <rect width="1" height="2" x="2" fill="#ed2939" />
+        </svg>
+      )
+    case 'FR':
+      return (
+        <svg className={cls} viewBox="0 0 3 2" aria-hidden="true">
+          <rect width="1" height="2" x="0" fill="#0055a4" />
+          <rect width="1" height="2" x="1" fill="#fff" />
+          <rect width="1" height="2" x="2" fill="#ef4135" />
+        </svg>
+      )
+    case 'LU':
+      return (
+        <svg className={cls} viewBox="0 0 3 2" aria-hidden="true">
+          <rect width="3" height="0.667" y="0" fill="#ed2939" />
+          <rect width="3" height="0.667" y="0.667" fill="#fff" />
+          <rect width="3" height="0.666" y="1.333" fill="#00a1de" />
+        </svg>
+      )
+    case 'NL':
+      return (
+        <svg className={cls} viewBox="0 0 3 2" aria-hidden="true">
+          <rect width="3" height="0.667" y="0" fill="#ae1c28" />
+          <rect width="3" height="0.667" y="0.667" fill="#fff" />
+          <rect width="3" height="0.666" y="1.333" fill="#21468b" />
+        </svg>
+      )
+    case 'DE':
+      return (
+        <svg className={cls} viewBox="0 0 3 2" aria-hidden="true">
+          <rect width="3" height="0.667" y="0" fill="#000" />
+          <rect width="3" height="0.667" y="0.667" fill="#dd0000" />
+          <rect width="3" height="0.666" y="1.333" fill="#ffce00" />
+        </svg>
+      )
+    default:
+      return null
+  }
 }
 
-function zoneFlag(zone) {
+function zoneCode(zone) {
   if (!zone) return null
-  const code = zone.slice(0, 2).toUpperCase()
-  return ZONE_FLAGS[code] || null
+  return zone.slice(0, 2).toUpperCase()
 }
 
 function formatDate(iso) {
@@ -651,11 +690,7 @@ export default function Receptions() {
                             <td rowSpan={span}>
                               {zone ? (
                                 <span className="zone-badge">
-                                  {zoneFlag(zone) && (
-                                    <span className="zone-badge__flag">
-                                      {zoneFlag(zone)}
-                                    </span>
-                                  )}
+                                  <ZoneFlag code={zoneCode(zone)} />
                                   {zone}
                                 </span>
                               ) : (
