@@ -928,3 +928,7 @@
   flex-shrink: 0;
   display: block;
 }
+
+.zone-badge--undefined {
+  opacity: 0.7;
+}

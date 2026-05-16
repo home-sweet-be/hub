@@ -694,7 +694,9 @@ export default function Receptions() {
                                   {zone}
                                 </span>
                               ) : (
-                                <span className="reception-table__muted">—</span>
+                                <span className="zone-badge zone-badge--undefined">
+                                  Non défini
+                                </span>
                               )}
                             </td>
                           )}
