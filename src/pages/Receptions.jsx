@@ -408,7 +408,17 @@ export default function Receptions() {
                             </div>
                           </td>
                           <td className="reception-articles">
-                            {articleLine(li)}
+                            <span className="reception-qty">
+                              {effectiveQuantity(li)}×
+                            </span>
+                            <span className="reception-article__title">
+                              {li.title}
+                            </span>
+                            {li.variantTitle && (
+                              <span className="reception-article__variant">
+                                {li.variantTitle}
+                              </span>
+                            )}
                           </td>
                           {isFirst && (
                             <td className="reception-num" rowSpan={span}>

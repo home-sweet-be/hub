@@ -702,6 +702,33 @@
   text-overflow: ellipsis;
 }
 
+.reception-qty {
+  display: inline-block;
+  min-width: 26px;
+  padding: 2px 8px;
+  margin-right: 8px;
+  border-radius: 999px;
+  background: rgba(28, 28, 30, 0.08);
+  color: var(--text);
+  font-size: 11px;
+  font-weight: 600;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+  vertical-align: middle;
+}
+
+.reception-article__title {
+  vertical-align: middle;
+}
+
+.reception-article__variant {
+  font-size: 9px;
+  color: var(--text-soft);
+  margin-left: 6px;
+  vertical-align: middle;
+  letter-spacing: 0.02em;
+}
+
 .zone-badge {
   display: inline-block;
   padding: 3px 9px;
