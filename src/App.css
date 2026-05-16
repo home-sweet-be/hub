@@ -732,11 +732,10 @@
 }
 
 .reception-thumb--placeholder {
-  background: transparent;
-  display: flex;
+  background: #f1f1f3;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  color: rgba(28, 28, 30, 0.35);
 }
 
 .reception-thumb--placeholder svg {
