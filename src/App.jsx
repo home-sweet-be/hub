@@ -2,8 +2,7 @@ import { BrowserRouter, Routes, Route, Navigate, NavLink, Outlet, useLocation } 
 import { useEffect, useState } from 'react'
 import logo from './assets/homesweet.png'
 import Commandes from './pages/Commandes'
-import Receptions from './pages/Receptions'
-import Fournisseurs from './pages/Fournisseurs'
+import Logistique from './pages/Logistique'
 import Livraisons from './pages/Livraisons'
 import Compta from './pages/Compta'
 import Factures from './pages/Factures'
@@ -12,8 +11,7 @@ import './App.css'
 
 const MODULES = [
   { to: '/commandes', label: 'Commandes', icon: '🧾' },
-  { to: '/receptions', label: 'Réceptions', icon: '📦' },
-  { to: '/fournisseurs', label: 'Fournisseurs', icon: '🚚' },
+  { to: '/logistique', label: 'Logistique', icon: '📦' },
   { to: '/livraisons', label: 'Livraisons', icon: '🛋️' },
   { to: '/compta', label: 'Compta', icon: '💶' },
   { to: '/factures', label: 'Factures', icon: '🧮' },
@@ -124,8 +122,9 @@ export default function App() {
         <Route element={<Shell />}>
           <Route index element={<Navigate to="/commandes" replace />} />
           <Route path="commandes" element={<Commandes />} />
-          <Route path="receptions" element={<Receptions />} />
-          <Route path="fournisseurs" element={<Fournisseurs />} />
+          <Route path="logistique" element={<Logistique />} />
+          <Route path="receptions" element={<Navigate to="/logistique" replace />} />
+          <Route path="fournisseurs" element={<Navigate to="/logistique" replace />} />
           <Route path="livraisons" element={<Livraisons />} />
           <Route path="compta" element={<Compta />} />
           <Route path="factures" element={<Factures />} />
