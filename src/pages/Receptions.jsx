@@ -356,63 +356,82 @@ export default function Receptions() {
                       </td>
                     </tr>
                   )}
-                  {filtered.map((o) => {
+                  {filtered.flatMap((o) => {
                     const zone = extractZone(o.tags)
                     const isSelected = selectedIds.has(o.id)
                     const items = activeLineItems(o)
-                    return (
-                      <tr key={o.id} className={isSelected ? 'is-selected' : ''}>
-                        <td>
-                          <button
-                            type="button"
-                            className="reception-action"
-                            onClick={() => addToCart(o.id)}
-                            disabled={isSelected}
-                            title={
-                              isSelected ? 'Déjà ajoutée' : 'Ajouter au panier'
-                            }
-                          >
-                            +
-                          </button>
-                        </td>
-                        <td>
-                          <div className="reception-thumbs">
-                            {items.slice(0, 4).map((li, idx) =>
-                              li.image?.url ? (
+                    if (items.length === 0) return []
+                    const span = items.length
+                    return items.map((li, idx) => {
+                      const isFirst = idx === 0
+                      const isLast = idx === span - 1
+                      const rowCls = [
+                        isSelected ? 'is-selected' : '',
+                        span > 1 && !isLast ? 'is-row-mid' : '',
+                        span > 1 && !isFirst ? 'is-row-cont' : '',
+                      ]
+                        .filter(Boolean)
+                        .join(' ')
+                      return (
+                        <tr key={`${o.id}-${idx}`} className={rowCls}>
+                          {isFirst && (
+                            <td rowSpan={span}>
+                              <button
+                                type="button"
+                                className="reception-action"
+                                onClick={() => addToCart(o.id)}
+                                disabled={isSelected}
+                                title={
+                                  isSelected
+                                    ? 'Déjà ajoutée'
+                                    : 'Ajouter au panier'
+                                }
+                              >
+                                +
+                              </button>
+                            </td>
+                          )}
+                          <td>
+                            <div className="reception-thumbs">
+                              {li.image?.url ? (
                                 <img
-                                  key={idx}
                                   src={li.image.url}
                                   alt={li.image.altText || li.title}
                                   className="reception-thumb"
                                 />
                               ) : (
                                 <div
-                                  key={idx}
                                   className="reception-thumb reception-thumb--placeholder"
                                   aria-hidden="true"
                                 />
-                              )
-                            )}
-                          </div>
-                        </td>
-                        <td className="reception-num">
-                          {o.name.replace(/^#/, '')}
-                        </td>
-                        <td>
-                          {zone ? (
-                            <span className="zone-badge">{zone}</span>
-                          ) : (
-                            <span className="reception-table__muted">—</span>
+                              )}
+                            </div>
+                          </td>
+                          {isFirst && (
+                            <td className="reception-num" rowSpan={span}>
+                              {o.name.replace(/^#/, '')}
+                            </td>
                           )}
-                        </td>
-                        <td className="reception-date">
-                          {formatDate(o.createdAt)}
-                        </td>
-                        <td className="reception-articles">
-                          {items.map((li) => articleLine(li)).join(' · ')}
-                        </td>
-                      </tr>
-                    )
+                          {isFirst && (
+                            <td rowSpan={span}>
+                              {zone ? (
+                                <span className="zone-badge">{zone}</span>
+                              ) : (
+                                <span className="reception-table__muted">—</span>
+                              )}
+                            </td>
+                          )}
+                          {isFirst && (
+                            <td className="reception-date" rowSpan={span}>
+                              {formatDate(o.createdAt)}
+                            </td>
+                          )}
+                          <td className="reception-articles">
+                            {articleLine(li)}
+                          </td>
+                        </tr>
+                      )
+                    })
                   })}
                 </tbody>
               </table>
