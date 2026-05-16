@@ -2592,6 +2592,57 @@
   font-weight: 600;
 }
 
+/* Prêtes pour la livraison: bulk select + waitlist toolbar */
+.pretes-bulk-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 14px;
+  margin: 10px auto 6px;
+  max-width: 760px;
+  background: rgba(255, 159, 10, 0.08);
+  border: 1px solid rgba(255, 159, 10, 0.28);
+  border-radius: 12px;
+  animation: pretes-toolbar-in 0.18s cubic-bezier(0.2, 0.9, 0.3, 1.1);
+}
+
+@keyframes pretes-toolbar-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.pretes-bulk-toolbar__count {
+  font-size: 13px;
+  font-weight: 500;
+  color: #8a5a00;
+}
+
+.pretes-check-cell {
+  width: 38px;
+  text-align: center;
+  padding: 0 4px;
+}
+
+.pretes-check-cell input[type='checkbox'] {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+  accent-color: #ff9f0a;
+  margin: 0;
+}
+
+.pretes-check-cell input[type='checkbox']:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
 /* Réservations sub-page: two stacked sections with action column */
 .reservations__section {
   margin-top: 28px;

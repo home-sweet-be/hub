@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { ZoneFlag, zoneCode } from '../components/ZoneFlag'
 import ZoneModal from '../components/ZoneModal'
 import AddressModal from '../components/AddressModal'
@@ -80,10 +80,14 @@ export default function PretesLivraison() {
   const [error, setError] = useState(null)
   const [zoneEditing, setZoneEditing] = useState(null)
   const [addressViewing, setAddressViewing] = useState(null)
+  const [selectedIds, setSelectedIds] = useState(() => new Set())
+  const [pending, setPending] = useState(false)
+  const headerCheckRef = useRef(null)
 
   const load = useCallback(() => {
     setOrders(null)
     setError(null)
+    setSelectedIds(new Set())
     const cutoff = new Date(Date.now() - 150 * 86400000)
       .toISOString()
       .slice(0, 10)
@@ -115,6 +119,55 @@ export default function PretesLivraison() {
     return [...orders].sort((a, b) => numericId(a) - numericId(b))
   }, [orders])
 
+  const allSelected =
+    sorted.length > 0 && sorted.every((o) => selectedIds.has(o.id))
+  const someSelected = selectedIds.size > 0 && !allSelected
+
+  useEffect(() => {
+    if (headerCheckRef.current) {
+      headerCheckRef.current.indeterminate = someSelected
+    }
+  }, [someSelected])
+
+  const toggleOne = (id) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev)
+      if (next.has(id)) next.delete(id)
+      else next.add(id)
+      return next
+    })
+  }
+
+  const toggleAll = () => {
+    if (allSelected) {
+      setSelectedIds(new Set())
+    } else {
+      setSelectedIds(new Set(sorted.map((o) => o.id)))
+    }
+  }
+
+  const sendToWaitlist = async () => {
+    if (pending || selectedIds.size === 0) return
+    setPending(true)
+    setError(null)
+    try {
+      const r = await fetch('/api/shopify/orders/tags', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          orderIds: [...selectedIds],
+          add: ['WaitingList'],
+        }),
+      })
+      if (!r.ok) throw new Error(`HTTP ${r.status}`)
+      await load()
+    } catch (e) {
+      setError(e.message || String(e))
+    } finally {
+      setPending(false)
+    }
+  }
+
   return (
     <div className="page reception reception--list-only">
       <div className="reception__body">
@@ -122,6 +175,25 @@ export default function PretesLivraison() {
           <div className="reception__pane-label reception__pane-label--right">
             Commandes prêtes pour la livraison
           </div>
+
+          {selectedIds.size > 0 && (
+            <div className="pretes-bulk-toolbar">
+              <span className="pretes-bulk-toolbar__count">
+                {selectedIds.size} commande{selectedIds.size > 1 ? 's' : ''} sélectionnée
+                {selectedIds.size > 1 ? 's' : ''}
+              </span>
+              <button
+                type="button"
+                className="btn btn--orange"
+                onClick={sendToWaitlist}
+                disabled={pending}
+              >
+                {pending
+                  ? 'Envoi…'
+                  : `Envoyer en file d'attente`}
+              </button>
+            </div>
+          )}
 
           {error && <p style={{ color: '#c00' }}>Erreur : {error}</p>}
           {orders === null && !error && (
@@ -133,6 +205,16 @@ export default function PretesLivraison() {
               <table className="reception-table">
                 <thead>
                   <tr>
+                    <th className="pretes-check-cell">
+                      <input
+                        ref={headerCheckRef}
+                        type="checkbox"
+                        checked={allSelected}
+                        onChange={toggleAll}
+                        disabled={sorted.length === 0 || pending}
+                        aria-label="Tout sélectionner"
+                      />
+                    </th>
                     <th aria-label="image" />
                     <th>Produit</th>
                     <th>N°</th>
@@ -146,7 +228,7 @@ export default function PretesLivraison() {
                 <tbody>
                   {sorted.length === 0 && (
                     <tr>
-                      <td colSpan={8} className="reception-table__empty">
+                      <td colSpan={9} className="reception-table__empty">
                         Aucune commande.
                       </td>
                     </tr>
@@ -199,6 +281,20 @@ export default function PretesLivraison() {
 
                       return (
                         <tr key={`${o.id}-${idx}`} className={rowCls}>
+                          {isFirst && (
+                            <td
+                              className="pretes-check-cell"
+                              rowSpan={span}
+                            >
+                              <input
+                                type="checkbox"
+                                checked={selectedIds.has(o.id)}
+                                onChange={() => toggleOne(o.id)}
+                                disabled={pending}
+                                aria-label={`Sélectionner ${o.name}`}
+                              />
+                            </td>
+                          )}
                           <td className="reception-img-cell">
                             {hasImage ? (
                               <img
