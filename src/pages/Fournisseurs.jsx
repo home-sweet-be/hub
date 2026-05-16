@@ -345,7 +345,7 @@ export default function Fournisseurs() {
   }
 
   return (
-    <div className="page reception">
+    <div className="page reception page--fournisseurs">
       <div className="reception__tabs">
         {TABS.map((t) => (
           <button

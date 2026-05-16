@@ -2131,3 +2131,47 @@
   }
 }
 
+/* =========================================================
+   Fournisseurs — green → orange palette
+   ========================================================= */
+
+.page--fournisseurs .reception__pane-label--left {
+  background: rgba(255, 159, 10, 0.2);
+  border-color: rgba(255, 159, 10, 0.32);
+}
+
+.page--fournisseurs .reception-cart {
+  border-color: rgba(255, 159, 10, 0.22);
+  background: rgba(255, 159, 10, 0.08);
+}
+
+.page--fournisseurs .reception-cart__table thead th {
+  background: rgba(255, 159, 10, 0.15);
+  border-bottom-color: rgba(255, 159, 10, 0.22);
+}
+
+.page--fournisseurs .reception-cart__table tbody td {
+  border-bottom-color: rgba(255, 159, 10, 0.16);
+}
+
+.page--fournisseurs .reception-cart__footer {
+  border-top-color: rgba(255, 159, 10, 0.22);
+}
+
+.page--fournisseurs .reception-cart__empty svg {
+  color: rgba(255, 159, 10, 0.4);
+}
+
+.page--fournisseurs .reception-action {
+  background: linear-gradient(180deg, #ff9f0a 0%, #e88a00 100%);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.4) inset,
+    0 4px 10px -4px rgba(255, 159, 10, 0.5);
+}
+
+.page--fournisseurs .reception-action:hover:not(:disabled) {
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.5) inset,
+    0 6px 14px -4px rgba(255, 159, 10, 0.6);
+}
+
