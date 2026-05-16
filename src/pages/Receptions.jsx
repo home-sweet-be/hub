@@ -543,12 +543,13 @@ export default function Receptions() {
                     <th>Client</th>
                     <th>Attente</th>
                     <th>Date</th>
+                    <th aria-label="ouvrir dans Shopify" />
                   </tr>
                 </thead>
                 <tbody>
                   {filtered.length === 0 && (
                     <tr>
-                      <td colSpan={9} className="reception-table__empty">
+                      <td colSpan={10} className="reception-table__empty">
                         Aucune commande dans cet onglet.
                       </td>
                     </tr>
@@ -766,6 +767,33 @@ export default function Receptions() {
                           {isFirst && (
                             <td className="reception-date" rowSpan={span}>
                               {formatDate(o.createdAt)}
+                            </td>
+                          )}
+                          {isFirst && (
+                            <td className="reception-open" rowSpan={span}>
+                              {o.adminUrl && (
+                                <a
+                                  href={o.adminUrl}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="reception-open__btn"
+                                  title="Ouvrir dans Shopify Admin"
+                                >
+                                  <svg
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    strokeWidth="1.6"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    aria-hidden="true"
+                                  >
+                                    <path d="M14 4h6v6" />
+                                    <path d="M20 4 10 14" />
+                                    <path d="M19 13v5a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h5" />
+                                  </svg>
+                                </a>
+                              )}
                             </td>
                           )}
                         </tr>

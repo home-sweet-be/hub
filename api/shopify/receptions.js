@@ -102,6 +102,7 @@ export default async function handler(req, res) {
     const orders = (data.data?.orders?.edges || [])
       .map((edge) => {
         const o = edge.node
+        const numericId = (o.id || '').split('/').pop()
         return {
           id: o.id,
           name: o.name,
@@ -112,6 +113,9 @@ export default async function handler(req, res) {
           financialStatus: o.displayFinancialStatus,
           shippingAddress: o.shippingAddress,
           customer: o.customer,
+          adminUrl: numericId
+            ? `https://${domain}/admin/orders/${numericId}`
+            : null,
           lineItems: (o.lineItems?.edges || []).map((le) => le.node),
         }
       })
