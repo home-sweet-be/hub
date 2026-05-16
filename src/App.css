@@ -732,6 +732,15 @@
 
 .reception-thumb--placeholder {
   background: rgba(0, 0, 0, 0.04);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(28, 28, 30, 0.35);
+}
+
+.reception-thumb--placeholder svg {
+  width: 55%;
+  height: 55%;
 }
 
 .reception-num {
