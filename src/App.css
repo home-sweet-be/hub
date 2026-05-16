@@ -1712,6 +1712,55 @@
   padding: 8px 4px !important;
 }
 
+.stock-modal__delta-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 42px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  font-size: 12px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.stock-modal__delta-pill.is-positive {
+  background: rgba(52, 199, 89, 0.18);
+  color: #1f7c39;
+}
+
+.stock-modal__delta-pill.is-positive:hover:not(:disabled) {
+  background: rgba(52, 199, 89, 0.3);
+  border-color: rgba(52, 199, 89, 0.5);
+}
+
+.stock-modal__delta-pill.is-negative {
+  background: rgba(255, 59, 48, 0.14);
+  color: #c43b30;
+}
+
+.stock-modal__delta-pill.is-negative:hover:not(:disabled) {
+  background: rgba(255, 59, 48, 0.22);
+  border-color: rgba(255, 59, 48, 0.4);
+}
+
+.stock-modal__delta-pill.is-zero {
+  background: rgba(28, 28, 30, 0.06);
+  color: var(--text-muted);
+}
+
+.stock-modal__delta-pill.is-zero:hover:not(:disabled) {
+  background: rgba(28, 28, 30, 0.1);
+}
+
+.stock-modal__delta-pill:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 .stock-modal__delta-group {
   display: inline-flex;
   align-items: center;

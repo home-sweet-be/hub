@@ -13,7 +13,7 @@ export default function StockAdjustModal({
 
   useEffect(() => {
     if (open && Array.isArray(items)) {
-      setEditedItems(items.map((it) => ({ ...it })))
+      setEditedItems(items.map((it) => ({ ...it, editing: false })))
     }
   }, [open, items])
 
@@ -55,6 +55,12 @@ export default function StockAdjustModal({
       prev.map((it, i) =>
         i === idx ? { ...it, delta: (it.delta || 0) + by } : it
       )
+    )
+  }
+
+  const startEdit = (idx) => {
+    setEditedItems((prev) =>
+      prev.map((it, i) => (i === idx ? { ...it, editing: true } : it))
     )
   }
 
@@ -160,33 +166,53 @@ export default function StockAdjustModal({
                         {typeof before === 'number' ? before : '—'}
                       </td>
                       <td className="stock-modal__arrow">
-                        <div className="stock-modal__delta-group">
+                        {it.editing ? (
+                          <div className="stock-modal__delta-group">
+                            <button
+                              type="button"
+                              className="stock-modal__delta-btn"
+                              onClick={() => bumpDelta(idx, -1)}
+                              disabled={pending}
+                              aria-label="Diminuer"
+                            >
+                              −
+                            </button>
+                            <input
+                              type="number"
+                              className={deltaClass}
+                              value={delta}
+                              onChange={(e) => setDelta(idx, e.target.value)}
+                              disabled={pending}
+                              autoFocus
+                            />
+                            <button
+                              type="button"
+                              className="stock-modal__delta-btn"
+                              onClick={() => bumpDelta(idx, 1)}
+                              disabled={pending}
+                              aria-label="Augmenter"
+                            >
+                              +
+                            </button>
+                          </div>
+                        ) : (
                           <button
                             type="button"
-                            className="stock-modal__delta-btn"
-                            onClick={() => bumpDelta(idx, -1)}
+                            className={
+                              'stock-modal__delta-pill' +
+                              (delta > 0
+                                ? ' is-positive'
+                                : delta < 0
+                                ? ' is-negative'
+                                : ' is-zero')
+                            }
+                            onClick={() => startEdit(idx)}
                             disabled={pending}
-                            aria-label="Diminuer"
+                            title="Cliquer pour ajuster"
                           >
-                            −
+                            {delta > 0 ? `+${delta}` : delta}
                           </button>
-                          <input
-                            type="number"
-                            className={deltaClass}
-                            value={delta}
-                            onChange={(e) => setDelta(idx, e.target.value)}
-                            disabled={pending}
-                          />
-                          <button
-                            type="button"
-                            className="stock-modal__delta-btn"
-                            onClick={() => bumpDelta(idx, 1)}
-                            disabled={pending}
-                            aria-label="Augmenter"
-                          >
-                            +
-                          </button>
-                        </div>
+                        )}
                       </td>
                       <td className="stock-modal__num stock-modal__after">
                         {after !== null ? after : '—'}
