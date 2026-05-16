@@ -615,7 +615,7 @@
 /* Image column — image fills the cell with small padding */
 .reception-table thead th:nth-child(2),
 .reception-table .reception-img-cell {
-  width: 80px;
+  width: 40px;
   padding: 3px;
   position: relative;
 }
