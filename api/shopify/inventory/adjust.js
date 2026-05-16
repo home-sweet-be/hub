@@ -111,7 +111,7 @@ export default async function handler(req, res) {
   }
 
   const { json } = await shopifyGraphql(domain, token, ADJUST_MUTATION, {
-    input: { reason, name: 'available', changes },
+    input: { reason, name: 'on_hand', changes },
   })
 
   const userErrors = json.data?.inventoryAdjustQuantities?.userErrors || []
