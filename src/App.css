@@ -615,7 +615,7 @@
 /* Image column — fixed-size thumb, never overflows */
 .reception-table thead th:nth-child(2),
 .reception-table .reception-img-cell {
-  width: 40px;
+  width: 60px;
   padding: 3px;
   box-sizing: border-box;
   text-align: center;
@@ -623,8 +623,8 @@
 
 .reception-table .reception-img-cell .reception-thumb {
   display: block;
-  width: 34px;
-  height: 34px;
+  width: 54px;
+  height: 54px;
   border-radius: 5px;
   border: none;
   object-fit: cover;
