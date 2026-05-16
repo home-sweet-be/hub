@@ -568,9 +568,15 @@ export default function Receptions() {
                           </td>
                           <td className="reception-articles">
                             {isWrongVendor ? (
-                              <span className="reception-wrong-vendor">
-                                ⚠️ Produit d'un autre fournisseur
-                              </span>
+                              <>
+                                <span className="reception-qty">
+                                  {effectiveQuantity(li)}×
+                                </span>
+                                <span className="reception-wrong-vendor">
+                                  ⚠️ Produit d'un autre fournisseur
+                                  {li.vendor ? ` (${li.vendor})` : ''}
+                                </span>
+                              </>
                             ) : isSubLine ? (
                               <span className="reception-suboption">
                                 <SubBranch />
