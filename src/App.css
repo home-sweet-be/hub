@@ -2592,9 +2592,9 @@
   font-weight: 600;
 }
 
-/* Wider modal to fit calendar + slider side by side */
+/* Wider landscape modal: Date | Zones | Horaires */
 .slot-modal__card {
-  max-width: 760px;
+  max-width: 1020px;
 }
 
 .slot-modal__body {
@@ -2603,16 +2603,40 @@
 
 .slot-modal__grid {
   display: grid;
-  grid-template-columns: 280px 1fr;
+  grid-template-columns: 280px minmax(0, 300px) minmax(0, 1fr);
   gap: 28px;
   margin-bottom: 18px;
+  align-items: start;
 }
 
-.slot-modal__right {
+.slot-modal__col--date {
+  min-width: 0;
+}
+
+.slot-modal__col--zones {
+  min-width: 0;
+}
+
+.slot-modal__col--right {
   display: flex;
   flex-direction: column;
   gap: 22px;
   min-width: 0;
+}
+
+.slot-modal__zones-scroll {
+  max-height: 340px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.slot-modal__zones-scroll::-webkit-scrollbar {
+  width: 6px;
+}
+
+.slot-modal__zones-scroll::-webkit-scrollbar-thumb {
+  background: rgba(28, 28, 30, 0.15);
+  border-radius: 3px;
 }
 
 /* --- Custom calendar --- */
@@ -2913,6 +2937,12 @@
   .slot-modal__grid {
     grid-template-columns: 1fr;
     gap: 22px;
+  }
+  .slot-modal__col--zones {
+    max-width: none;
+  }
+  .slot-modal__zones-scroll {
+    max-height: none;
   }
 }
 

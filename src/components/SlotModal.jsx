@@ -423,7 +423,7 @@ export default function SlotModal({ open, editing, onClose, onSaved }) {
 
         <div className="zone-modal__body slot-modal__body">
           <div className="slot-modal__grid">
-            <section className="slot-modal__section">
+            <section className="slot-modal__section slot-modal__col--date">
               <div className="slot-modal__section-title">Date</div>
               <CalendarPicker
                 value={day}
@@ -432,7 +432,36 @@ export default function SlotModal({ open, editing, onClose, onSaved }) {
               />
             </section>
 
-            <div className="slot-modal__right">
+            <section className="slot-modal__section slot-modal__col--zones">
+              <div className="slot-modal__section-title">Zones desservies</div>
+              <div className="slot-modal__zones-scroll">
+                {Object.entries(ZONES_BY_COUNTRY).map(([country, list]) => (
+                  <div key={country} className="slot-modal__zone-group">
+                    <div className="slot-modal__country">{country}</div>
+                    <div className="slot-modal__zones">
+                      {list.map((z) => (
+                        <button
+                          key={z}
+                          type="button"
+                          className={
+                            'slot-modal__zone' +
+                            (zones.has(z) ? ' is-active' : '')
+                          }
+                          onClick={() => toggleZone(z)}
+                          disabled={pending}
+                        >
+                          {z === 'LU'
+                            ? 'Pays entier'
+                            : z.replace(/^[A-Z]{2}-/, '').replace(/-/g, ' ')}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </section>
+
+            <div className="slot-modal__col--right">
               <section className="slot-modal__section">
                 <div className="slot-modal__section-title">Horaires</div>
                 <TimeRangeSlider
@@ -453,32 +482,6 @@ export default function SlotModal({ open, editing, onClose, onSaved }) {
               </section>
             </div>
           </div>
-
-          <section className="slot-modal__section">
-            <div className="slot-modal__section-title">Zones desservies</div>
-            {Object.entries(ZONES_BY_COUNTRY).map(([country, list]) => (
-              <div key={country} className="slot-modal__zone-group">
-                <div className="slot-modal__country">{country}</div>
-                <div className="slot-modal__zones">
-                  {list.map((z) => (
-                    <button
-                      key={z}
-                      type="button"
-                      className={
-                        'slot-modal__zone' + (zones.has(z) ? ' is-active' : '')
-                      }
-                      onClick={() => toggleZone(z)}
-                      disabled={pending}
-                    >
-                      {z === 'LU'
-                        ? 'Pays entier'
-                        : z.replace(/^[A-Z]{2}-/, '').replace(/-/g, ' ')}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            ))}
-          </section>
         </div>
 
         {error && <div className="zone-modal__error">{error}</div>}
