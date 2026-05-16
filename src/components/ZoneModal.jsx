@@ -55,6 +55,7 @@ export default function ZoneModal({
   customerId,
   customerName,
   address,
+  orderId,
   orderName,
   onChanged,
 }) {
@@ -90,25 +91,33 @@ export default function ZoneModal({
       onClose?.()
       return
     }
-    if (!customerId) {
-      setError('Aucun client associé à cette commande, impossible de modifier la zone.')
+    if (!customerId && !orderId) {
+      setError('Aucun client ni commande à modifier.')
       return
     }
     setPending(true)
     setError(null)
     try {
+      const removeTags = currentZone ? [currentZone] : []
+      const addTags = [zone]
       const r = await fetch('/api/shopify/orders/tags', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          customerIds: [customerId],
-          customerRemove: currentZone ? [currentZone] : [],
-          customerAdd: [zone],
+          orderIds: orderId ? [orderId] : [],
+          add: orderId ? addTags : [],
+          remove: orderId ? removeTags : [],
+          customerIds: customerId ? [customerId] : [],
+          customerAdd: customerId ? addTags : [],
+          customerRemove: customerId ? removeTags : [],
         }),
       })
       const data = await r.json()
       if (!r.ok || data.hasErrors) {
-        const msg = (data.customerResults || [])
+        const msg = [
+          ...(data.orderResults || []),
+          ...(data.customerResults || []),
+        ]
           .flatMap((x) => [...(x.addErrors || []), ...(x.removeErrors || [])])
           .map((e) => e.message)
           .join(' · ')
