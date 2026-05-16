@@ -7,6 +7,7 @@ const TABS = [
     id: 'stock',
     label: 'EN STOCK',
     dot: '#34c759',
+    vendor: null,
     supplierTitle: null,
     allowStockAdjust: false,
     filter: (o) => o.tags.includes('ProduitEnStock'),
@@ -14,6 +15,7 @@ const TABS = [
   {
     id: 'intercommerce',
     label: 'INTERCOMMERCE',
+    vendor: 'INTERCOMMERCE',
     supplierTitle: 'intercommerce',
     allowStockAdjust: true,
     filter: (o) =>
@@ -23,6 +25,7 @@ const TABS = [
   {
     id: 'eltap',
     label: 'ELTAP',
+    vendor: 'ELTAP',
     supplierTitle: 'ELTAP',
     allowStockAdjust: true,
     filter: (o) =>
@@ -454,7 +457,10 @@ export default function Receptions() {
                     // separate sub-line / cheap unimaged line item).
                     const rows = []
                     items.forEach((li) => {
-                      rows.push({ kind: 'line', li })
+                      const wrong =
+                        activeDef.vendor && li.vendor !== activeDef.vendor
+                      rows.push({ kind: 'line', li, wrong })
+                      if (wrong) return
                       for (const attr of li.customAttributes || []) {
                         if (!attr.key || attr.key.startsWith('_')) continue
                         if (!attr.value) continue
@@ -481,16 +487,21 @@ export default function Receptions() {
                         ? Number(li.discountedTotalSet?.shopMoney?.amount || 0)
                         : 0
                       const isSubLine = isSubRow(row)
+                      const isWrongVendor = row.kind === 'line' && !!row.wrong
                       const nudgeImage =
                         row.kind === 'line' &&
                         hasImage &&
+                        !isWrongVendor &&
                         isSubRow(rows[idx + 1])
                       const rowCls = [
                         isSelected ? 'is-selected' : '',
                         span > 1 && !isLast ? 'is-row-mid' : '',
                         span > 1 && !isFirst ? 'is-row-cont' : '',
-                        isSubLine ? 'is-row-sub' : '',
-                        isSubLine && isLast ? 'is-row-sub--last' : '',
+                        isSubLine && !isWrongVendor ? 'is-row-sub' : '',
+                        isSubLine && isLast && !isWrongVendor
+                          ? 'is-row-sub--last'
+                          : '',
+                        isWrongVendor ? 'is-row-wrong-vendor' : '',
                       ]
                         .filter(Boolean)
                         .join(' ')
@@ -556,7 +567,11 @@ export default function Receptions() {
                             ) : null}
                           </td>
                           <td className="reception-articles">
-                            {isSubLine ? (
+                            {isWrongVendor ? (
+                              <span className="reception-wrong-vendor">
+                                ⚠️ Produit d'un autre fournisseur
+                              </span>
+                            ) : isSubLine ? (
                               <span className="reception-suboption">
                                 <SubBranch />
                                 <span className="reception-suboption__bubble">

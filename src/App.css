@@ -876,6 +876,18 @@
   flex-shrink: 0;
 }
 
+/* Wrong-vendor row tint */
+.reception-table tbody tr.is-row-wrong-vendor td:not([rowspan]) {
+  background: rgba(255, 159, 10, 0.12);
+}
+
+.reception-wrong-vendor {
+  font-size: 12px;
+  font-weight: 500;
+  color: #b65a00;
+  font-style: italic;
+}
+
 .reception-suboption__bubble {
   display: inline-block;
   padding: 2px 8px;
