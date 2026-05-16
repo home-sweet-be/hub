@@ -844,20 +844,49 @@
 }
 
 .reception-num__link {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
   padding: 2px 8px;
   margin: -2px -8px;
   border-radius: 6px;
   color: inherit;
   text-decoration: none;
   transition:
-    background 0.15s ease,
-    color 0.15s ease;
+    background 0.18s ease,
+    color 0.18s ease;
 }
 
 .reception-num__link:hover {
-  background: rgba(10, 132, 255, 0.12);
-  color: #0a5fb8;
+  background: rgba(149, 191, 71, 0.18);
+  color: #5e8e3e;
+}
+
+.reception-num__icon-wrap {
+  display: inline-flex;
+  align-items: center;
+  max-width: 0;
+  overflow: hidden;
+  transition: max-width 0.25s ease;
+}
+
+.reception-num__icon {
+  width: 15px;
+  height: 15px;
+  margin-right: 5px;
+  opacity: 0;
+  transform: translateX(-6px);
+  transition:
+    opacity 0.25s ease,
+    transform 0.25s ease;
+}
+
+.reception-num__link:hover .reception-num__icon-wrap {
+  max-width: 22px;
+}
+
+.reception-num__link:hover .reception-num__icon {
+  opacity: 1;
+  transform: translateX(0);
 }
 
 .reception-meta__chip--wait {
