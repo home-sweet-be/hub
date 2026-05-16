@@ -633,6 +633,29 @@
   box-shadow:
     -6px 0 12px -8px rgba(28, 28, 30, 0.12),
     6px 0 12px -8px rgba(28, 28, 30, 0.12);
+  scrollbar-width: thin;
+  scrollbar-color: rgba(28, 28, 30, 0.2) transparent;
+}
+
+.reception-table-wrap::-webkit-scrollbar {
+  height: 8px;
+}
+
+.reception-table-wrap::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.reception-table-wrap::-webkit-scrollbar-thumb {
+  background: rgba(28, 28, 30, 0.18);
+  border-radius: 999px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+.reception-table-wrap::-webkit-scrollbar-thumb:hover {
+  background: rgba(28, 28, 30, 0.32);
+  background-clip: padding-box;
+  border: 2px solid transparent;
 }
 
 .reception-table {
