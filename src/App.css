@@ -790,9 +790,15 @@
 }
 
 /* "Sub-tree" line for line items without image */
-.reception-table tr.is-row-sub .reception-articles {
+.reception-table tr.is-row-sub td {
+  height: 10px;
+  padding-top: 0;
+  padding-bottom: 0;
   vertical-align: top;
-  padding-top: 6px;
+}
+
+.reception-table tr.is-row-sub .reception-articles {
+  padding-left: 30px;
 }
 
 .reception-suboption {
@@ -805,7 +811,6 @@
   color: rgba(28, 28, 30, 0.35);
   font-size: 14px;
   line-height: 1;
-  margin-left: 6px;
 }
 
 .reception-suboption__bubble {
