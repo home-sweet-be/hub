@@ -662,11 +662,8 @@
   height: 46px;
   vertical-align: middle;
   white-space: nowrap;
-  background: rgba(255, 255, 255, 0.55);
-}
-
-.reception-table tbody tr.is-order-alt td {
-  background: rgba(245, 245, 247, 0.85);
+  background: rgba(255, 255, 255, 0.7);
+  box-shadow: 0 2px 4px -2px rgba(28, 28, 30, 0.08);
 }
 
 /* Sticky first column ("+" button) */
@@ -712,9 +709,6 @@
   background: rgba(255, 255, 255, 0.92);
 }
 
-.reception-table tbody tr.is-order-alt:not(.is-row-cont) td:first-child {
-  background: rgba(245, 245, 247, 0.95);
-}
 
 .reception-table tbody tr.is-selected:not(.is-row-cont) td:first-child {
   background: rgba(217, 245, 226, 0.96);

@@ -553,7 +553,7 @@ export default function Receptions() {
                       </td>
                     </tr>
                   )}
-                  {filtered.flatMap((o, orderIdx) => {
+                  {filtered.flatMap((o) => {
                     const zone = extractZone(o.tags)
                     const isSelected = selectedIds.has(o.id)
                     const items = activeLineItems(o)
@@ -611,7 +611,6 @@ export default function Receptions() {
                           ? 'is-row-sub--last'
                           : '',
                         isWrongVendor ? 'is-row-wrong-vendor' : '',
-                        orderIdx % 2 === 1 ? 'is-order-alt' : '',
                       ]
                         .filter(Boolean)
                         .join(' ')
