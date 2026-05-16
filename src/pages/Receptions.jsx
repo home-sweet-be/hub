@@ -389,7 +389,7 @@ export default function Receptions() {
                   <th>N°</th>
                   <th>Produit</th>
                   <th aria-label="action">
-                    {selectedOrders.length > 2 && (
+                    {selectedOrders.length >= 1 && (
                       <button
                         type="button"
                         className="reception-cart__clear"
