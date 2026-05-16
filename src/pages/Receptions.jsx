@@ -416,18 +416,25 @@ export default function Receptions() {
                                 className="reception-cart__product"
                                 key={`l-${idx}`}
                               >
-                                <span className="reception-qty">
-                                  {effectiveQuantity(li)}×
-                                </span>
-                                <span className="reception-article__title">
-                                  {li.title}
-                                </span>
-                                {li.variantTitle &&
-                                  !/texture/i.test(li.variantTitle) && (
-                                    <span className="reception-article__variant">
-                                      {li.variantTitle}
-                                    </span>
-                                  )}
+                                <div className="reception-cart__product-main">
+                                  <span className="reception-qty">
+                                    {effectiveQuantity(li)}×
+                                  </span>
+                                  <span className="reception-article__title">
+                                    {li.title}
+                                  </span>
+                                  {li.variantTitle &&
+                                    !/texture/i.test(li.variantTitle) && (
+                                      <span className="reception-article__variant">
+                                        {li.variantTitle}
+                                      </span>
+                                    )}
+                                </div>
+                                {(li.sku || li.variant?.sku) && (
+                                  <div className="reception-cart__sku">
+                                    SKU · {li.sku || li.variant?.sku}
+                                  </div>
+                                )}
                               </div>
                             )
                           }
