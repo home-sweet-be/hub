@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
-import { ZoneFlag, zoneCode } from './ZoneFlag'
+import { createPortal } from 'react-dom'
+import { ZoneFlag } from './ZoneFlag'
 
 export const ZONES_BY_COUNTRY = {
   Belgique: [
@@ -53,6 +54,15 @@ export default function ZoneModal({
     if (open) setError(null)
   }, [open])
 
+  useEffect(() => {
+    if (!open) return
+    const prev = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    return () => {
+      document.body.style.overflow = prev
+    }
+  }, [open])
+
   if (!open) return null
 
   const handleSelect = async (zone) => {
@@ -93,7 +103,7 @@ export default function ZoneModal({
     }
   }
 
-  return (
+  return createPortal(
     <div
       className="zone-modal__backdrop"
       onClick={onClose}
@@ -148,7 +158,6 @@ export default function ZoneModal({
                       onClick={() => handleSelect(z)}
                       disabled={pending}
                     >
-                      <ZoneFlag code={zoneCode(z)} />
                       {zoneLabel(z)}
                       {active && (
                         <span className="zone-modal__current">actuelle</span>
@@ -164,6 +173,7 @@ export default function ZoneModal({
         {error && <div className="zone-modal__error">{error}</div>}
         {pending && <div className="zone-modal__pending">Mise à jour…</div>}
       </div>
-    </div>
+    </div>,
+    document.body
   )
 }
