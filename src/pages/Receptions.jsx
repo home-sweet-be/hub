@@ -509,7 +509,7 @@ export default function Receptions() {
                 </div>
               )}
 
-              {activeDef.allowStockAdjust && (
+              {activeDef.allowStockAdjust ? (
                 <button
                   type="button"
                   className="btn btn--blue"
@@ -520,18 +520,18 @@ export default function Receptions() {
                     ? 'Réception en cours…'
                     : 'Réceptionner les produits'}
                 </button>
+              ) : (
+                <button
+                  type="button"
+                  className="btn btn--green"
+                  disabled={selectedOrders.length === 0 || pending !== null}
+                  onClick={handleMarkReady}
+                >
+                  {pending === 'markReady'
+                    ? 'Mise à jour…'
+                    : 'Marquer comme prêtes pour la livraison'}
+                </button>
               )}
-
-              <button
-                type="button"
-                className="btn btn--green"
-                disabled={selectedOrders.length === 0 || pending !== null}
-                onClick={handleMarkReady}
-              >
-                {pending === 'markReady'
-                  ? 'Mise à jour…'
-                  : 'Marquer comme prêtes pour la livraison'}
-              </button>
             </div>
           </div>
         </aside>

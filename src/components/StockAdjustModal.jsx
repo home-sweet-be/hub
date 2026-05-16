@@ -238,11 +238,13 @@ export default function StockAdjustModal({
           </button>
           <button
             type="button"
-            className="btn btn--blue"
+            className="btn btn--green"
             onClick={handleConfirm}
             disabled={pending}
           >
-            {pending ? 'Réception en cours…' : 'Réceptionner les produits'}
+            {pending
+              ? 'Réception en cours…'
+              : 'Marquer comme prêtes pour la livraison'}
           </button>
         </footer>
       </div>
