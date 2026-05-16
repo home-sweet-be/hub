@@ -816,7 +816,7 @@
 .reception-table tr.is-row-sub--last .reception-suboption {
   position: absolute;
   top: auto;
-  bottom: 1px;
+  bottom: -2px;
   left: 30px;
   font-size: 12.5px;
   line-height: 1;
