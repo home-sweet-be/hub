@@ -846,8 +846,8 @@
 .reception-num__link {
   position: relative;
   display: inline-block;
-  padding: 2px 8px;
-  margin: -2px -8px;
+  padding: 2px 8px 2px 27px;
+  margin: -2px -8px -2px -8px;
   border-radius: 6px;
   color: inherit;
   text-decoration: none;
@@ -864,8 +864,7 @@
 .reception-num__icon-wrap {
   position: absolute;
   top: 50%;
-  right: 100%;
-  margin-right: 2px;
+  left: 7px;
   transform: translateY(-50%);
   pointer-events: none;
 }
@@ -875,7 +874,7 @@
   width: 15px;
   height: 15px;
   opacity: 0;
-  transform: translateX(6px);
+  transform: translateX(-6px);
   transition:
     opacity 0.25s ease,
     transform 0.25s ease;
