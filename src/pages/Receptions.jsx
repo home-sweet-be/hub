@@ -244,22 +244,19 @@ export default function Receptions() {
               <thead>
                 <tr>
                   <th>N°</th>
-                  <th>
-                    <div className="reception-cart__th-row">
-                      <span>Produit</span>
-                      {selectedOrders.length > 2 && (
-                        <button
-                          type="button"
-                          className="reception-cart__clear"
-                          onClick={() => setSelectedIds(new Set())}
-                          title="Tout retirer"
-                        >
-                          − tout retirer
-                        </button>
-                      )}
-                    </div>
+                  <th>Produit</th>
+                  <th aria-label="action">
+                    {selectedOrders.length > 2 && (
+                      <button
+                        type="button"
+                        className="reception-cart__clear"
+                        onClick={() => setSelectedIds(new Set())}
+                        title="Tout retirer"
+                      >
+                        −
+                      </button>
+                    )}
                   </th>
-                  <th aria-label="action" />
                 </tr>
               </thead>
               <tbody>
