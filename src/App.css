@@ -848,7 +848,7 @@
   position: absolute;
   top: auto;
   bottom: -8px;
-  left: 30px;
+  left: 14px;
   font-size: 12.5px;
   line-height: 1;
   z-index: 2;
@@ -860,7 +860,7 @@
 }
 
 .reception-table tr.is-row-sub .reception-articles {
-  padding-left: 30px;
+  padding-left: 14px;
 }
 
 .reception-suboption {
