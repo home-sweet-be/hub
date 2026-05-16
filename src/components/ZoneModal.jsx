@@ -17,16 +17,19 @@ export const ZONES_BY_COUNTRY = {
   ],
   Luxembourg: ['LU'],
   France: ['FR-Est', 'FR-Nord'],
+  Autre: ['LIV-Externe'],
 }
 
 const COUNTRY_FLAG = {
   Belgique: 'BE',
   Luxembourg: 'LU',
   France: 'FR',
+  Autre: null,
 }
 
 function zoneLabel(zone) {
   if (zone === 'LU') return 'Pays entier'
+  if (zone === 'LIV-Externe') return 'Externe'
   return zone.replace(/^[A-Z]{2}-/, '').replace(/-/g, ' ')
 }
 
@@ -231,10 +234,12 @@ export default function ZoneModal({
             {Object.entries(ZONES_BY_COUNTRY).map(([country, zones]) => (
             <section key={country} className="zone-modal__section">
               <header className="zone-modal__section-header">
-                <ZoneFlag
-                  code={COUNTRY_FLAG[country]}
-                  className="zone-modal__country-flag"
-                />
+                {COUNTRY_FLAG[country] && (
+                  <ZoneFlag
+                    code={COUNTRY_FLAG[country]}
+                    className="zone-modal__country-flag"
+                  />
+                )}
                 <span>{country}</span>
               </header>
               <div className="zone-modal__zones">

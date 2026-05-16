@@ -3,7 +3,7 @@ import { ZoneFlag, zoneCode } from '../components/ZoneFlag'
 import ZoneModal from '../components/ZoneModal'
 import AddressModal from '../components/AddressModal'
 
-const ZONE_TAG_PATTERN = /^(BE|FR|LU|NL|DE)(-|$)/i
+const ZONE_TAG_PATTERN = /^(BE|FR|LU|NL|DE|LIV)(-|$)/i
 
 const TABS = [
   {
@@ -697,16 +697,23 @@ export default function Receptions() {
                                 type="button"
                                 className={
                                   'zone-badge zone-badge--button' +
-                                  (!zone ? ' zone-badge--undefined' : '')
+                                  (!zone ? ' zone-badge--undefined' : '') +
+                                  (zone && /^LIV/i.test(zone)
+                                    ? ' zone-badge--external'
+                                    : '')
                                 }
                                 onClick={() => setZoneEditing(o)}
                                 title="Changer la zone"
                               >
                                 {zone ? (
-                                  <>
-                                    <ZoneFlag code={zoneCode(zone)} />
-                                    {zone}
-                                  </>
+                                  /^LIV/i.test(zone) ? (
+                                    'Externe'
+                                  ) : (
+                                    <>
+                                      <ZoneFlag code={zoneCode(zone)} />
+                                      {zone}
+                                    </>
+                                  )
                                 ) : (
                                   'Non défini'
                                 )}

@@ -1109,6 +1109,16 @@
   opacity: 0.7;
 }
 
+.zone-badge--external {
+  background: rgba(255, 159, 10, 0.22) !important;
+  color: #b65a00 !important;
+}
+
+.zone-badge--external.zone-badge--button:hover {
+  background: rgba(255, 159, 10, 0.35) !important;
+  border-color: rgba(255, 159, 10, 0.45) !important;
+}
+
 .zone-badge--button {
   cursor: pointer;
   border: 1px solid transparent;
