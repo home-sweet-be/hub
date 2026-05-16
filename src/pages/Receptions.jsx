@@ -508,7 +508,7 @@ export default function Receptions() {
                                   strokeLinejoin="round"
                                   aria-hidden="true"
                                 >
-                                  <path d="M1 1 V 7 L 10 12" />
+                                  <path d="M2 2 L 7 8 L 13 8" />
                                 </svg>
                                 <span className="reception-suboption__bubble">
                                   {row.kind === 'attr'
