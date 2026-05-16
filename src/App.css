@@ -803,7 +803,13 @@
 }
 
 .reception-table tr.is-row-sub--last td {
-  height: 2px;
+  height: auto;
+  padding-bottom: 3px;
+  vertical-align: bottom;
+}
+
+.reception-table tr.is-row-sub--last .reception-suboption {
+  top: 0;
 }
 
 .reception-table tr.is-row-sub .reception-suboption {
