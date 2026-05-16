@@ -92,8 +92,8 @@ export default async function handler(req, res) {
     return res.status(400).json({ ok: false, code: 'missing_fields' })
   }
 
-  // Shopify search by order name, e.g. name:#1234
-  const filter = `name:#${orderName}`
+  // Shopify search by order name (HOMESWEET orders have no # prefix)
+  const filter = `name:${orderName}`
 
   try {
     const r = await fetch(

@@ -220,19 +220,15 @@ export default function PlanificationLivraison() {
             <form className="plani__form" onSubmit={submitAuth}>
               <label className="plani__field">
                 <span>Numéro de commande</span>
-                <div className="plani__input-prefix">
-                  <span>#</span>
-                  <input
-                    type="text"
-                    inputMode="numeric"
-                    autoComplete="off"
-                    placeholder="1234"
-                    value={orderName}
-                    onChange={(e) => setOrderName(e.target.value)}
-                    disabled={verifying}
-                    required
-                  />
-                </div>
+                <input
+                  type="text"
+                  autoComplete="off"
+                  placeholder="1234"
+                  value={orderName}
+                  onChange={(e) => setOrderName(e.target.value)}
+                  disabled={verifying}
+                  required
+                />
               </label>
               <label className="plani__field">
                 <span>E-mail utilisé pour la commande</span>
