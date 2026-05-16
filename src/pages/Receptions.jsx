@@ -186,8 +186,8 @@ export default function Receptions() {
               ? li.variantTitle
               : null,
             imageUrl: li.image?.url || null,
-            before: typeof li.variant?.inventoryQuantity === 'number'
-              ? li.variant.inventoryQuantity
+            before: typeof li.variant?.onHand === 'number'
+              ? li.variant.onHand
               : null,
             delta: effectiveQuantity(li),
           })
