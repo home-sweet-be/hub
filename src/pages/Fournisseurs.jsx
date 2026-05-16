@@ -311,40 +311,29 @@ export default function Fournisseurs() {
     }
   }
 
-  const handleMarkReady = async () => {
+  const handleMarkSent = async () => {
     if (selectedOrders.length === 0) return
-    setPending('markReady')
+    setPending('markSent')
     setFeedback(null)
     try {
-      const customerIds = [
-        ...new Set(
-          selectedOrders.map((o) => o.customer?.id).filter(Boolean)
-        ),
-      ]
       const r = await fetch('/api/shopify/orders/tags', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           orderIds: selectedOrders.map((o) => o.id),
-          remove: ['SentToSupplier'],
-          add: ['PretPourLaLivraison'],
-          customerIds,
-          customerAdd: ['SendingBookingEmail'],
+          add: ['SentToSupplier'],
         }),
       })
       const data = await r.json()
       if (!r.ok || data.hasErrors) {
-        const messages = [
-          ...(data.orderResults || []),
-          ...(data.customerResults || []),
-        ]
+        const messages = (data.orderResults || [])
           .flatMap((x) => [...(x.addErrors || []), ...(x.removeErrors || [])])
           .map((e) => e.message)
         throw new Error(messages.join(' · ') || `HTTP ${r.status}`)
       }
       setFeedback({
         type: 'ok',
-        message: `${selectedOrders.length} commande(s) marquée(s) prête(s) pour la livraison.`,
+        message: `${selectedOrders.length} commande(s) marquée(s) comme envoyée(s) au fournisseur.`,
       })
       setSelectedIds(new Set())
       await load()
@@ -383,7 +372,7 @@ export default function Fournisseurs() {
       <div className="reception__panes">
         {/* ---------- Left: reception cart ---------- */}
         <aside className="reception__left">
-          <div className="reception__pane-label reception__pane-label--left">Liste de commandes réceptionnées</div>
+          <div className="reception__pane-label reception__pane-label--left">Liste de commandes à envoyer</div>
 
           <div className="reception-cart">
             <table className="reception-cart__table">
@@ -551,33 +540,18 @@ export default function Fournisseurs() {
                 </div>
               )}
 
-              {activeDef.allowStockAdjust ? (
-                <button
-                  type="button"
-                  className="btn btn--blue"
-                  disabled={selectedOrders.length === 0 || pending !== null}
-                  onClick={handleAdjustStock}
-                >
-                  {pending === 'adjust'
-                    ? 'Réception en cours…'
-                    : selectedRefCount === 1
-                    ? 'Réceptionner le produit'
-                    : 'Réceptionner les produits'}
-                </button>
-              ) : (
-                <button
-                  type="button"
-                  className="btn btn--green"
-                  disabled={selectedOrders.length === 0 || pending !== null}
-                  onClick={handleMarkReady}
-                >
-                  {pending === 'markReady'
-                    ? 'Mise à jour…'
-                    : selectedOrders.length === 1
-                    ? 'Marquer comme prête pour la livraison'
-                    : 'Marquer comme prêtes pour la livraison'}
-                </button>
-              )}
+              <button
+                type="button"
+                className="btn btn--orange"
+                disabled={selectedOrders.length === 0 || pending !== null}
+                onClick={handleMarkSent}
+              >
+                {pending === 'markSent'
+                  ? 'Mise à jour…'
+                  : selectedOrders.length === 1
+                  ? 'Marquer comme envoyée au fournisseur'
+                  : 'Marquer comme envoyées au fournisseur'}
+              </button>
             </div>
           </div>
         </aside>
