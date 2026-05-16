@@ -142,7 +142,16 @@ export default function Receptions() {
   const load = useCallback(() => {
     setOrders(null)
     setError(null)
-    return fetch('/api/shopify/receptions?first=250')
+    const cutoff = new Date(Date.now() - 150 * 86400000)
+      .toISOString()
+      .slice(0, 10)
+    return fetch(
+      '/api/shopify/receptions?q=' +
+        encodeURIComponent(
+          `created_at:>=${cutoff} AND (tag:SentToSupplier OR tag:ProduitEnStock) AND NOT tag:removed AND NOT fulfillment_status:fulfilled AND NOT financial_status:refunded AND NOT financial_status:partially_refunded AND total_price:>1`
+        ) +
+        '&first=250'
+    )
       .then(async (r) => {
         if (!r.ok) throw new Error(`HTTP ${r.status} ${await r.text()}`)
         return r.json()

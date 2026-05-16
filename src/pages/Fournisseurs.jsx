@@ -135,10 +135,13 @@ export default function Fournisseurs() {
   const load = useCallback(() => {
     setOrders(null)
     setError(null)
+    const cutoff = new Date(Date.now() - 150 * 86400000)
+      .toISOString()
+      .slice(0, 10)
     return fetch(
       '/api/shopify/receptions?q=' +
         encodeURIComponent(
-          'NOT tag:SentToSupplier AND NOT tag:ProduitEnStock AND NOT tag:removed AND NOT fulfillment_status:fulfilled AND NOT financial_status:refunded AND NOT financial_status:partially_refunded AND total_price:>1'
+          `created_at:>=${cutoff} AND NOT tag:SentToSupplier AND NOT tag:ProduitEnStock AND NOT tag:removed AND NOT fulfillment_status:fulfilled AND NOT financial_status:refunded AND NOT financial_status:partially_refunded AND total_price:>1`
         ) +
         '&first=250'
     )
