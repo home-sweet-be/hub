@@ -223,12 +223,6 @@ function OrdersTable({
                         <span className="reception-article__title">
                           {li.title}
                         </span>
-                        {li.variantTitle &&
-                          !/texture/i.test(li.variantTitle) && (
-                            <span className="reception-article__variant">
-                              {li.variantTitle}
-                            </span>
-                          )}
                       </>
                     )}
                   </td>
