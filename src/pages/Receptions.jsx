@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 
-const ZONE_TAG_PATTERN = /^(BE|FR|LU|NL|DE)-/i
+const ZONE_TAG_PATTERN = /^(BE|FR|LU|NL|DE)(-|$)/i
 
 const TABS = [
   {
@@ -34,8 +34,9 @@ const TABS = [
   },
 ]
 
-function extractZone(tags = []) {
-  return tags.find((t) => ZONE_TAG_PATTERN.test(t)) || null
+function extractZone(order) {
+  const find = (tags) => (tags || []).find((t) => ZONE_TAG_PATTERN.test(t))
+  return find(order?.tags) || find(order?.customer?.tags) || null
 }
 
 function ZoneFlag({ code }) {
@@ -554,7 +555,7 @@ export default function Receptions() {
                     </tr>
                   )}
                   {filtered.flatMap((o) => {
-                    const zone = extractZone(o.tags)
+                    const zone = extractZone(o)
                     const isSelected = selectedIds.has(o.id)
                     const items = activeLineItems(o)
                     if (items.length === 0) return []

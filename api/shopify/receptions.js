@@ -22,6 +22,7 @@ const QUERY = `
             id
             firstName
             lastName
+            tags
           }
           lineItems(first: 20) {
             edges {
