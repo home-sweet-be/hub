@@ -450,31 +450,15 @@
 
 .reception-cart__empty {
   text-align: center;
-  padding: 40px 16px !important;
-  color: var(--text-muted);
-  font-style: normal;
+  padding: 32px 16px !important;
 }
 
 .reception-cart__empty svg {
   display: block;
-  margin: 0 auto 10px;
-  width: 36px;
-  height: 36px;
-  color: rgba(52, 199, 89, 0.5);
-}
-
-.reception-cart__empty-title {
-  display: block;
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--text);
-  margin-bottom: 4px;
-}
-
-.reception-cart__empty-hint {
-  display: block;
-  font-size: 11.5px;
-  color: var(--text-muted);
+  margin: 0 auto;
+  width: 28px;
+  height: 28px;
+  color: rgba(52, 199, 89, 0.55);
 }
 
 .reception-cart__products {

@@ -340,22 +340,13 @@ export default function Receptions() {
                         viewBox="0 0 24 24"
                         fill="none"
                         stroke="currentColor"
-                        strokeWidth="1.5"
+                        strokeWidth="2.2"
                         strokeLinecap="round"
                         strokeLinejoin="round"
                         aria-hidden="true"
                       >
-                        <path d="M5 7h14l-1.4 11.2a2 2 0 0 1-2 1.8H8.4a2 2 0 0 1-2-1.8L5 7z" />
-                        <path d="M9 7V5a3 3 0 0 1 6 0v2" />
-                        <path d="M12 11v5" />
-                        <path d="M9.5 13.5h5" />
+                        <path d="M5 12.5l4.5 4.5L19 7" />
                       </svg>
-                      <span className="reception-cart__empty-title">
-                        Panier vide
-                      </span>
-                      <span className="reception-cart__empty-hint">
-                        Ajoutez des commandes depuis la liste à droite
-                      </span>
                     </td>
                   </tr>
                 )}
