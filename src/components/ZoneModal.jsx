@@ -31,8 +31,8 @@ function zoneLabel(zone) {
 }
 
 const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_TOKEN
-// Zoom 8 ≈ ~100 km visible on a ~600px tile at BE/FR latitude.
-const MAP_ZOOM = 8
+// Lower = more dezoomed (Mapbox zoom 0-22 scale)
+const MAP_ZOOM = 7
 
 function mapboxStatic(lat, lon, width = 800, height = 500) {
   if (!MAPBOX_TOKEN) return null
