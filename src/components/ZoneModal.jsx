@@ -30,8 +30,8 @@ function zoneLabel(zone) {
   return zone.replace(/^[A-Z]{2}-/, '').replace(/-/g, ' ')
 }
 
-// ~150 km radius. 1° latitude ≈ 111 km, so 1.35° ≈ 150 km.
-const BBOX_DEG = 1.35
+// ~100 km radius. 1° latitude ≈ 111 km, so 0.9° ≈ 100 km.
+const BBOX_DEG = 0.9
 
 function osmEmbed(lat, lon) {
   const left = lon - BBOX_DEG
@@ -175,15 +175,18 @@ export default function ZoneModal({
                   </span>
                 )}
                 {(flatAddress || hasCoords) && (
-                  <a
-                    href={gmapsLink(lat, lon, flatAddress)}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="zone-modal__gmaps-btn"
-                    title="Ouvrir dans Google Maps"
-                  >
-                    Google Maps ↗
-                  </a>
+                  <>
+                    {' '}
+                    <a
+                      href={gmapsLink(lat, lon, flatAddress)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="zone-modal__gmaps-btn"
+                      title="Ouvrir dans Google Maps"
+                    >
+                      Google Maps ↗
+                    </a>
+                  </>
                 )}
               </p>
             )}
