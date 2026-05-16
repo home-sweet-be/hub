@@ -731,7 +731,7 @@
 }
 
 .reception-thumb--placeholder {
-  background: rgba(0, 0, 0, 0.04);
+  background: transparent;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -739,8 +739,8 @@
 }
 
 .reception-thumb--placeholder svg {
-  width: 55%;
-  height: 55%;
+  width: 70%;
+  height: 70%;
 }
 
 .reception-num {

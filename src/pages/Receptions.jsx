@@ -433,13 +433,13 @@ export default function Receptions() {
                                   viewBox="0 0 24 24"
                                   fill="none"
                                   stroke="currentColor"
-                                  strokeWidth="1.6"
+                                  strokeWidth="1.4"
                                   strokeLinecap="round"
                                   strokeLinejoin="round"
                                 >
-                                  <rect x="3" y="3" width="18" height="18" rx="2" />
-                                  <circle cx="8.5" cy="8.5" r="1.5" />
-                                  <path d="m21 15-5-5L5 21" />
+                                  <path d="M12 3 L3 8 L12 13 L21 8 Z" />
+                                  <path d="M3 8 L3 17 L12 22 L12 13 Z" />
+                                  <path d="M21 8 L21 17 L12 22 L12 13 Z" />
                                 </svg>
                               </div>
                             )}
