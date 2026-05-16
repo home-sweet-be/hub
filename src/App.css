@@ -789,6 +789,37 @@
   letter-spacing: -0.5px;
 }
 
+/* "Sub-tree" line for line items without image */
+.reception-table tr.is-row-sub .reception-articles {
+  vertical-align: top;
+  padding-top: 6px;
+}
+
+.reception-suboption {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.reception-suboption__branch {
+  color: rgba(28, 28, 30, 0.35);
+  font-size: 14px;
+  line-height: 1;
+  margin-left: 6px;
+}
+
+.reception-suboption__bubble {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: rgba(10, 132, 255, 0.1);
+  color: #0a84ff;
+  font-size: 8px;
+  font-style: italic;
+  letter-spacing: 0;
+  line-height: 1.4;
+}
+
 .zone-badge {
   display: inline-block;
   padding: 3px 9px;
