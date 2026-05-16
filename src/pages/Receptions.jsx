@@ -403,6 +403,15 @@ export default function Receptions() {
                     })
                     const span = rows.length
 
+                    const isSubRow = (r) => {
+                      if (!r) return false
+                      if (r.kind === 'attr') return true
+                      const x = r.li
+                      const amt = Number(
+                        x?.discountedTotalSet?.shopMoney?.amount || 0
+                      )
+                      return !!x && !x.image?.url && amt < 590
+                    }
                     return rows.map((row, idx) => {
                       const isFirst = idx === 0
                       const isLast = idx === span - 1
@@ -411,9 +420,11 @@ export default function Receptions() {
                       const lineAmount = li
                         ? Number(li.discountedTotalSet?.shopMoney?.amount || 0)
                         : 0
-                      const isSubLine =
-                        row.kind === 'attr' ||
-                        (li && !hasImage && lineAmount < 590)
+                      const isSubLine = isSubRow(row)
+                      const nudgeImage =
+                        row.kind === 'line' &&
+                        hasImage &&
+                        isSubRow(rows[idx + 1])
                       const rowCls = [
                         isSelected ? 'is-selected' : '',
                         span > 1 && !isLast ? 'is-row-mid' : '',
@@ -446,7 +457,10 @@ export default function Receptions() {
                               <img
                                 src={li.image.url}
                                 alt={li.image.altText || li.title}
-                                className="reception-thumb"
+                                className={
+                                  'reception-thumb' +
+                                  (nudgeImage ? ' is-nudged' : '')
+                                }
                               />
                             ) : isSubLine ? null : row.kind === 'line' ? (
                               <div
