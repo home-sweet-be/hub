@@ -244,7 +244,21 @@ export default function Receptions() {
               <thead>
                 <tr>
                   <th>N°</th>
-                  <th>Produit</th>
+                  <th>
+                    <div className="reception-cart__th-row">
+                      <span>Produit</span>
+                      {selectedOrders.length > 2 && (
+                        <button
+                          type="button"
+                          className="reception-cart__clear"
+                          onClick={() => setSelectedIds(new Set())}
+                          title="Tout retirer"
+                        >
+                          − tout retirer
+                        </button>
+                      )}
+                    </div>
+                  </th>
                   <th aria-label="action" />
                 </tr>
               </thead>
@@ -297,20 +311,8 @@ export default function Receptions() {
 
             <div className="reception-cart__footer">
               <div className="reception-cart__count">
-                <span>
-                  {selectedOrders.length} sélectionnée
-                  {selectedOrders.length > 1 ? 's' : ''}
-                </span>
-                {selectedOrders.length > 2 && (
-                  <button
-                    type="button"
-                    className="reception-cart__clear"
-                    onClick={() => setSelectedIds(new Set())}
-                    title="Tout retirer"
-                  >
-                    − tout retirer
-                  </button>
-                )}
+                {selectedOrders.length} sélectionnée
+                {selectedOrders.length > 1 ? 's' : ''}
               </div>
 
               {feedback && (
