@@ -787,6 +787,8 @@ export default function Receptions() {
         customerName={
           zoneEditing ? customerName(zoneEditing.customer) : null
         }
+        address={zoneEditing?.shippingAddress || null}
+        orderName={zoneEditing?.name || null}
         onClose={() => setZoneEditing(null)}
         onChanged={() => load()}
       />

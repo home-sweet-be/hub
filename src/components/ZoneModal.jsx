@@ -30,12 +30,38 @@ function zoneLabel(zone) {
   return zone.replace(/^[A-Z]{2}-/, '').replace(/-/g, ' ')
 }
 
+// ~300 km radius. 1° latitude ≈ 111 km, so 2.7° ≈ 300 km.
+const BBOX_DEG = 2.7
+
+function osmEmbed(lat, lon) {
+  const left = lon - BBOX_DEG
+  const right = lon + BBOX_DEG
+  const top = lat + BBOX_DEG
+  const bottom = lat - BBOX_DEG
+  return `https://www.openstreetmap.org/export/embed.html?bbox=${left}%2C${bottom}%2C${right}%2C${top}&layer=mapnik&marker=${lat}%2C${lon}`
+}
+
+function osmLink(lat, lon) {
+  return `https://www.openstreetmap.org/?mlat=${lat}&mlon=${lon}#map=7/${lat}/${lon}`
+}
+
+function gmapsLink(lat, lon, q) {
+  if (lat != null && lon != null) {
+    return `https://www.google.com/maps?q=${lat},${lon}`
+  }
+  return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+    q || ''
+  )}`
+}
+
 export default function ZoneModal({
   open,
   onClose,
   currentZone,
   customerId,
   customerName,
+  address,
+  orderName,
   onChanged,
 }) {
   const [pending, setPending] = useState(false)
@@ -103,6 +129,22 @@ export default function ZoneModal({
     }
   }
 
+  const lat = typeof address?.latitude === 'number' ? address.latitude : null
+  const lon = typeof address?.longitude === 'number' ? address.longitude : null
+  const hasCoords = lat !== null && lon !== null
+  const cityLine = address
+    ? [address.zip, address.city].filter(Boolean).join(' ')
+    : ''
+  const addressLines = address
+    ? [
+        address.address1,
+        address.address2,
+        cityLine,
+        [address.province, address.country].filter(Boolean).join(' · '),
+      ].filter(Boolean)
+    : []
+  const flatAddress = addressLines.join(', ')
+
   return createPortal(
     <div
       className="zone-modal__backdrop"
@@ -110,7 +152,7 @@ export default function ZoneModal({
       role="presentation"
     >
       <div
-        className="zone-modal__card"
+        className="zone-modal__card zone-modal__card--wide"
         role="dialog"
         aria-modal="true"
         aria-labelledby="zone-modal-title"
@@ -119,9 +161,11 @@ export default function ZoneModal({
         <header className="zone-modal__header">
           <div>
             <h3 id="zone-modal-title">Changer la zone de livraison</h3>
-            {customerName && (
+            {(orderName || customerName) && (
               <p className="zone-modal__subtitle">
-                Client&nbsp;: {customerName}
+                {orderName && <span>{orderName}</span>}
+                {orderName && customerName && <span> · </span>}
+                {customerName && <span>{customerName}</span>}
               </p>
             )}
           </div>
@@ -135,8 +179,64 @@ export default function ZoneModal({
           </button>
         </header>
 
-        <div className="zone-modal__body">
-          {Object.entries(ZONES_BY_COUNTRY).map(([country, zones]) => (
+        <div className="zone-modal__layout">
+          <aside className="zone-modal__address-pane">
+            {hasCoords ? (
+              <a
+                href={osmLink(lat, lon)}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="zone-modal__map"
+                title="Ouvrir dans OpenStreetMap"
+              >
+                <iframe
+                  src={osmEmbed(lat, lon)}
+                  title="Carte"
+                  loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
+                />
+              </a>
+            ) : (
+              <div className="zone-modal__no-map">
+                Coordonnées GPS indisponibles
+              </div>
+            )}
+            {address && (
+              <div className="zone-modal__address">
+                {address.name && (
+                  <div className="zone-modal__address-name">
+                    {address.name}
+                  </div>
+                )}
+                {addressLines.map((l, i) => (
+                  <div key={i}>{l}</div>
+                ))}
+                <div className="zone-modal__address-actions">
+                  <a
+                    href={gmapsLink(lat, lon, flatAddress)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="zone-modal__address-link"
+                  >
+                    Google Maps
+                  </a>
+                  {hasCoords && (
+                    <a
+                      href={osmLink(lat, lon)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="zone-modal__address-link"
+                    >
+                      OpenStreetMap
+                    </a>
+                  )}
+                </div>
+              </div>
+            )}
+          </aside>
+
+          <div className="zone-modal__body">
+            {Object.entries(ZONES_BY_COUNTRY).map(([country, zones]) => (
             <section key={country} className="zone-modal__section">
               <header className="zone-modal__section-header">
                 <ZoneFlag
@@ -168,6 +268,7 @@ export default function ZoneModal({
               </div>
             </section>
           ))}
+          </div>
         </div>
 
         {error && <div className="zone-modal__error">{error}</div>}

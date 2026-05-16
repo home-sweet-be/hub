@@ -1,8 +1,8 @@
 import { useEffect } from 'react'
 import { createPortal } from 'react-dom'
 
-// ~500 km radius. 1° latitude ≈ 111 km, so 4.5° ≈ 500 km.
-const BBOX_DEG = 4.5
+// ~300 km radius. 1° latitude ≈ 111 km, so 2.7° ≈ 300 km.
+const BBOX_DEG = 2.7
 
 function buildOsmEmbedUrl(lat, lon) {
   const left = lon - BBOX_DEG

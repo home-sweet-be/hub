@@ -888,6 +888,7 @@
   color: #0a5fb8;
 }
 
+
 .reception-meta__chip--link {
   color: inherit;
   text-decoration: none;
@@ -1155,6 +1156,92 @@
   animation: zone-modal-pop 0.2s cubic-bezier(0.2, 0.9, 0.3, 1.1);
 }
 
+.zone-modal__card--wide {
+  max-width: 900px;
+}
+
+.zone-modal__layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+  gap: 16px;
+  padding: 0 22px 22px;
+}
+
+.zone-modal__address-pane {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+}
+
+.zone-modal__map {
+  display: block;
+  width: 100%;
+  height: 240px;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid rgba(28, 28, 30, 0.1);
+  background: #eef0f3;
+}
+
+.zone-modal__map iframe {
+  width: 100%;
+  height: 100%;
+  border: 0;
+  display: block;
+  pointer-events: none;
+}
+
+.zone-modal__no-map {
+  padding: 24px;
+  background: rgba(28, 28, 30, 0.04);
+  border-radius: 12px;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 12.5px;
+}
+
+.zone-modal__address {
+  font-size: 12.5px;
+  color: var(--text);
+  line-height: 1.5;
+  background: rgba(28, 28, 30, 0.03);
+  border: 1px solid rgba(28, 28, 30, 0.06);
+  border-radius: 10px;
+  padding: 10px 12px;
+}
+
+.zone-modal__address-name {
+  font-weight: 600;
+  margin-bottom: 3px;
+}
+
+.zone-modal__address-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.zone-modal__address-link {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 9px;
+  border-radius: 6px;
+  background: rgba(10, 132, 255, 0.1);
+  color: #0a5fb8;
+  font-size: 11px;
+  font-weight: 500;
+  text-decoration: none;
+  border: 1px solid rgba(10, 132, 255, 0.18);
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.zone-modal__address-link:hover {
+  background: rgba(10, 132, 255, 0.18);
+  border-color: rgba(10, 132, 255, 0.32);
+}
+
 .zone-modal__header {
   display: flex;
   align-items: flex-start;
@@ -1196,10 +1283,10 @@
 }
 
 .zone-modal__body {
-  padding: 12px 22px 22px;
   display: flex;
   flex-direction: column;
   gap: 18px;
+  min-width: 0;
 }
 
 .zone-modal__section {
@@ -1459,3 +1546,4 @@
   background: rgba(10, 132, 255, 0.18);
   border-color: rgba(10, 132, 255, 0.35);
 }
+
