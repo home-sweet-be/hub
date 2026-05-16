@@ -473,6 +473,13 @@
   margin-top: 2px;
 }
 
+.reception-cart__product.is-wrong-vendor {
+  background: rgba(255, 159, 10, 0.12);
+  border-radius: 6px;
+  padding: 3px 6px;
+  margin: 2px -6px 2px -6px;
+}
+
 .reception-cart__product.is-sub .reception-suboption__branch {
   width: 14px;
   height: 14px;

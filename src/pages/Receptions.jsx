@@ -303,6 +303,27 @@ export default function Receptions() {
                             li.discountedTotalSet?.shopMoney?.amount || 0
                           )
                           const isSubLine = !hasImage && lineAmount < 590
+                          const wrong =
+                            !!activeDef.vendor &&
+                            !!li.vendor &&
+                            li.vendor !== activeDef.vendor
+                          if (wrong) {
+                            out.push(
+                              <div
+                                className="reception-cart__product is-wrong-vendor"
+                                key={`l-${idx}`}
+                              >
+                                <span className="reception-qty">
+                                  {effectiveQuantity(li)}×
+                                </span>
+                                <span className="reception-wrong-vendor">
+                                  ⚠️ {li.title}
+                                  {li.vendor ? ` (${li.vendor})` : ''}
+                                </span>
+                              </div>
+                            )
+                            return
+                          }
                           if (isSubLine) {
                             out.push(
                               <div
@@ -577,7 +598,7 @@ export default function Receptions() {
                                   {effectiveQuantity(li)}×
                                 </span>
                                 <span className="reception-wrong-vendor">
-                                  ⚠️ Produit d'un autre fournisseur
+                                  ⚠️ {li.title}
                                   {li.vendor ? ` (${li.vendor})` : ''}
                                 </span>
                               </>
