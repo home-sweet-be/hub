@@ -32,7 +32,7 @@ function zoneLabel(zone) {
 
 const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_TOKEN
 // Lower = more dezoomed (Mapbox zoom 0-22 scale)
-const MAP_ZOOM = 7
+const MAP_ZOOM = 6
 
 function mapboxStatic(lat, lon, width = 800, height = 500) {
   if (!MAPBOX_TOKEN) return null
