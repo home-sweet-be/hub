@@ -880,6 +880,7 @@ export default function Receptions() {
       <StockAdjustModal
         open={adjustItems !== null}
         items={adjustItems || []}
+        orderCount={selectedOrders.length}
         onClose={() => setAdjustItems(null)}
         onConfirm={applyStockAdjust}
       />

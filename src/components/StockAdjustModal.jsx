@@ -5,6 +5,7 @@ export default function StockAdjustModal({
   open,
   onClose,
   items,
+  orderCount = 0,
   onConfirm,
 }) {
   const [pending, setPending] = useState(false)
@@ -228,14 +229,9 @@ export default function StockAdjustModal({
         {error && <div className="stock-modal__error">{error}</div>}
 
         <footer className="stock-modal__footer">
-          <button
-            type="button"
-            className="btn btn--ghost"
-            onClick={onClose}
-            disabled={pending}
-          >
-            Annuler
-          </button>
+          <span className="stock-modal__order-count">
+            {orderCount} commande{orderCount > 1 ? 's' : ''}
+          </span>
           <button
             type="button"
             className="btn btn--green"
