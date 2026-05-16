@@ -802,9 +802,14 @@
   overflow: visible;
 }
 
+.reception-table tr.is-row-sub--last td {
+  height: 0;
+  line-height: 0;
+  font-size: 0;
+}
+
 .reception-table tr.is-row-sub--last .reception-articles {
   position: relative;
-  height: 21px;
   padding-left: 0;
 }
 
@@ -813,6 +818,8 @@
   top: auto;
   bottom: 3px;
   left: 30px;
+  font-size: 12.5px;
+  line-height: 1;
 }
 
 .reception-table tr.is-row-sub .reception-suboption {
