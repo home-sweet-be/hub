@@ -844,8 +844,8 @@
 }
 
 .reception-num__link {
-  display: inline-flex;
-  align-items: center;
+  position: relative;
+  display: inline-block;
   padding: 2px 8px;
   margin: -2px -8px;
   border-radius: 6px;
@@ -862,26 +862,23 @@
 }
 
 .reception-num__icon-wrap {
-  display: inline-flex;
-  align-items: center;
-  max-width: 0;
-  overflow: hidden;
-  transition: max-width 0.25s ease;
+  position: absolute;
+  top: 50%;
+  right: 100%;
+  margin-right: 2px;
+  transform: translateY(-50%);
+  pointer-events: none;
 }
 
 .reception-num__icon {
+  display: block;
   width: 15px;
   height: 15px;
-  margin-right: 5px;
   opacity: 0;
-  transform: translateX(-6px);
+  transform: translateX(6px);
   transition:
     opacity 0.25s ease,
     transform 0.25s ease;
-}
-
-.reception-num__link:hover .reception-num__icon-wrap {
-  max-width: 22px;
 }
 
 .reception-num__link:hover .reception-num__icon {
