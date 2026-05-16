@@ -472,12 +472,20 @@
 }
 
 .reception-cart__sku {
-  margin-top: 1px;
+  margin-top: 2px;
   margin-left: 42px;
+}
+
+.reception-cart__sku span {
+  display: inline-block;
+  padding: 1px 7px;
   font-size: 10px;
   font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
   letter-spacing: -0.02em;
-  color: var(--text-muted);
+  color: rgba(28, 28, 30, 0.6);
+  background: rgba(28, 28, 30, 0.05);
+  border: 1px dashed rgba(28, 28, 30, 0.12);
+  border-radius: 4px;
 }
 
 .reception-cart__product.is-sub {

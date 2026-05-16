@@ -432,7 +432,7 @@ export default function Receptions() {
                                 </div>
                                 {(li.sku || li.variant?.sku) && (
                                   <div className="reception-cart__sku">
-                                    SKU · {li.sku || li.variant?.sku}
+                                    <span>{li.sku || li.variant?.sku}</span>
                                   </div>
                                 )}
                               </div>
