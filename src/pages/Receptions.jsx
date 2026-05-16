@@ -532,8 +532,8 @@ export default function Receptions() {
                     <th>Produit</th>
                     <th>N°</th>
                     <th>Zone</th>
-                    <th>Client</th>
                     <th>Ville</th>
+                    <th>Client</th>
                     <th>Attente</th>
                     <th>Date</th>
                   </tr>
@@ -726,10 +726,10 @@ export default function Receptions() {
                           )}
                           {isFirst && (
                             <td className="reception-meta" rowSpan={span}>
-                              {customerName(o.customer) ? (
+                              {o.shippingAddress?.city ? (
                                 <span className="reception-meta__chip">
-                                  <span className="reception-meta__emoji">👤</span>
-                                  {customerName(o.customer)}
+                                  <span className="reception-meta__emoji">📍</span>
+                                  {o.shippingAddress.city}
                                 </span>
                               ) : (
                                 <span className="reception-table__muted">—</span>
@@ -738,10 +738,10 @@ export default function Receptions() {
                           )}
                           {isFirst && (
                             <td className="reception-meta" rowSpan={span}>
-                              {o.shippingAddress?.city ? (
-                                <span className="reception-meta__chip">
-                                  <span className="reception-meta__emoji">📍</span>
-                                  {o.shippingAddress.city}
+                              {customerName(o.customer) ? (
+                                <span className="reception-meta__chip reception-meta__chip--client">
+                                  <span className="reception-meta__emoji">👤</span>
+                                  {customerName(o.customer)}
                                 </span>
                               ) : (
                                 <span className="reception-table__muted">—</span>

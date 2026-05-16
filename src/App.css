@@ -820,9 +820,21 @@
   line-height: 1;
 }
 
+.reception-meta__chip--client {
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: rgba(28, 28, 30, 0.05);
+}
+
 .reception-meta__chip--wait {
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: rgba(28, 28, 30, 0.08);
+  color: var(--text);
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: -0.5px;
   font-variant-numeric: tabular-nums;
-  color: var(--text-muted);
 }
 
 .reception-articles {
