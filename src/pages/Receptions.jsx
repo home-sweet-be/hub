@@ -138,11 +138,12 @@ export default function Receptions() {
     if (!orders) return []
     return orders
       .filter(activeDef.filter)
+      .filter((o) => !selectedIds.has(o.id))
       .sort(
         (a, b) =>
           new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
       )
-  }, [orders, activeDef])
+  }, [orders, activeDef, selectedIds])
 
   const selectedOrders = useMemo(() => {
     if (!orders) return []
