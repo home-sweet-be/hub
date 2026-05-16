@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { ZoneFlag, zoneCode } from '../components/ZoneFlag'
 import ZoneModal from '../components/ZoneModal'
+import AddressModal from '../components/AddressModal'
 
 const ZONE_TAG_PATTERN = /^(BE|FR|LU|NL|DE)(-|$)/i
 
@@ -105,6 +106,7 @@ export default function Receptions() {
   const [pending, setPending] = useState(null) // 'adjust' | 'markReady' | null
   const [feedback, setFeedback] = useState(null) // { type, message }
   const [zoneEditing, setZoneEditing] = useState(null) // order being edited
+  const [addressViewing, setAddressViewing] = useState(null) // order whose address is shown
 
   const load = useCallback(() => {
     setOrders(null)
@@ -714,10 +716,15 @@ export default function Receptions() {
                           {isFirst && (
                             <td className="reception-meta" rowSpan={span}>
                               {o.shippingAddress?.city ? (
-                                <span className="reception-meta__chip">
+                                <button
+                                  type="button"
+                                  className="reception-meta__chip reception-meta__chip--button"
+                                  onClick={() => setAddressViewing(o)}
+                                  title="Voir l'adresse sur la carte"
+                                >
                                   <span className="reception-meta__emoji">📍</span>
                                   {o.shippingAddress.city}
-                                </span>
+                                </button>
                               ) : (
                                 <span className="reception-table__muted">—</span>
                               )}
@@ -782,6 +789,16 @@ export default function Receptions() {
         }
         onClose={() => setZoneEditing(null)}
         onChanged={() => load()}
+      />
+
+      <AddressModal
+        open={!!addressViewing}
+        address={addressViewing?.shippingAddress || null}
+        customerName={
+          addressViewing ? customerName(addressViewing.customer) : null
+        }
+        orderName={addressViewing?.name || null}
+        onClose={() => setAddressViewing(null)}
       />
     </div>
   )

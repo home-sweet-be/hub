@@ -12,11 +12,17 @@ const QUERY = `
           totalPriceSet { shopMoney { amount currencyCode } }
           displayFinancialStatus
           shippingAddress {
+            name
+            address1
+            address2
             city
             province
             provinceCode
             zip
+            country
             countryCode
+            latitude
+            longitude
           }
           customer {
             id
