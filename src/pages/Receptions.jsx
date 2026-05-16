@@ -199,38 +199,68 @@ export default function Receptions() {
 
   const applyStockAdjust = async (itemsFromModal) => {
     const list = itemsFromModal || adjustItems
-    if (!list || list.length === 0) {
-      setAdjustItems(null)
-      return
-    }
     setPending('adjust')
     try {
-      const r = await fetch('/api/shopify/inventory/adjust', {
+      // Step 1 — stock adjustment (skip if everything is 0)
+      const stockItems = (list || [])
+        .filter((it) => Number(it.delta) !== 0)
+        .map((it) => ({
+          inventoryItemId: it.inventoryItemId,
+          delta: Number(it.delta),
+        }))
+
+      if (stockItems.length > 0) {
+        const r = await fetch('/api/shopify/inventory/adjust', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            items: stockItems,
+            reason: 'received',
+          }),
+        })
+        const data = await r.json()
+        if (!r.ok || data.ok === false) {
+          throw new Error(
+            (data.userErrors ||
+              data.errors || [{ message: 'Erreur stock' }])
+              .map((e) => e.message)
+              .join(' · ')
+          )
+        }
+      }
+
+      // Step 2 — flip tags: SentToSupplier → PretPourLaLivraison
+      const customerIds = [
+        ...new Set(selectedOrders.map((o) => o.customer?.id).filter(Boolean)),
+      ]
+      const r2 = await fetch('/api/shopify/orders/tags', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          items: list
-            .filter((it) => Number(it.delta) !== 0)
-            .map((it) => ({
-              inventoryItemId: it.inventoryItemId,
-              delta: Number(it.delta),
-            })),
-          reason: 'received',
+          orderIds: selectedOrders.map((o) => o.id),
+          remove: ['SentToSupplier'],
+          add: ['PretPourLaLivraison'],
+          customerIds,
+          customerAdd: ['SendingBookingEmail'],
         }),
       })
-      const data = await r.json()
-      if (!r.ok || data.ok === false) {
-        throw new Error(
-          (data.userErrors || data.errors || [{ message: 'Erreur inconnue' }])
-            .map((e) => e.message)
-            .join(' · ')
-        )
+      const data2 = await r2.json()
+      if (!r2.ok || data2.hasErrors) {
+        const messages = [
+          ...(data2.orderResults || []),
+          ...(data2.customerResults || []),
+        ]
+          .flatMap((x) => [...(x.addErrors || []), ...(x.removeErrors || [])])
+          .map((e) => e.message)
+        throw new Error(messages.join(' · ') || `HTTP ${r2.status}`)
       }
+
       setFeedback({
         type: 'ok',
-        message: `Stock ajusté pour ${data.applied?.length || 0} référence(s).`,
+        message: `${selectedOrders.length} commande(s) réceptionnée(s) — stock mis à jour et marquée(s) prête(s) pour la livraison.`,
       })
       setAdjustItems(null)
+      setSelectedIds(new Set())
       await load()
     } catch (e) {
       throw e
@@ -487,8 +517,8 @@ export default function Receptions() {
                   onClick={handleAdjustStock}
                 >
                   {pending === 'adjust'
-                    ? 'Ajustement…'
-                    : 'Ajuster les entrées en stock'}
+                    ? 'Réception en cours…'
+                    : 'Réceptionner les produits'}
                 </button>
               )}
 

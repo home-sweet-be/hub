@@ -95,7 +95,7 @@ export default function StockAdjustModal({
       >
         <header className="stock-modal__header">
           <div>
-            <h3 id="stock-modal-title">Ajuster les entrées en stock</h3>
+            <h3 id="stock-modal-title">Réceptionner les produits</h3>
             <p className="stock-modal__subtitle">
               {editedItems.length} référence
               {editedItems.length > 1 ? 's' : ''} · delta total{' '}
@@ -240,9 +240,9 @@ export default function StockAdjustModal({
             type="button"
             className="btn btn--blue"
             onClick={handleConfirm}
-            disabled={pending || items.length === 0}
+            disabled={pending}
           >
-            {pending ? 'Ajustement…' : 'Valider l\'ajustement'}
+            {pending ? 'Réception en cours…' : 'Réceptionner les produits'}
           </button>
         </footer>
       </div>
