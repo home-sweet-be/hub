@@ -1,19 +1,12 @@
 import { useEffect } from 'react'
 import { createPortal } from 'react-dom'
 
-// ~300 km radius. 1° latitude ≈ 111 km, so 2.7° ≈ 300 km.
-const BBOX_DEG = 2.7
+const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_TOKEN
+const MAP_ZOOM = 8
 
-function buildOsmEmbedUrl(lat, lon) {
-  const left = lon - BBOX_DEG
-  const right = lon + BBOX_DEG
-  const top = lat + BBOX_DEG
-  const bottom = lat - BBOX_DEG
-  return `https://www.openstreetmap.org/export/embed.html?bbox=${left}%2C${bottom}%2C${right}%2C${top}&layer=mapnik&marker=${lat}%2C${lon}`
-}
-
-function buildOsmLinkUrl(lat, lon) {
-  return `https://www.openstreetmap.org/?mlat=${lat}&mlon=${lon}#map=6/${lat}/${lon}`
+function buildMapboxStatic(lat, lon, width = 900, height = 500) {
+  if (!MAPBOX_TOKEN) return null
+  return `https://api.mapbox.com/styles/v1/mapbox/streets-v12/static/pin-l+ed2939(${lon},${lat})/${lon},${lat},${MAP_ZOOM}/${width}x${height}@2x?access_token=${MAPBOX_TOKEN}`
 }
 
 function buildGmapsUrl(lat, lon, q) {
@@ -100,19 +93,18 @@ export default function AddressModal({
         </header>
 
         <div className="address-modal__body">
-          {hasCoords ? (
+          {hasCoords && buildMapboxStatic(lat, lon) ? (
             <a
-              href={buildOsmLinkUrl(lat, lon)}
+              href={buildGmapsUrl(lat, lon, flatAddress)}
               target="_blank"
               rel="noopener noreferrer"
               className="address-modal__map"
-              title="Ouvrir dans OpenStreetMap"
+              title="Ouvrir dans Google Maps"
             >
-              <iframe
-                src={buildOsmEmbedUrl(lat, lon)}
-                title="Carte"
+              <img
+                src={buildMapboxStatic(lat, lon)}
+                alt="Carte de l'adresse"
                 loading="lazy"
-                referrerPolicy="no-referrer-when-downgrade"
               />
             </a>
           ) : (
@@ -137,16 +129,6 @@ export default function AddressModal({
               >
                 Ouvrir dans Google Maps
               </a>
-              {hasCoords && (
-                <a
-                  href={buildOsmLinkUrl(lat, lon)}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="address-modal__action"
-                >
-                  Ouvrir dans OpenStreetMap
-                </a>
-              )}
             </div>
           </div>
         </div>

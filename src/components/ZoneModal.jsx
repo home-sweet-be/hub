@@ -30,19 +30,13 @@ function zoneLabel(zone) {
   return zone.replace(/^[A-Z]{2}-/, '').replace(/-/g, ' ')
 }
 
-// ~100 km radius. 1° latitude ≈ 111 km, so 0.9° ≈ 100 km.
-const BBOX_DEG = 0.9
+const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_TOKEN
+// Zoom 8 ≈ ~100 km visible on a ~600px tile at BE/FR latitude.
+const MAP_ZOOM = 8
 
-function osmEmbed(lat, lon) {
-  const left = lon - BBOX_DEG
-  const right = lon + BBOX_DEG
-  const top = lat + BBOX_DEG
-  const bottom = lat - BBOX_DEG
-  return `https://www.openstreetmap.org/export/embed.html?bbox=${left}%2C${bottom}%2C${right}%2C${top}&layer=mapnik&marker=${lat}%2C${lon}`
-}
-
-function osmLink(lat, lon) {
-  return `https://www.openstreetmap.org/?mlat=${lat}&mlon=${lon}#map=7/${lat}/${lon}`
+function mapboxStatic(lat, lon, width = 800, height = 500) {
+  if (!MAPBOX_TOKEN) return null
+  return `https://api.mapbox.com/styles/v1/mapbox/streets-v12/static/pin-l+ed2939(${lon},${lat})/${lon},${lat},${MAP_ZOOM}/${width}x${height}@2x?access_token=${MAPBOX_TOKEN}`
 }
 
 function gmapsLink(lat, lon, q) {
@@ -203,19 +197,18 @@ export default function ZoneModal({
 
         <div className="zone-modal__layout">
           <aside className="zone-modal__address-pane">
-            {hasCoords ? (
+            {hasCoords && mapboxStatic(lat, lon) ? (
               <a
-                href={osmLink(lat, lon)}
+                href={gmapsLink(lat, lon, flatAddress)}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="zone-modal__map zone-modal__map--full"
-                title="Ouvrir dans OpenStreetMap"
+                title="Ouvrir dans Google Maps"
               >
-                <iframe
-                  src={osmEmbed(lat, lon)}
-                  title="Carte"
+                <img
+                  src={mapboxStatic(lat, lon)}
+                  alt="Carte de l'adresse de livraison"
                   loading="lazy"
-                  referrerPolicy="no-referrer-when-downgrade"
                 />
               </a>
             ) : (
