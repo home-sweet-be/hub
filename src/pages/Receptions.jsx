@@ -417,21 +417,19 @@ export default function Receptions() {
                               </button>
                             </td>
                           )}
-                          <td>
-                            <div className="reception-thumbs">
-                              {li.image?.url ? (
-                                <img
-                                  src={li.image.url}
-                                  alt={li.image.altText || li.title}
-                                  className="reception-thumb"
-                                />
-                              ) : (
-                                <div
-                                  className="reception-thumb reception-thumb--placeholder"
-                                  aria-hidden="true"
-                                />
-                              )}
-                            </div>
+                          <td className="reception-img-cell">
+                            {li.image?.url ? (
+                              <img
+                                src={li.image.url}
+                                alt={li.image.altText || li.title}
+                                className="reception-thumb"
+                              />
+                            ) : (
+                              <div
+                                className="reception-thumb reception-thumb--placeholder"
+                                aria-hidden="true"
+                              />
+                            )}
                           </td>
                           <td className="reception-articles">
                             <span className="reception-qty">
