@@ -95,7 +95,7 @@ export default function Commandes() {
     return fetch(
       '/api/shopify/receptions?q=' +
         encodeURIComponent(
-          'created_at:>=2024-01-01 AND NOT financial_status:refunded'
+          'created_at:>=2024-01-01 AND NOT financial_status:refunded AND status:open'
         ) +
         '&first=100'
     )
