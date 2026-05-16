@@ -297,7 +297,20 @@ export default function Receptions() {
 
             <div className="reception-cart__footer">
               <div className="reception-cart__count">
-                {selectedOrders.length} sélectionnée{selectedOrders.length > 1 ? 's' : ''}
+                <span>
+                  {selectedOrders.length} sélectionnée
+                  {selectedOrders.length > 1 ? 's' : ''}
+                </span>
+                {selectedOrders.length > 2 && (
+                  <button
+                    type="button"
+                    className="reception-cart__clear"
+                    onClick={() => setSelectedIds(new Set())}
+                    title="Tout retirer"
+                  >
+                    − tout retirer
+                  </button>
+                )}
               </div>
 
               {feedback && (
