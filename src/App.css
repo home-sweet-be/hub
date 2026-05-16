@@ -100,6 +100,34 @@
   -webkit-backdrop-filter: blur(12px);
 }
 
+.hub-header__burger {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  border: 1px solid rgba(28, 28, 30, 0.1);
+  background: rgba(255, 255, 255, 0.5);
+  color: var(--text);
+  cursor: pointer;
+  margin-right: 12px;
+  transition: background 0.15s ease;
+}
+
+.hub-header__burger:hover {
+  background: rgba(255, 255, 255, 0.85);
+}
+
+.hub-header__burger svg {
+  width: 20px;
+  height: 20px;
+}
+
+.hub-drawer-backdrop {
+  display: none;
+}
+
 /* =========================================================
    Body grid (sidebar + main)
    ========================================================= */
@@ -1948,5 +1976,144 @@
 @keyframes skeleton-shimmer {
   0% { background-position: 200% 0; }
   100% { background-position: -200% 0; }
+}
+
+/* =========================================================
+   Responsive
+   ========================================================= */
+
+@media (max-width: 900px) {
+  .hub-header {
+    padding: 10px 14px;
+  }
+
+  .hub-header__burger {
+    display: inline-flex;
+  }
+
+  .hub-header__greeting {
+    display: none;
+  }
+
+  .hub-header__logo {
+    height: 26px;
+  }
+
+  .hub-body {
+    flex-direction: column;
+    gap: 0;
+    padding: 0 12px 12px;
+  }
+
+  .hub-sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 260px;
+    z-index: 950;
+    border-radius: 0;
+    transform: translateX(-100%);
+    transition: transform 0.25s cubic-bezier(0.2, 0.9, 0.3, 1.05);
+    padding-top: 80px;
+    box-shadow: 8px 0 30px -10px rgba(28, 28, 30, 0.25);
+  }
+
+  .hub-sidebar.is-open {
+    transform: translateX(0);
+  }
+
+  .hub-drawer-backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(28, 28, 30, 0.3);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    z-index: 940;
+    animation: zone-modal-fade 0.18s ease-out;
+  }
+
+  .hub-main {
+    width: 100%;
+  }
+
+  .hub-main__inner {
+    padding: 14px;
+    border-radius: 16px;
+  }
+
+  /* Receptions: stack cart + list vertically */
+  .reception__panes {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  /* Tabs: allow horizontal scroll if too many */
+  .reception__tabs {
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .reception__tabs::-webkit-scrollbar { display: none; }
+
+  .reception__body {
+    padding: 14px;
+    border-radius: 16px;
+  }
+
+  /* Pane labels: tighten */
+  .reception__pane-label {
+    margin-top: 0;
+  }
+
+  /* Tighter tables on phone */
+  .reception-table tbody td,
+  .reception-table thead th {
+    padding: 3px 10px;
+  }
+
+  /* Modals: full-width padding */
+  .zone-modal__backdrop,
+  .address-modal__backdrop,
+  .stock-modal__backdrop {
+    padding: 14px;
+  }
+
+  .zone-modal__layout {
+    grid-template-columns: 1fr;
+    gap: 14px;
+    padding: 0 16px 16px;
+  }
+
+  .zone-modal__map--full,
+  .zone-modal__no-map--full {
+    min-height: 220px;
+  }
+}
+
+@media (max-width: 520px) {
+  .hub-header__logo {
+    height: 22px;
+  }
+
+  .hub-main__inner {
+    padding: 10px;
+  }
+
+  .reception__body {
+    padding: 10px;
+  }
+
+  .reception__tab {
+    padding: 8px 14px;
+    font-size: 12px;
+  }
+
+  /* Stock modal table: shrink */
+  .stock-modal__table thead th,
+  .stock-modal__table tbody td {
+    padding: 6px 6px;
+    font-size: 11.5px;
+  }
 }
 

@@ -1,4 +1,5 @@
-import { BrowserRouter, Routes, Route, Navigate, NavLink, Outlet } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, Navigate, NavLink, Outlet, useLocation } from 'react-router-dom'
+import { useEffect, useState } from 'react'
 import logo from './assets/homesweet.png'
 import Commandes from './pages/Commandes'
 import Receptions from './pages/Receptions'
@@ -20,16 +21,58 @@ const MODULES = [
 ]
 
 function Shell() {
+  const [drawerOpen, setDrawerOpen] = useState(false)
+  const location = useLocation()
+
+  // Close drawer on route change
+  useEffect(() => {
+    setDrawerOpen(false)
+  }, [location.pathname])
+
+  // Lock body scroll while drawer is open
+  useEffect(() => {
+    if (!drawerOpen) return
+    const prev = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    return () => {
+      document.body.style.overflow = prev
+    }
+  }, [drawerOpen])
+
   return (
     <div className="hub-shell">
       <div className="hub-bg" aria-hidden="true" />
 
       <header className="hub-header glass">
+        <button
+          type="button"
+          className="hub-header__burger"
+          aria-label={drawerOpen ? 'Fermer le menu' : 'Ouvrir le menu'}
+          aria-expanded={drawerOpen}
+          onClick={() => setDrawerOpen((o) => !o)}
+        >
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+            {drawerOpen ? (
+              <>
+                <path d="M6 6l12 12" />
+                <path d="M18 6L6 18" />
+              </>
+            ) : (
+              <>
+                <path d="M4 7h16" />
+                <path d="M4 12h16" />
+                <path d="M4 17h16" />
+              </>
+            )}
+          </svg>
+        </button>
+
         <img
           src={logo}
           alt="HOMESWEET BRUXELLES"
           className="hub-header__logo"
         />
+
         <div className="hub-header__greeting">
           <span role="img" aria-label="wave">👋</span>
           <span>Bienvenue Alessandro</span>
@@ -37,7 +80,16 @@ function Shell() {
       </header>
 
       <div className="hub-body">
-        <nav className="hub-sidebar glass">
+        {drawerOpen && (
+          <div
+            className="hub-drawer-backdrop"
+            onClick={() => setDrawerOpen(false)}
+            aria-hidden="true"
+          />
+        )}
+        <nav
+          className={'hub-sidebar glass' + (drawerOpen ? ' is-open' : '')}
+        >
           <ul className="hub-sidebar__list">
             {MODULES.map((m) => (
               <li key={m.to}>
