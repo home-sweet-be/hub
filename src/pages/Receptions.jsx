@@ -458,7 +458,9 @@ export default function Receptions() {
                     const rows = []
                     items.forEach((li) => {
                       const wrong =
-                        activeDef.vendor && li.vendor !== activeDef.vendor
+                        !!activeDef.vendor &&
+                        !!li.vendor &&
+                        li.vendor !== activeDef.vendor
                       rows.push({ kind: 'line', li, wrong })
                       if (wrong) return
                       for (const attr of li.customAttributes || []) {
