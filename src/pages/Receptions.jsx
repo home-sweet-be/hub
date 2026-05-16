@@ -766,10 +766,23 @@ export default function Receptions() {
                           {isFirst && (
                             <td className="reception-meta" rowSpan={span}>
                               {customerName(o.customer) ? (
-                                <span className="reception-meta__chip reception-meta__chip--client">
-                                  <span className="reception-meta__emoji">👤</span>
-                                  {customerName(o.customer)}
-                                </span>
+                                o.customer?.adminUrl ? (
+                                  <a
+                                    href={o.customer.adminUrl}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="reception-meta__chip reception-meta__chip--client reception-meta__chip--link"
+                                    title="Ouvrir la fiche client dans Shopify"
+                                  >
+                                    <span className="reception-meta__emoji">👤</span>
+                                    {customerName(o.customer)}
+                                  </a>
+                                ) : (
+                                  <span className="reception-meta__chip reception-meta__chip--client">
+                                    <span className="reception-meta__emoji">👤</span>
+                                    {customerName(o.customer)}
+                                  </span>
+                                )
                               ) : (
                                 <span className="reception-table__muted">—</span>
                               )}

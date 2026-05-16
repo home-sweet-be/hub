@@ -103,6 +103,7 @@ export default async function handler(req, res) {
       .map((edge) => {
         const o = edge.node
         const numericId = (o.id || '').split('/').pop()
+        const customerNumericId = (o.customer?.id || '').split('/').pop()
         return {
           id: o.id,
           name: o.name,
@@ -112,7 +113,14 @@ export default async function handler(req, res) {
           currency: o.totalPriceSet?.shopMoney?.currencyCode,
           financialStatus: o.displayFinancialStatus,
           shippingAddress: o.shippingAddress,
-          customer: o.customer,
+          customer: o.customer
+            ? {
+                ...o.customer,
+                adminUrl: customerNumericId
+                  ? `https://${domain}/admin/customers/${customerNumericId}`
+                  : null,
+              }
+            : null,
           adminUrl: numericId
             ? `https://${domain}/admin/orders/${numericId}`
             : null,
