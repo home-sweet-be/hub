@@ -802,14 +802,17 @@
   overflow: visible;
 }
 
-.reception-table tr.is-row-sub--last td {
-  height: auto;
-  padding-bottom: 3px;
-  vertical-align: bottom;
+.reception-table tr.is-row-sub--last .reception-articles {
+  position: relative;
+  height: 21px;
+  padding-left: 0;
 }
 
 .reception-table tr.is-row-sub--last .reception-suboption {
-  top: 0;
+  position: absolute;
+  top: auto;
+  bottom: 3px;
+  left: 30px;
 }
 
 .reception-table tr.is-row-sub .reception-suboption {
