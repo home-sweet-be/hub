@@ -2293,3 +2293,315 @@
   }
 }
 
+/* =========================================================
+   Livraisons — week calendar
+   ========================================================= */
+
+.livraisons {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.livraisons__toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.livraisons__nav {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.livraisons__nav-btn {
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  border: 1px solid rgba(28, 28, 30, 0.1);
+  background: rgba(255, 255, 255, 0.7);
+  font-size: 18px;
+  cursor: pointer;
+  color: var(--text);
+  transition: background 0.15s ease;
+}
+
+.livraisons__nav-btn:hover {
+  background: rgba(255, 255, 255, 0.95);
+}
+
+.livraisons__nav-btn--today {
+  width: auto;
+  padding: 0 14px;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.livraisons__title {
+  margin: 0 0 0 6px;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text);
+  letter-spacing: -0.01em;
+}
+
+.livraisons__week {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.livraisons__day {
+  background: rgba(255, 255, 255, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  border-radius: 12px;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-height: 180px;
+}
+
+.livraisons__day.is-today {
+  border-color: rgba(10, 132, 255, 0.45);
+  box-shadow: 0 0 0 2px rgba(10, 132, 255, 0.12);
+}
+
+.livraisons__day-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  padding-bottom: 6px;
+  border-bottom: 1px solid rgba(28, 28, 30, 0.06);
+}
+
+.livraisons__day-name {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-soft);
+}
+
+.livraisons__day-date {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.livraisons__day-slots {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.livraisons__slot {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: rgba(10, 132, 255, 0.1);
+  border: 1px solid rgba(10, 132, 255, 0.25);
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.15s ease, transform 0.1s ease;
+}
+
+.livraisons__slot:hover {
+  background: rgba(10, 132, 255, 0.18);
+}
+
+.livraisons__slot:active {
+  transform: scale(0.98);
+}
+
+.livraisons__slot.is-full {
+  background: rgba(255, 159, 10, 0.14);
+  border-color: rgba(255, 159, 10, 0.32);
+}
+
+.livraisons__slot.is-full:hover {
+  background: rgba(255, 159, 10, 0.22);
+}
+
+.livraisons__slot-time {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+
+.livraisons__slot-zones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px;
+}
+
+.livraisons__slot-zone {
+  display: inline-block;
+  padding: 1px 6px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.7);
+  font-size: 10px;
+  color: var(--text);
+  white-space: nowrap;
+}
+
+.livraisons__slot-zone--more {
+  background: rgba(28, 28, 30, 0.08);
+  color: var(--text-soft);
+}
+
+.livraisons__slot-cap {
+  font-size: 10.5px;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.livraisons__slot.is-full .livraisons__slot-cap {
+  color: #b65a00;
+  font-weight: 600;
+}
+
+.livraisons__add {
+  padding: 6px 8px;
+  border-radius: 8px;
+  border: 1px dashed rgba(28, 28, 30, 0.18);
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 11.5px;
+  cursor: pointer;
+  transition: background 0.12s ease, color 0.12s ease;
+}
+
+.livraisons__add:hover {
+  background: rgba(10, 132, 255, 0.08);
+  color: #0a5fb8;
+  border-color: rgba(10, 132, 255, 0.3);
+}
+
+.livraisons__skeleton {
+  height: 60px;
+  border-radius: 8px;
+  background: linear-gradient(
+    90deg,
+    rgba(28, 28, 30, 0.06) 0%,
+    rgba(28, 28, 30, 0.12) 50%,
+    rgba(28, 28, 30, 0.06) 100%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.4s ease-in-out infinite;
+}
+
+/* Slot modal fields */
+.slot-modal__row {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.slot-modal__field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 12px;
+}
+
+.slot-modal__field span {
+  color: var(--text-soft);
+  font-weight: 500;
+}
+
+.slot-modal__field input,
+.slot-modal__field textarea {
+  font: inherit;
+  font-size: 13px;
+  padding: 7px 10px;
+  border: 1px solid rgba(28, 28, 30, 0.12);
+  border-radius: 8px;
+  background: #fff;
+  outline: none;
+  transition: border-color 0.15s ease;
+}
+
+.slot-modal__field input:focus,
+.slot-modal__field textarea:focus {
+  border-color: rgba(10, 132, 255, 0.5);
+}
+
+.slot-modal__field--full {
+  grid-column: 1 / -1;
+  margin-top: 10px;
+}
+
+.slot-modal__section {
+  margin-top: 4px;
+}
+
+.slot-modal__section-title {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-soft);
+  margin-bottom: 10px;
+}
+
+.slot-modal__zone-group {
+  margin-bottom: 10px;
+}
+
+.slot-modal__country {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  margin-bottom: 5px;
+}
+
+.slot-modal__zones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.slot-modal__zone {
+  padding: 5px 11px;
+  border-radius: 999px;
+  border: 1px solid rgba(28, 28, 30, 0.12);
+  background: rgba(28, 28, 30, 0.03);
+  font-size: 12px;
+  cursor: pointer;
+  color: var(--text);
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.slot-modal__zone:hover:not(:disabled) {
+  background: rgba(10, 132, 255, 0.08);
+  border-color: rgba(10, 132, 255, 0.3);
+}
+
+.slot-modal__zone.is-active {
+  background: rgba(10, 132, 255, 0.18);
+  border-color: rgba(10, 132, 255, 0.45);
+  color: #0a5fb8;
+  font-weight: 600;
+}
+
+@media (max-width: 900px) {
+  .livraisons__week {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+  .livraisons__day {
+    min-height: 0;
+  }
+  .slot-modal__row {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
