@@ -99,6 +99,25 @@ function SubBranch() {
   )
 }
 
+function isSamples(li) {
+  return li?.title ? /[ée]chantillon/i.test(li.title) : false
+}
+
+function SamplesThumb() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      aria-hidden="true"
+      preserveAspectRatio="xMidYMid meet"
+    >
+      <rect x="2" y="5" width="5" height="14" rx="1" fill="#c4956c" />
+      <rect x="7.5" y="5" width="5" height="14" rx="1" fill="#9c7b67" />
+      <rect x="13" y="5" width="5" height="14" rx="1" fill="#6b8e7f" />
+      <rect x="18.5" y="5" width="3.5" height="14" rx="1" fill="#d8c4a1" />
+    </svg>
+  )
+}
+
 export default function Receptions() {
   const [orders, setOrders] = useState(null)
   const [error, setError] = useState(null)
@@ -617,6 +636,7 @@ export default function Receptions() {
                       if (!r) return false
                       if (r.kind === 'attr') return true
                       const x = r.li
+                      if (isSamples(x)) return false
                       const amt = Number(
                         x?.discountedTotalSet?.shopMoney?.amount || 0
                       )
@@ -678,6 +698,13 @@ export default function Receptions() {
                                   (nudgeImage ? ' is-nudged' : '')
                                 }
                               />
+                            ) : row.kind === 'line' && isSamples(li) ? (
+                              <div
+                                className="reception-thumb reception-thumb--samples"
+                                aria-hidden="true"
+                              >
+                                <SamplesThumb />
+                              </div>
                             ) : isSubLine ? null : row.kind === 'line' ? (
                               <div
                                 className="reception-thumb reception-thumb--placeholder"

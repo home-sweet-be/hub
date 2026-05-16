@@ -828,6 +828,20 @@
   justify-content: center;
 }
 
+.reception-thumb--samples {
+  background: #f6f1ea;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  box-sizing: border-box;
+}
+
+.reception-thumb--samples svg {
+  width: 100%;
+  height: 100%;
+}
+
 .reception-thumb--placeholder svg {
   width: 70%;
   height: 70%;
