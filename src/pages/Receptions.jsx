@@ -24,7 +24,8 @@ const TABS = [
     allowStockAdjust: true,
     filter: (o) =>
       o.tags.includes('SentToSupplier') &&
-      o.lineItems.some((li) => li.vendor === 'INTERCOMMERCE'),
+      Number(o.total) >= 590 &&
+      o.lineItems.some((li) => isMainLineItem(li) && li.vendor !== 'ELTAP'),
   },
   {
     id: 'eltap',
@@ -34,7 +35,8 @@ const TABS = [
     allowStockAdjust: true,
     filter: (o) =>
       o.tags.includes('SentToSupplier') &&
-      o.lineItems.some((li) => li.vendor === 'ELTAP'),
+      Number(o.total) >= 590 &&
+      o.lineItems.some((li) => isMainLineItem(li) && li.vendor === 'ELTAP'),
   },
 ]
 
@@ -70,6 +72,13 @@ function effectiveQuantity(li) {
 
 function activeLineItems(order) {
   return order.lineItems.filter((li) => effectiveQuantity(li) > 0)
+}
+
+function isMainLineItem(li) {
+  if (li?.title && /[ée]chantillon/i.test(li.title)) return true
+  if (li?.image?.url) return true
+  const amt = Number(li?.discountedTotalSet?.shopMoney?.amount || 0)
+  return amt >= 590
 }
 
 function articleLine(li) {
