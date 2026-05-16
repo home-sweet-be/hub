@@ -2605,3 +2605,477 @@
   }
 }
 
+/* ============================================================
+   PLANIFICATION LIVRAISON — public page
+   ============================================================ */
+
+.plani {
+  min-height: 100vh;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  font-family: inherit;
+  color: #1d1d1f;
+}
+
+.plani__bg {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background:
+    radial-gradient(1200px 600px at 10% -10%, rgba(10, 132, 255, 0.18), transparent 60%),
+    radial-gradient(900px 600px at 110% 10%, rgba(52, 199, 89, 0.14), transparent 60%),
+    linear-gradient(180deg, #f5f7fb 0%, #eef1f6 100%);
+}
+
+.plani__header {
+  display: flex;
+  justify-content: center;
+  padding: 28px 24px 0;
+}
+
+.plani__logo {
+  height: 36px;
+  width: auto;
+  object-fit: contain;
+}
+
+.plani__main {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 32px 16px 48px;
+}
+
+.plani__card {
+  width: 100%;
+  max-width: 460px;
+  background: #fff;
+  border-radius: 24px;
+  padding: 36px 32px;
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.04),
+    0 24px 60px -20px rgba(20, 30, 60, 0.18);
+}
+
+.plani__card--wide {
+  max-width: 980px;
+}
+
+.plani__card--done {
+  text-align: center;
+  max-width: 520px;
+}
+
+.plani__title {
+  margin: 0 0 8px;
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.plani__lead {
+  margin: 0 0 28px;
+  color: #4a4a4f;
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+.plani__form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.plani__field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.plani__field > span {
+  font-size: 13px;
+  font-weight: 600;
+  color: #4a4a4f;
+}
+
+.plani__field input {
+  height: 44px;
+  padding: 0 14px;
+  font-size: 15px;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  border-radius: 12px;
+  background: #fff;
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+  font-family: inherit;
+  color: inherit;
+  width: 100%;
+}
+
+.plani__field input:focus {
+  border-color: #0a84ff;
+  box-shadow: 0 0 0 3px rgba(10, 132, 255, 0.18);
+}
+
+.plani__field input:disabled {
+  background: #f6f6f8;
+  color: #8a8a8e;
+}
+
+.plani__input-prefix {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.plani__input-prefix > span {
+  position: absolute;
+  left: 14px;
+  font-size: 15px;
+  color: #8a8a8e;
+  pointer-events: none;
+  font-weight: 600;
+}
+
+.plani__input-prefix input {
+  padding-left: 28px;
+}
+
+.plani__error {
+  background: rgba(255, 59, 48, 0.08);
+  border: 1px solid rgba(255, 59, 48, 0.24);
+  color: #b71c1c;
+  padding: 10px 12px;
+  border-radius: 10px;
+  font-size: 13.5px;
+  line-height: 1.4;
+}
+
+.plani__cta {
+  height: 48px;
+  padding: 0 24px;
+  background: #0a84ff;
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.08s;
+  font-family: inherit;
+  white-space: nowrap;
+}
+
+.plani__cta:hover:not(:disabled) {
+  background: #0070e0;
+}
+
+.plani__cta:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+.plani__cta:disabled {
+  background: #c7c7cc;
+  cursor: not-allowed;
+}
+
+.plani__help {
+  margin: 24px 0 0;
+  font-size: 13px;
+  color: #6e6e73;
+  text-align: center;
+}
+
+.plani__help a {
+  color: #0a84ff;
+  text-decoration: none;
+}
+
+.plani__help a:hover {
+  text-decoration: underline;
+}
+
+/* --- Step 2: order recap --- */
+.plani__order-recap {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 24px;
+  padding: 16px 18px;
+  background: #f5f7fb;
+  border-radius: 14px;
+  margin-bottom: 28px;
+}
+
+.plani__recap-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #8a8a8e;
+  font-weight: 600;
+  margin-bottom: 2px;
+}
+
+.plani__recap-value {
+  font-size: 14px;
+  color: #1d1d1f;
+  font-weight: 500;
+}
+
+.plani__step-title {
+  margin: 0 0 16px;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.plani__week-nav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.plani__nav-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  background: #fff;
+  cursor: pointer;
+  font-size: 18px;
+  color: #1d1d1f;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.plani__nav-btn:hover:not(:disabled) {
+  background: #f5f7fb;
+  border-color: rgba(0, 0, 0, 0.18);
+}
+
+.plani__nav-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.plani__week-label {
+  font-size: 15px;
+  font-weight: 600;
+  min-width: 220px;
+  text-align: center;
+}
+
+.plani__week {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 8px;
+}
+
+.plani__day {
+  display: flex;
+  flex-direction: column;
+  background: #fafbfd;
+  border-radius: 12px;
+  padding: 10px 8px;
+  min-height: 240px;
+}
+
+.plani__day-head {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  margin-bottom: 10px;
+}
+
+.plani__day-name {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #8a8a8e;
+  font-weight: 600;
+}
+
+.plani__day-date {
+  font-size: 17px;
+  font-weight: 600;
+  color: #1d1d1f;
+}
+
+.plani__day-slots {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.plani__day-empty {
+  text-align: center;
+  color: #c7c7cc;
+  font-size: 14px;
+  padding: 8px 0;
+}
+
+.plani__skeleton {
+  height: 36px;
+  border-radius: 8px;
+  background: linear-gradient(90deg, #eef0f4 0%, #f5f7fb 50%, #eef0f4 100%);
+  background-size: 200% 100%;
+  animation: planiShimmer 1.4s linear infinite;
+}
+
+@keyframes planiShimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+.plani__slot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 8px 6px;
+  background: #fff;
+  border: 1.5px solid rgba(10, 132, 255, 0.25);
+  border-radius: 10px;
+  font-family: inherit;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s, transform 0.08s;
+  color: #0a5fb8;
+}
+
+.plani__slot:hover:not(:disabled):not(.is-active) {
+  border-color: rgba(10, 132, 255, 0.6);
+  background: rgba(10, 132, 255, 0.04);
+}
+
+.plani__slot:active:not(:disabled) {
+  transform: scale(0.97);
+}
+
+.plani__slot.is-active {
+  background: #0a84ff;
+  border-color: #0a84ff;
+  color: #fff;
+}
+
+.plani__slot.is-full {
+  border-color: rgba(0, 0, 0, 0.08);
+  background: #f5f7fb;
+  color: #c7c7cc;
+  cursor: not-allowed;
+}
+
+.plani__slot-time {
+  font-size: 12.5px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.plani__slot-status {
+  font-size: 10.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.plani__footer {
+  margin-top: 28px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.plani__footer-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.plani__selected {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.plani__selected-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #8a8a8e;
+  font-weight: 600;
+}
+
+.plani__selected-value {
+  font-size: 15px;
+  font-weight: 600;
+  color: #1d1d1f;
+}
+
+.plani__selected-empty {
+  color: #8a8a8e;
+  font-size: 14px;
+  font-style: italic;
+}
+
+/* --- Step 3: success --- */
+.plani__success {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.plani__done-recap {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  text-align: left;
+  margin: 24px 0;
+  padding: 16px 18px;
+  background: #f5f7fb;
+  border-radius: 14px;
+}
+
+@media (max-width: 900px) {
+  .plani__card {
+    padding: 28px 22px;
+    border-radius: 20px;
+  }
+  .plani__order-recap {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  .plani__week {
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
+  .plani__day {
+    min-height: 0;
+    padding: 10px 12px;
+  }
+  .plani__day-head {
+    flex-direction: row;
+    justify-content: space-between;
+  }
+  .plani__day-slots {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+  .plani__slot {
+    flex: 0 1 auto;
+    min-width: 110px;
+  }
+  .plani__footer-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .plani__cta {
+    width: 100%;
+  }
+  .plani__done-recap {
+    grid-template-columns: 1fr;
+  }
+}
+

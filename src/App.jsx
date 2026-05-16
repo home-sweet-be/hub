@@ -7,6 +7,7 @@ import Livraisons from './pages/Livraisons'
 import Compta from './pages/Compta'
 import Factures from './pages/Factures'
 import Rapports from './pages/Rapports'
+import PlanificationLivraison from './pages/PlanificationLivraison'
 import './App.css'
 
 const MODULES = [
@@ -119,6 +120,7 @@ export default function App() {
   return (
     <BrowserRouter>
       <Routes>
+        <Route path="planification-livraison" element={<PlanificationLivraison />} />
         <Route element={<Shell />}>
           <Route index element={<Navigate to="/commandes" replace />} />
           <Route path="commandes" element={<Commandes />} />
