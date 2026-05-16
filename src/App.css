@@ -465,6 +465,21 @@
   margin-top: 4px;
 }
 
+.reception-cart__product.is-sub {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  padding-left: 18px;
+  margin-top: 2px;
+}
+
+.reception-cart__product.is-sub .reception-suboption__branch {
+  width: 14px;
+  height: 14px;
+  color: rgba(28, 28, 30, 0.18);
+  flex-shrink: 0;
+}
+
 .reception-cart__footer {
   display: flex;
   flex-direction: column;

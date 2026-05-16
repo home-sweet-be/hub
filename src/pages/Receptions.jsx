@@ -62,6 +62,23 @@ function productsSummary(items) {
   return items.map((li) => `${effectiveQuantity(li)}× ${li.title}`).join(', ')
 }
 
+function SubBranch() {
+  return (
+    <svg
+      className="reception-suboption__branch"
+      viewBox="0 0 14 14"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.4"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M2 2 L 7 8 L 13 8" />
+    </svg>
+  )
+}
+
 export default function Receptions() {
   const [orders, setOrders] = useState(null)
   const [error, setError] = useState(null)
@@ -275,22 +292,65 @@ export default function Receptions() {
                       </span>
                     </td>
                     <td className="reception-cart__products">
-                      {activeLineItems(o).map((li, idx) => (
-                        <div className="reception-cart__product" key={idx}>
-                          <span className="reception-qty">
-                            {effectiveQuantity(li)}×
-                          </span>
-                          <span className="reception-article__title">
-                            {li.title}
-                          </span>
-                          {li.variantTitle &&
-                            !/texture/i.test(li.variantTitle) && (
-                              <span className="reception-article__variant">
-                                {li.variantTitle}
-                              </span>
-                            )}
-                        </div>
-                      ))}
+                      {(() => {
+                        const out = []
+                        activeLineItems(o).forEach((li, idx) => {
+                          const hasImage = !!li.image?.url
+                          const lineAmount = Number(
+                            li.discountedTotalSet?.shopMoney?.amount || 0
+                          )
+                          const isSubLine = !hasImage && lineAmount < 590
+                          if (isSubLine) {
+                            out.push(
+                              <div
+                                className="reception-cart__product is-sub"
+                                key={`l-${idx}`}
+                              >
+                                <SubBranch />
+                                <span className="reception-suboption__bubble">
+                                  {li.title}
+                                </span>
+                              </div>
+                            )
+                          } else {
+                            out.push(
+                              <div
+                                className="reception-cart__product"
+                                key={`l-${idx}`}
+                              >
+                                <span className="reception-qty">
+                                  {effectiveQuantity(li)}×
+                                </span>
+                                <span className="reception-article__title">
+                                  {li.title}
+                                </span>
+                                {li.variantTitle &&
+                                  !/texture/i.test(li.variantTitle) && (
+                                    <span className="reception-article__variant">
+                                      {li.variantTitle}
+                                    </span>
+                                  )}
+                              </div>
+                            )
+                          }
+                          for (const attr of li.customAttributes || []) {
+                            if (!attr.key || attr.key.startsWith('_')) continue
+                            if (!attr.value) continue
+                            out.push(
+                              <div
+                                className="reception-cart__product is-sub"
+                                key={`a-${idx}-${attr.key}`}
+                              >
+                                <SubBranch />
+                                <span className="reception-suboption__bubble">
+                                  {attr.key}: {attr.value}
+                                </span>
+                              </div>
+                            )
+                          }
+                        })
+                        return out
+                      })()}
                     </td>
                     <td>
                       <button
@@ -498,18 +558,7 @@ export default function Receptions() {
                           <td className="reception-articles">
                             {isSubLine ? (
                               <span className="reception-suboption">
-                                <svg
-                                  className="reception-suboption__branch"
-                                  viewBox="0 0 14 14"
-                                  fill="none"
-                                  stroke="currentColor"
-                                  strokeWidth="1.4"
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  aria-hidden="true"
-                                >
-                                  <path d="M2 2 L 7 8 L 13 8" />
-                                </svg>
+                                <SubBranch />
                                 <span className="reception-suboption__bubble">
                                   {row.kind === 'attr'
                                     ? `${row.attr.key}: ${row.attr.value}`
