@@ -757,7 +757,7 @@
   color: var(--text-soft);
   margin-left: 6px;
   vertical-align: middle;
-  letter-spacing: 0.02em;
+  letter-spacing: 0;
 }
 
 .zone-badge {
