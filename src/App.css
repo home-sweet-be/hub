@@ -741,6 +741,7 @@
 .reception-thumb--placeholder svg {
   width: 70%;
   height: 70%;
+  margin-top: 10px;
 }
 
 .reception-num {
