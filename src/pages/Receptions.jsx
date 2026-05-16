@@ -417,7 +417,9 @@ export default function Receptions() {
         {/* ---------- Right: pending receptions ---------- */}
         <section className="reception__right">
           <div className="reception__pane-label reception__pane-label--right">
-            Commandes à réceptionner du fournisseur
+            {activeDef.id === 'stock'
+              ? 'Commandes à valider'
+              : 'Commandes à réceptionner du fournisseur'}
           </div>
 
           {error && <p style={{ color: '#c00' }}>Erreur : {error}</p>}
