@@ -283,11 +283,12 @@ export default function Receptions() {
                           <span className="reception-article__title">
                             {li.title}
                           </span>
-                          {li.variantTitle && (
-                            <span className="reception-article__variant">
-                              {li.variantTitle}
-                            </span>
-                          )}
+                          {li.variantTitle &&
+                            !/texture/i.test(li.variantTitle) && (
+                              <span className="reception-article__variant">
+                                {li.variantTitle}
+                              </span>
+                            )}
                         </div>
                       ))}
                     </td>
@@ -502,11 +503,12 @@ export default function Receptions() {
                                 <span className="reception-article__title">
                                   {li.title}
                                 </span>
-                                {li.variantTitle && (
-                                  <span className="reception-article__variant">
-                                    {li.variantTitle}
-                                  </span>
-                                )}
+                                {li.variantTitle &&
+                                  !/texture/i.test(li.variantTitle) && (
+                                    <span className="reception-article__variant">
+                                      {li.variantTitle}
+                                    </span>
+                                  )}
                               </>
                             )}
                           </td>
