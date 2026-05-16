@@ -38,6 +38,20 @@ function extractZone(tags = []) {
   return tags.find((t) => ZONE_TAG_PATTERN.test(t)) || null
 }
 
+const ZONE_FLAGS = {
+  BE: '🇧🇪',
+  FR: '🇫🇷',
+  LU: '🇱🇺',
+  NL: '🇳🇱',
+  DE: '🇩🇪',
+}
+
+function zoneFlag(zone) {
+  if (!zone) return null
+  const code = zone.slice(0, 2).toUpperCase()
+  return ZONE_FLAGS[code] || null
+}
+
 function formatDate(iso) {
   if (!iso) return ''
   return new Date(iso).toLocaleDateString('fr-BE', {
@@ -636,7 +650,14 @@ export default function Receptions() {
                           {isFirst && (
                             <td rowSpan={span}>
                               {zone ? (
-                                <span className="zone-badge">{zone}</span>
+                                <span className="zone-badge">
+                                  {zoneFlag(zone) && (
+                                    <span className="zone-badge__flag">
+                                      {zoneFlag(zone)}
+                                    </span>
+                                  )}
+                                  {zone}
+                                </span>
                               ) : (
                                 <span className="reception-table__muted">—</span>
                               )}
