@@ -149,6 +149,17 @@ export default function Receptions() {
     return orders.filter((o) => selectedIds.has(o.id))
   }, [orders, selectedIds])
 
+  const selectedRefCount = useMemo(() => {
+    const set = new Set()
+    for (const o of selectedOrders) {
+      for (const li of activeLineItems(o)) {
+        const id = li.variant?.inventoryItem?.id
+        if (id) set.add(id)
+      }
+    }
+    return set.size
+  }, [selectedOrders])
+
   const addToCart = (id) => {
     setSelectedIds((s) => {
       const next = new Set(s)
@@ -518,6 +529,8 @@ export default function Receptions() {
                 >
                   {pending === 'adjust'
                     ? 'Réception en cours…'
+                    : selectedRefCount === 1
+                    ? 'Réceptionner le produit'
                     : 'Réceptionner les produits'}
                 </button>
               ) : (
@@ -529,6 +542,8 @@ export default function Receptions() {
                 >
                   {pending === 'markReady'
                     ? 'Mise à jour…'
+                    : selectedOrders.length === 1
+                    ? 'Marquer comme prête pour la livraison'
                     : 'Marquer comme prêtes pour la livraison'}
                 </button>
               )}

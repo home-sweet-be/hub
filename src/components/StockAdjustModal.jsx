@@ -240,6 +240,8 @@ export default function StockAdjustModal({
           >
             {pending
               ? 'Réception en cours…'
+              : orderCount === 1
+              ? 'Marquer comme prête pour la livraison'
               : 'Marquer comme prêtes pour la livraison'}
           </button>
         </footer>
