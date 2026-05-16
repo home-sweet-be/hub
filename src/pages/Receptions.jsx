@@ -233,10 +233,6 @@ export default function Receptions() {
         ))}
       </div>
 
-      {activeDef.supplierTitle && (
-        <div className="reception__supplier-title">{activeDef.supplierTitle}</div>
-      )}
-
       <div className="reception__panes">
         {/* ---------- Left: reception cart ---------- */}
         <aside className="reception__left">
