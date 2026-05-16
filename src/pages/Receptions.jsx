@@ -341,11 +341,11 @@ export default function Receptions() {
                 <thead>
                   <tr>
                     <th aria-label="action" />
-                    <th>Produits</th>
+                    <th aria-label="image" />
+                    <th>Produit</th>
                     <th>N°</th>
                     <th>Zone</th>
                     <th>Date</th>
-                    <th>Articles</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -407,6 +407,9 @@ export default function Receptions() {
                               )}
                             </div>
                           </td>
+                          <td className="reception-articles">
+                            {articleLine(li)}
+                          </td>
                           {isFirst && (
                             <td className="reception-num" rowSpan={span}>
                               {o.name.replace(/^#/, '')}
@@ -426,9 +429,6 @@ export default function Receptions() {
                               {formatDate(o.createdAt)}
                             </td>
                           )}
-                          <td className="reception-articles">
-                            {articleLine(li)}
-                          </td>
                         </tr>
                       )
                     })
