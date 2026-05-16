@@ -802,7 +802,7 @@
 }
 
 .reception-table tbody tr.is-selected {
-  background: rgba(52, 199, 89, 0.1);
+  opacity: 0.3;
 }
 
 .reception-thumbs {
