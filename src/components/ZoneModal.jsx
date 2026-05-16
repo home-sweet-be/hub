@@ -30,8 +30,8 @@ function zoneLabel(zone) {
   return zone.replace(/^[A-Z]{2}-/, '').replace(/-/g, ' ')
 }
 
-// ~200 km radius. 1° latitude ≈ 111 km, so 1.8° ≈ 200 km.
-const BBOX_DEG = 1.8
+// ~150 km radius. 1° latitude ≈ 111 km, so 1.35° ≈ 150 km.
+const BBOX_DEG = 1.35
 
 function osmEmbed(lat, lon) {
   const left = lon - BBOX_DEG
