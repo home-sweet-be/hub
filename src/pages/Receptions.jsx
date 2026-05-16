@@ -706,35 +706,12 @@ export default function Receptions() {
                                 <SamplesThumb />
                               </div>
                             ) : isSubLine ? null : row.kind === 'line' ? (
-                              <div
-                                className="reception-thumb reception-thumb--placeholder"
+                              <img
+                                src="/canapbackup.jpg"
+                                alt=""
                                 aria-hidden="true"
-                              >
-                                <svg
-                                  viewBox="0 0 24 24"
-                                  strokeLinejoin="round"
-                                  strokeLinecap="round"
-                                >
-                                  <path
-                                    d="M12 3 L3 8 L12 13 L21 8 Z"
-                                    fill="#d8d8de"
-                                    stroke="#9a9aa3"
-                                    strokeWidth="0.9"
-                                  />
-                                  <path
-                                    d="M3 8 L3 17 L12 22 L12 13 Z"
-                                    fill="#b3b3bd"
-                                    stroke="#9a9aa3"
-                                    strokeWidth="0.9"
-                                  />
-                                  <path
-                                    d="M21 8 L21 17 L12 22 L12 13 Z"
-                                    fill="#909099"
-                                    stroke="#9a9aa3"
-                                    strokeWidth="0.9"
-                                  />
-                                </svg>
-                              </div>
+                                className="reception-thumb"
+                              />
                             ) : null}
                           </td>
                           <td className="reception-articles">
