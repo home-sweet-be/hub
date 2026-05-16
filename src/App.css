@@ -573,7 +573,7 @@
 
 /* Sticky first column ("+" button) */
 .reception-table thead th:first-child,
-.reception-table tbody td:first-child {
+.reception-table tbody tr:not(.is-row-cont) td:first-child {
   position: sticky;
   left: 0;
   width: 56px;
@@ -587,12 +587,12 @@
   box-shadow: 1px 0 0 rgba(28, 28, 30, 0.06);
 }
 
-.reception-table tbody td:first-child {
+.reception-table tbody tr:not(.is-row-cont) td:first-child {
   background: rgba(255, 255, 255, 0.92);
   box-shadow: 1px 0 0 rgba(28, 28, 30, 0.05);
 }
 
-.reception-table tbody tr.is-selected td:first-child {
+.reception-table tbody tr.is-selected:not(.is-row-cont) td:first-child {
   background: rgba(217, 245, 226, 0.96);
 }
 
