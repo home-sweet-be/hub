@@ -2598,7 +2598,7 @@
 }
 
 .slot-modal__body {
-  padding-bottom: 8px;
+  padding: 0 22px 8px;
 }
 
 .slot-modal__grid {
