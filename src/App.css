@@ -846,25 +846,43 @@
 .reception-num__link {
   position: relative;
   display: inline-block;
-  padding: 2px 8px 2px 27px;
-  margin: -2px -8px -2px -8px;
-  border-radius: 6px;
+  padding: 2px 8px;
+  margin: -2px -8px;
   color: inherit;
   text-decoration: none;
+  isolation: isolate;
+  transition: color 0.18s ease;
+}
+
+.reception-num__link::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  border-radius: 6px;
+  background: transparent;
   transition:
     background 0.18s ease,
-    color 0.18s ease;
+    left 0.25s ease;
+  z-index: -1;
 }
 
 .reception-num__link:hover {
-  background: rgba(149, 191, 71, 0.18);
   color: #5e8e3e;
+}
+
+.reception-num__link:hover::before {
+  background: rgba(149, 191, 71, 0.18);
+  left: -23px;
 }
 
 .reception-num__icon-wrap {
   position: absolute;
   top: 50%;
-  left: 7px;
+  right: 100%;
+  margin-right: 3px;
   transform: translateY(-50%);
   pointer-events: none;
 }
@@ -874,7 +892,7 @@
   width: 15px;
   height: 15px;
   opacity: 0;
-  transform: translateX(-6px);
+  transform: translateX(6px);
   transition:
     opacity 0.25s ease,
     transform 0.25s ease;
