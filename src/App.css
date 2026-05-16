@@ -388,6 +388,11 @@
   text-align: center;
 }
 
+.reception__pane-label--left {
+  background: rgba(52, 199, 89, 0.18);
+  border-color: rgba(52, 199, 89, 0.28);
+}
+
 .reception__left {
   display: flex;
   flex-direction: column;

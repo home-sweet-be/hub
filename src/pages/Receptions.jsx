@@ -237,7 +237,7 @@ export default function Receptions() {
       <div className="reception__panes">
         {/* ---------- Left: reception cart ---------- */}
         <aside className="reception__left">
-          <div className="reception__pane-label">Liste de commandes réceptionnées</div>
+          <div className="reception__pane-label reception__pane-label--left">Liste de commandes réceptionnées</div>
 
           <div className="reception-cart">
             <table className="reception-cart__table">
