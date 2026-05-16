@@ -91,9 +91,9 @@ export default function StockAdjustModal({
                   <th aria-label="image" />
                   <th>Produit</th>
                   <th>SKU</th>
-                  <th className="stock-modal__num">Avant</th>
+                  <th className="stock-modal__num">Dispo. avant</th>
                   <th />
-                  <th className="stock-modal__num">Après</th>
+                  <th className="stock-modal__num">Dispo. après</th>
                 </tr>
               </thead>
               <tbody>

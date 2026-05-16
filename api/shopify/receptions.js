@@ -48,19 +48,7 @@ const QUERY = `
                   id
                   sku
                   inventoryQuantity
-                  inventoryItem {
-                    id
-                    inventoryLevels(first: 10) {
-                      edges {
-                        node {
-                          quantities(names: ["on_hand"]) {
-                            name
-                            quantity
-                          }
-                        }
-                      }
-                    }
-                  }
+                  inventoryItem { id }
                 }
               }
             }
@@ -144,23 +132,7 @@ export default async function handler(req, res) {
           adminUrl: numericId
             ? `https://${domain}/admin/orders/${numericId}`
             : null,
-          lineItems: (o.lineItems?.edges || []).map((le) => {
-            const li = le.node
-            const levels =
-              li.variant?.inventoryItem?.inventoryLevels?.edges || []
-            const onHand = levels.reduce((sum, e) => {
-              const q = (e.node?.quantities || []).find(
-                (x) => x.name === 'on_hand'
-              )
-              return sum + (q?.quantity || 0)
-            }, 0)
-            return {
-              ...li,
-              variant: li.variant
-                ? { ...li.variant, onHand }
-                : li.variant,
-            }
-          }),
+          lineItems: (o.lineItems?.edges || []).map((le) => le.node),
         }
       })
       .filter((o) => Number(o.total) > 1)
