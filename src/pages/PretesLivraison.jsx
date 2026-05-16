@@ -39,14 +39,6 @@ function activeLineItems(order) {
   return order.lineItems.filter((li) => effectiveQuantity(li) > 0)
 }
 
-function formatPrice(amount, currency = 'EUR') {
-  const n = Number(amount)
-  if (Number.isNaN(n)) return amount
-  return new Intl.NumberFormat('fr-BE', { style: 'currency', currency }).format(
-    n
-  )
-}
-
 function SubBranch() {
   return (
     <svg
@@ -149,14 +141,12 @@ export default function PretesLivraison() {
                     <th>Client</th>
                     <th>Attente</th>
                     <th>Date</th>
-                    <th className="num">Total</th>
-                    <th>Paiement</th>
                   </tr>
                 </thead>
                 <tbody>
                   {sorted.length === 0 && (
                     <tr>
-                      <td colSpan={10} className="reception-table__empty">
+                      <td colSpan={8} className="reception-table__empty">
                         Aucune commande.
                       </td>
                     </tr>
@@ -369,22 +359,6 @@ export default function PretesLivraison() {
                           {isFirst && (
                             <td className="reception-date" rowSpan={span}>
                               {formatDate(o.createdAt)}
-                            </td>
-                          )}
-                          {isFirst && (
-                            <td className="num" rowSpan={span}>
-                              {formatPrice(o.total, o.currency)}
-                            </td>
-                          )}
-                          {isFirst && (
-                            <td rowSpan={span}>
-                              <span
-                                className={`badge badge--${(
-                                  o.financialStatus || ''
-                                ).toLowerCase()}`}
-                              >
-                                {(o.financialStatus || '—').toUpperCase()}
-                              </span>
                             </td>
                           )}
                         </tr>
