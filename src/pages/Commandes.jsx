@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { ZoneFlag, zoneCode } from '../components/ZoneFlag'
 import ZoneModal from '../components/ZoneModal'
 import AddressModal from '../components/AddressModal'
+import OrdersTableSkeleton from '../components/OrdersTableSkeleton'
 
 const ZONE_TAG_PATTERN = /^(BE|FR|LU|NL|DE|LIV)(-|$)/i
 
@@ -128,7 +129,7 @@ export default function Commandes() {
 
           {error && <p style={{ color: '#c00' }}>Erreur : {error}</p>}
           {orders === null && !error && (
-            <p className="page__hint">Chargement…</p>
+            <OrdersTableSkeleton columns={10} rows={8} hasImageCol />
           )}
 
           {orders && (

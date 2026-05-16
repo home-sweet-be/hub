@@ -1885,3 +1885,68 @@
   box-shadow: none;
 }
 
+/* Skeleton loading for orders table */
+.skeleton-row td {
+  border-bottom: 1px solid rgba(28, 28, 30, 0.05) !important;
+  background: rgba(255, 255, 255, 0.55) !important;
+}
+
+.skeleton-bar,
+.skeleton-image,
+.skeleton-action,
+.skeleton-qty {
+  display: block;
+  background: linear-gradient(
+    90deg,
+    rgba(28, 28, 30, 0.06) 0%,
+    rgba(28, 28, 30, 0.12) 50%,
+    rgba(28, 28, 30, 0.06) 100%
+  );
+  background-size: 200% 100%;
+  border-radius: 6px;
+  animation: skeleton-shimmer 1.4s ease-in-out infinite;
+}
+
+.skeleton-bar {
+  width: 80%;
+  height: 12px;
+}
+
+.skeleton-bar--wide {
+  width: 100%;
+  flex: 1;
+}
+
+.skeleton-image {
+  width: 54px;
+  height: 36px;
+  border-radius: 5px;
+  margin: 0 auto;
+}
+
+.skeleton-action {
+  width: 28px;
+  height: 28px;
+  border-radius: 7px;
+  margin: 0 auto;
+}
+
+.skeleton-qty {
+  width: 26px;
+  height: 16px;
+  border-radius: 999px;
+  flex-shrink: 0;
+}
+
+.skeleton-product {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+}
+
+@keyframes skeleton-shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
