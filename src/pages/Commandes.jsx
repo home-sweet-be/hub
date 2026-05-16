@@ -123,7 +123,7 @@ export default function Commandes() {
   }, [orders])
 
   return (
-    <div className="page reception">
+    <div className="page reception reception--list-only">
       <div className="reception__body">
         <section className="reception__right">
           <div className="reception__pane-label reception__pane-label--right">

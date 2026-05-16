@@ -98,7 +98,7 @@ export default function PretesLivraison() {
     return fetch(
       '/api/shopify/receptions?q=' +
         encodeURIComponent(
-          `created_at:>=${cutoff} AND tag:PretPourLaLivraison AND NOT tag:removed AND status:open`
+          `created_at:>=${cutoff} AND tag:PretPourLaLivraison AND NOT tag:removed AND status:open AND NOT financial_status:refunded AND NOT financial_status:partially_refunded`
         ) +
         '&first=100'
     )
@@ -124,7 +124,7 @@ export default function PretesLivraison() {
   }, [orders])
 
   return (
-    <div className="page reception">
+    <div className="page reception reception--list-only">
       <div className="reception__body">
         <section className="reception__right">
           <div className="reception__pane-label reception__pane-label--right">

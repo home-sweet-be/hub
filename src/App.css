@@ -774,6 +774,23 @@
   background: rgba(255, 255, 255, 0.92);
 }
 
+/* No-cart variants: disable sticky/first-col special styles */
+.reception--list-only .reception-table thead th:first-child,
+.reception--list-only .reception-table tbody tr:not(.is-row-cont) td:first-child {
+  position: static;
+  width: auto;
+  padding: 3px 14px;
+  box-shadow: none;
+}
+
+.reception--list-only .reception-table tbody tr:not(.is-row-cont) td:first-child {
+  background: rgba(255, 255, 255, 0.7);
+}
+
+.reception--list-only .reception-table .reception-img-cell {
+  width: 60px;
+  padding: 3px;
+}
 
 .reception-table tbody tr.is-selected:not(.is-row-cont) td:first-child {
   background: rgba(217, 245, 226, 0.96);
