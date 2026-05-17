@@ -17,7 +17,6 @@ const QUERY = `
             id
             firstName
             lastName
-            email
             tags
           }
           shippingAddress {
@@ -113,19 +112,18 @@ export default async function handler(req, res) {
     }
     const data = await r.json()
     if (data.errors) {
-      return res.status(500).json({ error: 'GraphQL errors', errors: data.errors })
+      const msg = data.errors.map((e) => e.message).join('; ')
+      return res
+        .status(500)
+        .json({ error: `GraphQL: ${msg}`, errors: data.errors })
     }
 
     const edges = data.data?.orders?.edges || []
-    // Find one with matching email (order.email or customer.email)
+    // Find one with matching email (order.email or order.contactEmail)
     const matched = edges
       .map((e) => e.node)
       .find((o) => {
-        const candidates = [
-          o.email,
-          o.contactEmail,
-          o.customer?.email,
-        ].map(normalizeEmail)
+        const candidates = [o.email, o.contactEmail].map(normalizeEmail)
         return candidates.includes(email)
       })
 
