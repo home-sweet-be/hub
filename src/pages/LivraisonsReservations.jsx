@@ -123,11 +123,11 @@ function OrdersTable({
             <th>Produit</th>
             <th>N°</th>
             <th>Zone</th>
+            <th>Livraison</th>
             <th>Ville</th>
             <th>Client</th>
             <th>Attente</th>
             <th>Date</th>
-            <th>Livraison</th>
           </tr>
         </thead>
         <tbody>
@@ -303,6 +303,37 @@ function OrdersTable({
                     </td>
                   )}
                   {isFirst && (
+                    <td rowSpan={span} className="reception-shipping">
+                      {(() => {
+                        const chip = classifyShipping(o.shippingLine?.title)
+                        if (!chip)
+                          return (
+                            <span className="reception-table__muted">—</span>
+                          )
+                        return (
+                          <span
+                            className={
+                              'reception-shipping__chip is-' +
+                              chip.label.toLowerCase()
+                            }
+                            title={o.shippingLine?.title || ''}
+                          >
+                            <span className="reception-shipping__label">
+                              {chip.label}
+                            </span>
+                            {chip.emojis.length > 0 && (
+                              <span className="reception-shipping__emojis">
+                                {chip.emojis.map((e, k) => (
+                                  <span key={k}>{e}</span>
+                                ))}
+                              </span>
+                            )}
+                          </span>
+                        )
+                      })()}
+                    </td>
+                  )}
+                  {isFirst && (
                     <td className="reception-meta" rowSpan={span}>
                       {o.shippingAddress?.city ? (
                         <button
@@ -355,37 +386,6 @@ function OrdersTable({
                   {isFirst && (
                     <td className="reception-date" rowSpan={span}>
                       {formatDate(o.createdAt)}
-                    </td>
-                  )}
-                  {isFirst && (
-                    <td rowSpan={span} className="reception-shipping">
-                      {(() => {
-                        const chip = classifyShipping(o.shippingLine?.title)
-                        if (!chip)
-                          return (
-                            <span className="reception-table__muted">—</span>
-                          )
-                        return (
-                          <span
-                            className={
-                              'reception-shipping__chip is-' +
-                              chip.label.toLowerCase()
-                            }
-                            title={o.shippingLine?.title || ''}
-                          >
-                            <span className="reception-shipping__label">
-                              {chip.label}
-                            </span>
-                            {chip.emojis.length > 0 && (
-                              <span className="reception-shipping__emojis">
-                                {chip.emojis.map((e, k) => (
-                                  <span key={k}>{e}</span>
-                                ))}
-                              </span>
-                            )}
-                          </span>
-                        )
-                      })()}
                     </td>
                   )}
                 </tr>
