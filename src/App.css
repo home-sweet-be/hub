@@ -3945,13 +3945,7 @@
 }
 
 .marge__field--search {
-  grid-column: span 1;
-}
-
-@media (min-width: 900px) {
-  .marge__field--search {
-    grid-column: span 2;
-  }
+  max-width: 180px;
 }
 
 /* Marge table cells */
@@ -3993,6 +3987,11 @@
 .marge-badge.is-bad {
   background: rgba(255, 59, 48, 0.14);
   color: #a3271f;
+}
+
+.marge-table__divider {
+  border-left: 2px solid rgba(28, 28, 30, 0.18) !important;
+  padding-left: 16px !important;
 }
 
 .marge-table__edit {

@@ -348,6 +348,9 @@ function CalculateurMarge() {
         const margePropre = margeHt - fraisParUnite
         const margeProprePct =
           priceHt > 0 ? (margePropre / priceHt) * 100 : 0
+        const margePlNet = margeTtc - fraisParUnite
+        const margePlNetPct =
+          priceTtc > 0 ? (margePlNet / priceTtc) * 100 : 0
         return {
           ...p,
           priceTtc,
@@ -359,6 +362,8 @@ function CalculateurMarge() {
           margeHtPct,
           margePropre,
           margeProprePct,
+          margePlNet,
+          margePlNetPct,
         }
       })
       .filter((r) => {
@@ -402,10 +407,10 @@ function CalculateurMarge() {
           </div>
         </div>
         <label className="marge__field marge__field--search">
-          <span>Recherche (nom ou SKU)</span>
+          <span>Recherche</span>
           <input
             type="search"
-            placeholder="Canapé, BE-…"
+            placeholder="Bellagio, COBRA…"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
@@ -424,100 +429,103 @@ function CalculateurMarge() {
                 <th>Produit</th>
                 <th>SKU</th>
                 <th className="num">Prix TTC</th>
+                <th className="num">Montant HT</th>
                 <th className="num">Coût HT</th>
-                <th className="num">Marge TTC</th>
                 <th className="num">Marge HT</th>
                 <th className="num">Marge nette</th>
+                <th className="num marge-table__divider">Marge PL</th>
+                <th className="num">Marge PL nette</th>
                 <th aria-label="actions" />
               </tr>
             </thead>
             <tbody>
               {rows.length === 0 && (
                 <tr>
-                  <td colSpan={9} className="reception-table__empty">
+                  <td colSpan={11} className="reception-table__empty">
                     {search
                       ? 'Aucun produit ne correspond à la recherche.'
                       : 'Aucun produit avec coût HT renseigné.'}
                   </td>
                 </tr>
               )}
-              {rows.map((r) => (
-                <tr key={r.id}>
-                  <td className="rapports-table__img">
-                    {r.imageUrl ? (
-                      <img
-                        src={r.imageUrl}
-                        alt=""
-                        className="rapports-table__thumb"
-                      />
-                    ) : (
-                      <div
-                        className="rapports-table__thumb rapports-table__thumb--empty"
-                        aria-hidden="true"
-                      />
-                    )}
-                  </td>
-                  <td>
-                    <div className="rapports-table__title">{r.title}</div>
-                  </td>
-                  <td className="rapports-table__sku">
-                    {r.variant.sku || (
-                      <span className="reception-table__muted">—</span>
-                    )}
-                  </td>
-                  <td className="num">{formatPrice(r.priceTtc)}</td>
-                  <td className="num">
-                    {r.costHt > 0 ? (
-                      formatPrice(r.costHt)
-                    ) : (
-                      <span className="reception-table__muted">—</span>
-                    )}
-                  </td>
-                  <td className="num marge-table__cell">
-                    {r.costHt > 0 ? (
-                      <>
-                        <div>{formatPrice(r.margeTtc)}</div>
-                        <MargeBadge pct={r.margeTtcPct} />
-                      </>
-                    ) : (
-                      <span className="reception-table__muted">—</span>
-                    )}
-                  </td>
-                  <td className="num marge-table__cell">
-                    {r.costHt > 0 ? (
-                      <>
-                        <div>{formatPrice(r.margeHt)}</div>
-                        <MargeBadge pct={r.margeHtPct} />
-                      </>
-                    ) : (
-                      <span className="reception-table__muted">—</span>
-                    )}
-                  </td>
-                  <td className="num marge-table__cell">
-                    {r.costHt > 0 ? (
-                      <>
-                        <div>{formatPrice(r.margePropre)}</div>
-                        <MargeBadge pct={r.margeProprePct} />
-                      </>
-                    ) : (
-                      <span className="reception-table__muted">—</span>
-                    )}
-                  </td>
-                  <td>
-                    {r.bulkEditUrl && (
-                      <a
-                        href={r.bulkEditUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="marge-table__edit"
-                        title="Modifier le coût HT dans Shopify"
-                      >
-                        ✎
-                      </a>
-                    )}
-                  </td>
-                </tr>
-              ))}
+              {rows.map((r) => {
+                const has = r.costHt > 0
+                const muted = (
+                  <span className="reception-table__muted">—</span>
+                )
+                return (
+                  <tr key={r.id}>
+                    <td className="rapports-table__img">
+                      {r.imageUrl ? (
+                        <img
+                          src={r.imageUrl}
+                          alt=""
+                          className="rapports-table__thumb"
+                        />
+                      ) : (
+                        <div
+                          className="rapports-table__thumb rapports-table__thumb--empty"
+                          aria-hidden="true"
+                        />
+                      )}
+                    </td>
+                    <td>
+                      <div className="rapports-table__title">{r.title}</div>
+                    </td>
+                    <td className="rapports-table__sku">
+                      {r.variant.sku || muted}
+                    </td>
+                    <td className="num">{formatPrice(r.priceTtc)}</td>
+                    <td className="num">{formatPrice(r.priceHt)}</td>
+                    <td className="num">{has ? formatPrice(r.costHt) : muted}</td>
+                    <td className="num marge-table__cell">
+                      {has ? (
+                        <>
+                          <div>{formatPrice(r.margeHt)}</div>
+                          <MargeBadge pct={r.margeHtPct} />
+                        </>
+                      ) : muted}
+                    </td>
+                    <td className="num marge-table__cell">
+                      {has ? (
+                        <>
+                          <div>{formatPrice(r.margePropre)}</div>
+                          <MargeBadge pct={r.margeProprePct} />
+                        </>
+                      ) : muted}
+                    </td>
+                    <td className="num marge-table__cell marge-table__divider">
+                      {has ? (
+                        <>
+                          <div>{formatPrice(r.margeTtc)}</div>
+                          <MargeBadge pct={r.margeTtcPct} />
+                        </>
+                      ) : muted}
+                    </td>
+                    <td className="num marge-table__cell">
+                      {has ? (
+                        <>
+                          <div>{formatPrice(r.margePlNet)}</div>
+                          <MargeBadge pct={r.margePlNetPct} />
+                        </>
+                      ) : muted}
+                    </td>
+                    <td>
+                      {r.bulkEditUrl && (
+                        <a
+                          href={r.bulkEditUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="marge-table__edit"
+                          title="Modifier le coût HT dans Shopify"
+                        >
+                          ✎
+                        </a>
+                      )}
+                    </td>
+                  </tr>
+                )
+              })}
             </tbody>
           </table>
         </div>
