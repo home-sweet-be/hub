@@ -4,7 +4,7 @@
   ],
   "headers": [
     {
-      "source": "/planification-livraison",
+      "source": "/(.*)",
       "headers": [
         {
           "key": "Content-Security-Policy",
