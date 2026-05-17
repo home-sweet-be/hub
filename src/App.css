@@ -3859,9 +3859,66 @@
   font-weight: 700;
 }
 
-.compta-table th,
-.compta-table td {
+.compta-table-wrap {
+  width: 100%;
+  overflow-x: auto;
+  border: 1px solid rgba(28, 28, 30, 0.08);
+  border-radius: 12px;
+  background: #fff;
+}
+
+.compta-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.compta-table thead {
+  background: rgba(248, 248, 252, 0.7);
+}
+
+.compta-table thead th {
+  text-align: left;
+  font-weight: 600;
+  font-size: 11.5px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-soft);
+  padding: 10px 14px;
+  vertical-align: middle;
+  border-bottom: 1px solid rgba(28, 28, 30, 0.08);
+  white-space: nowrap;
+}
+
+.compta-table thead th.num {
+  text-align: right;
+}
+
+.compta-table tbody td {
+  padding: 10px 14px;
   vertical-align: top;
+  border-bottom: 1px solid rgba(28, 28, 30, 0.06);
+}
+
+.compta-table tbody td.num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.compta-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.compta-table tbody tr:hover td {
+  background: rgba(28, 28, 30, 0.02);
+}
+
+.compta-table .reception-table__empty {
+  text-align: center;
+  padding: 32px 16px;
+  color: var(--text-muted);
+  font-style: italic;
 }
 
 .compta__client {

@@ -105,7 +105,7 @@ export default function Compta() {
       setLoadingIdx(idx)
       setError(null)
       try {
-        const q = `created_at:>=${ymd(m.start)} AND created_at:<${ymd(m.end)} AND NOT tag:removed`
+        const q = `created_at:>=${ymd(m.start)} AND created_at:<${ymd(m.end)} AND NOT tag:removed AND NOT financial_status:refunded AND NOT financial_status:partially_refunded`
         const r = await fetch(
           '/api/shopify/receptions?q=' +
             encodeURIComponent(q) +
@@ -228,8 +228,8 @@ export default function Compta() {
         {isLoading && <OrdersTableSkeleton columns={6} rows={8} />}
 
         {orders && (
-          <div className="reception-table-wrap">
-            <table className="reception-table compta-table">
+          <div className="compta-table-wrap">
+            <table className="compta-table">
               <thead>
                 <tr>
                   <th>Date</th>
