@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { ZoneFlag, zoneCode } from '../components/ZoneFlag'
 import ZoneModal from '../components/ZoneModal'
 import AddressModal from '../components/AddressModal'
@@ -176,24 +177,25 @@ export default function PretesLivraison() {
             Commandes prêtes pour la livraison
           </div>
 
-          {selectedIds.size > 0 && (
-            <div className="pretes-bulk-toolbar">
-              <span className="pretes-bulk-toolbar__count">
-                {selectedIds.size} commande{selectedIds.size > 1 ? 's' : ''} sélectionnée
-                {selectedIds.size > 1 ? 's' : ''}
-              </span>
-              <button
-                type="button"
-                className="btn btn--orange"
-                onClick={sendToWaitlist}
-                disabled={pending}
-              >
-                {pending
-                  ? 'Envoi…'
-                  : `Envoyer en file d'attente`}
-              </button>
-            </div>
-          )}
+          {selectedIds.size > 0 &&
+            createPortal(
+              <div className="pretes-bulk-toolbar">
+                <span className="pretes-bulk-toolbar__count">
+                  {selectedIds.size} commande
+                  {selectedIds.size > 1 ? 's' : ''} sélectionnée
+                  {selectedIds.size > 1 ? 's' : ''}
+                </span>
+                <button
+                  type="button"
+                  className="btn btn--orange"
+                  onClick={sendToWaitlist}
+                  disabled={pending}
+                >
+                  {pending ? 'Envoi…' : `Envoyer en file d'attente`}
+                </button>
+              </div>,
+              document.body
+            )}
 
           {error && <p style={{ color: '#c00' }}>Erreur : {error}</p>}
           {orders === null && !error && (
