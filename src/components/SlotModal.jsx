@@ -336,7 +336,7 @@ function BookingsList({ bookings, loading }) {
                   className="slot-bookings__order"
                   title="Ouvrir la commande dans Shopify"
                 >
-                  #{b.shopify_order_name}
+                  {b.shopify_order_name}
                 </a>
               </div>
               <div className="slot-bookings__contact">
