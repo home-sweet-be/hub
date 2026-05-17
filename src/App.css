@@ -4969,6 +4969,33 @@ body:has(.plani),
   margin-bottom: 20px;
 }
 
+.plani__locked-notice {
+  margin-top: 20px;
+  padding: 14px 16px;
+  background: #f5f5f7;
+  border: 1px solid #d2d2d7;
+  border-radius: 12px;
+  color: #1d1d1f;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.plani__locked-notice strong {
+  display: block;
+  margin-bottom: 4px;
+  font-size: 14px;
+}
+
+.plani__locked-notice p {
+  margin: 0;
+  color: var(--text-soft);
+}
+
+.plani__locked-notice a {
+  color: #1d1d1f;
+  text-decoration: underline;
+}
+
 .plani__done-recap {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);

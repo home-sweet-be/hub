@@ -137,6 +137,7 @@ export default function PlanificationLivraison() {
   const [selectedSlot, setSelectedSlot] = useState(null)
   const [booking, setBooking] = useState(false)
   const [bookingError, setBookingError] = useState(null)
+  const [existingBooking, setExistingBooking] = useState(null)
 
   const weekEnd = useMemo(() => addDays(weekStart, 7), [weekStart])
 
@@ -212,7 +213,25 @@ export default function PlanificationLivraison() {
         return
       }
       setOrder(data.order)
-      setStep('pick')
+      const cleanOrderName = (data.order?.name || orderName).replace(/^#/, '')
+      const { data: existing, error: existingErr } = await supabase
+        .from('delivery_bookings')
+        .select('id, slot_id, delivery_slots(*)')
+        .eq('shopify_order_name', cleanOrderName)
+        .eq('status', 'confirmed')
+        .maybeSingle()
+      if (existingErr) {
+        console.warn('existing booking lookup:', existingErr)
+      }
+      if (existing && existing.delivery_slots) {
+        setExistingBooking({
+          id: existing.id,
+          slot: existing.delivery_slots,
+        })
+        setStep('already-booked')
+      } else {
+        setStep('pick')
+      }
     } catch (err) {
       // eslint-disable-next-line no-console
       console.error('verify-order network:', err)
@@ -616,6 +635,76 @@ export default function PlanificationLivraison() {
               </footer>
             )}
             </div>
+            </div>
+          </section>
+        )}
+
+        {step === 'already-booked' && existingBooking && order && (
+          <section className="plani__card plani__card--done">
+            <div className="plani__success plani__success--locked">
+              <svg viewBox="0 0 64 64" width="64" height="64" aria-hidden="true">
+                <circle cx="32" cy="32" r="30" fill="#1d1d1f" />
+                <path
+                  d="M24 30v-4a8 8 0 0 1 16 0v4"
+                  fill="none"
+                  stroke="#fff"
+                  strokeWidth="4"
+                  strokeLinecap="round"
+                />
+                <rect
+                  x="20"
+                  y="30"
+                  width="24"
+                  height="18"
+                  rx="3"
+                  fill="#fff"
+                />
+                <circle cx="32" cy="38" r="2.4" fill="#1d1d1f" />
+                <path
+                  d="M32 40v4"
+                  stroke="#1d1d1f"
+                  strokeWidth="2.4"
+                  strokeLinecap="round"
+                />
+              </svg>
+            </div>
+            <h1 className="plani__title">Livraison déjà planifiée</h1>
+            <p className="plani__lead">
+              Votre livraison est prévue le{' '}
+              <strong>
+                {fmtFullDate(new Date(existingBooking.slot.starts_at))}
+              </strong>{' '}
+              entre{' '}
+              <strong>
+                {fmtTime(new Date(existingBooking.slot.starts_at))} et{' '}
+                {fmtTime(new Date(existingBooking.slot.ends_at))}
+              </strong>
+              .
+            </p>
+            <div className="plani__done-recap">
+              {MAPBOX_TOKEN && order.lat && order.lon ? (
+                <img
+                  className="plani__done-map"
+                  src={`https://api.mapbox.com/styles/v1/mapbox/streets-v12/static/pin-l+ea4335(${order.lon},${order.lat})/${order.lon},${order.lat},14/520x280@2x?access_token=${MAPBOX_TOKEN}&logo=false&attribution=false`}
+                  alt="Carte de l'adresse de livraison"
+                  loading="lazy"
+                />
+              ) : (
+                <div />
+              )}
+              <div>
+                <div className="plani__recap-label">Adresse</div>
+                <div className="plani__recap-value">{order.address}</div>
+              </div>
+            </div>
+            <div className="plani__locked-notice">
+              <strong>Ce créneau ne peut plus être modifié en ligne.</strong>
+              <p>
+                Pour toute demande de modification ou d'annulation, écrivez-nous
+                à{' '}
+                <a href="mailto:contact@home-sweet.be">contact@home-sweet.be</a>{' '}
+                ou contactez-nous par téléphone.
+              </p>
             </div>
           </section>
         )}
