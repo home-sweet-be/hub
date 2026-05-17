@@ -278,20 +278,24 @@ export default function PlanificationLivraison() {
 
         {step === 'pick' && order && (
           <section className="plani__card plani__card--wide">
-            <div className="plani__order-recap">
-              <div>
-                <div className="plani__recap-label">Commande</div>
-                <div className="plani__recap-value">{order.name}</div>
+            <div className="plani__pick-layout">
+            <aside className="plani__pick-recap">
+              <div className="plani__order-recap plani__order-recap--stack">
+                <div>
+                  <div className="plani__recap-label">Commande</div>
+                  <div className="plani__recap-value">{order.name}</div>
+                </div>
+                <div>
+                  <div className="plani__recap-label">Adresse de livraison</div>
+                  <div className="plani__recap-value">{order.address}</div>
+                </div>
+                <div>
+                  <div className="plani__recap-label">Zone</div>
+                  <div className="plani__recap-value">{zoneLabel(order.zone)}</div>
+                </div>
               </div>
-              <div>
-                <div className="plani__recap-label">Adresse de livraison</div>
-                <div className="plani__recap-value">{order.address}</div>
-              </div>
-              <div>
-                <div className="plani__recap-label">Zone</div>
-                <div className="plani__recap-value">{zoneLabel(order.zone)}</div>
-              </div>
-            </div>
+            </aside>
+            <div className="plani__pick-main">
 
             <div className="plani__step-header">
               <h2 className="plani__step-title">Choisissez un créneau</h2>
@@ -451,6 +455,8 @@ export default function PlanificationLivraison() {
                 </div>
               </footer>
             )}
+            </div>
+            </div>
           </section>
         )}
 

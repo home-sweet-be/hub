@@ -3736,15 +3736,56 @@
   text-decoration: underline;
 }
 
-/* --- Step 2: order recap --- */
+/* --- Step 2: pick layout (recap on left, calendar on right) --- */
+.plani__pick-layout {
+  display: grid;
+  grid-template-columns: minmax(220px, 280px) minmax(0, 1fr);
+  gap: 28px;
+  align-items: start;
+}
+
+.plani__pick-recap {
+  position: sticky;
+  top: 24px;
+}
+
+.plani__pick-main {
+  min-width: 0;
+}
+
 .plani__order-recap {
   display: grid;
   grid-template-columns: auto 1fr auto;
   gap: 24px;
   padding: 16px 18px;
-  background: #f5f7fb;
+  background: #f5f5f7;
   border-radius: 14px;
   margin-bottom: 28px;
+}
+
+.plani__order-recap--stack {
+  grid-template-columns: 1fr;
+  gap: 16px;
+  margin-bottom: 0;
+}
+
+@media (max-width: 900px) {
+  .plani__pick-layout {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  .plani__pick-recap {
+    position: static;
+  }
+  .plani__order-recap--stack {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 600px) {
+  .plani__order-recap--stack {
+    grid-template-columns: 1fr;
+  }
 }
 
 .plani__recap-label {
