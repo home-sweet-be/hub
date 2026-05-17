@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useState } from 'react'
-import logo from '../assets/homesweet.png'
 import { supabase } from '../lib/supabase'
 
 const DAY_LABELS_BY_DOW = ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam']
@@ -325,12 +324,6 @@ export default function PlanificationLivraison() {
 
   return (
     <div className="plani">
-      <div className="plani__bg" aria-hidden="true" />
-
-      <header className="plani__header">
-        <img src={logo} alt="HOMESWEET BRUXELLES" className="plani__logo" />
-      </header>
-
       <main className="plani__main">
         {step === 'auth' && (
           <section className="plani__card">
