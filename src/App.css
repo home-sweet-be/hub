@@ -3003,9 +3003,9 @@
 }
 
 .reception-shipping__chip.is-confort {
-  background: rgba(10, 132, 255, 0.1);
-  border-color: rgba(10, 132, 255, 0.25);
-  color: #0a5fb8;
+  background: rgba(255, 159, 10, 0.12);
+  border-color: rgba(255, 159, 10, 0.3);
+  color: #8a5a00;
 }
 
 .reception-shipping__chip.is-premium {
