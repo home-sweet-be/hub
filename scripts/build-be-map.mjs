@@ -19,7 +19,7 @@ const VIEW_W = 1000
 // Hainaut split: slanted line pivoting at Mons, tilted 5° clockwise (top→east)
 const HAINAUT_CUT_LON = 3.9514 // Mons longitude
 const HAINAUT_PIVOT_LAT = 50.4542 // Mons latitude
-const HAINAUT_TILT_DEG = 5 // visual tilt to the right
+const HAINAUT_TILT_DEG = 12 // visual tilt to the right
 const _cosLatBE = Math.cos((50.5 * Math.PI) / 180)
 const HAINAUT_SLOPE =
   Math.tan((HAINAUT_TILT_DEG * Math.PI) / 180) / _cosLatBE
