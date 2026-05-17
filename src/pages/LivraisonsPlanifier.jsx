@@ -172,6 +172,41 @@ export default function LivraisonsPlanifier() {
     }
   }, [priorityVersion])
 
+  const zonePriorities = useMemo(() => {
+    if (!waitingOrders) return null
+    const counts = new Map()
+    let unknown = 0
+    for (const o of waitingOrders) {
+      const zone = extractZone(o)
+      if (!zone) {
+        unknown += 1
+        continue
+      }
+      counts.set(zone, (counts.get(zone) || 0) + 1)
+    }
+
+    const coverageFor = (zone) => {
+      if (!upcomingSlots) return null
+      return upcomingSlots
+        .filter((s) => (s.zones || []).includes(zone))
+        .reduce(
+          (sum, s) =>
+            sum + Math.max(0, s.capacity - (upcomingBookings[s.id] || 0)),
+          0
+        )
+    }
+
+    const rows = [...counts.entries()]
+      .map(([zone, count]) => ({
+        zone,
+        count,
+        coverage: coverageFor(zone),
+      }))
+      .sort((a, b) => b.count - a.count)
+
+    return { rows, unknown, total: waitingOrders.length }
+  }, [waitingOrders, upcomingSlots, upcomingBookings])
+
   const coveredZones = useMemo(() => {
     const set = new Set()
     for (const r of zonePriorities?.rows || []) {
@@ -209,41 +244,6 @@ export default function LivraisonsPlanifier() {
       })
       .filter(Boolean)
   }, [waitingOrders, coveredZones])
-
-  const zonePriorities = useMemo(() => {
-    if (!waitingOrders) return null
-    const counts = new Map()
-    let unknown = 0
-    for (const o of waitingOrders) {
-      const zone = extractZone(o)
-      if (!zone) {
-        unknown += 1
-        continue
-      }
-      counts.set(zone, (counts.get(zone) || 0) + 1)
-    }
-
-    const coverageFor = (zone) => {
-      if (!upcomingSlots) return null
-      return upcomingSlots
-        .filter((s) => (s.zones || []).includes(zone))
-        .reduce(
-          (sum, s) =>
-            sum + Math.max(0, s.capacity - (upcomingBookings[s.id] || 0)),
-          0
-        )
-    }
-
-    const rows = [...counts.entries()]
-      .map(([zone, count]) => ({
-        zone,
-        count,
-        coverage: coverageFor(zone),
-      }))
-      .sort((a, b) => b.count - a.count)
-
-    return { rows, unknown, total: waitingOrders.length }
-  }, [waitingOrders, upcomingSlots, upcomingBookings])
 
   const days = useMemo(() => {
     const arr = []
