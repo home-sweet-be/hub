@@ -5,6 +5,7 @@ import ZoneModal from '../components/ZoneModal'
 import AddressModal from '../components/AddressModal'
 import OrdersTableSkeleton from '../components/OrdersTableSkeleton'
 import { useReload } from '../lib/reload'
+import { supabase } from '../lib/supabase'
 
 const ZONE_TAG_PATTERN = /^(BE|FR|LU|NL|DE|LIV)(-|$)/i
 const WAITLIST_TAG = 'WaitingList'
@@ -490,26 +491,43 @@ export default function LivraisonsReservations() {
   const headerCheckRef = useRef(null)
   const { reloadKey } = useReload()
 
-  const load = useCallback(() => {
+  const load = useCallback(async () => {
     setOrders(null)
     setError(null)
     setSelectedIds(new Set())
     const cutoff = new Date(Date.now() - 150 * 86400000)
       .toISOString()
       .slice(0, 10)
-    return fetch(
-      '/api/shopify/receptions?q=' +
-        encodeURIComponent(
-          `created_at:>=${cutoff} AND tag:${WAITLIST_TAG} AND NOT tag:removed AND status:open AND NOT financial_status:refunded AND NOT financial_status:partially_refunded`
-        ) +
-        '&first=100'
-    )
-      .then(async (r) => {
-        if (!r.ok) throw new Error(`HTTP ${r.status} ${await r.text()}`)
-        return r.json()
-      })
-      .then((data) => setOrders(data.orders || []))
-      .catch((e) => setError(e.message))
+    try {
+      const [ordersRes, bookedRes] = await Promise.all([
+        fetch(
+          '/api/shopify/receptions?q=' +
+            encodeURIComponent(
+              `created_at:>=${cutoff} AND tag:${WAITLIST_TAG} AND NOT tag:removed AND status:open AND NOT financial_status:refunded AND NOT financial_status:partially_refunded`
+            ) +
+            '&first=100'
+        ),
+        supabase
+          .from('delivery_bookings')
+          .select('shopify_order_name')
+          .eq('status', 'confirmed'),
+      ])
+      if (!ordersRes.ok) {
+        throw new Error(`HTTP ${ordersRes.status} ${await ordersRes.text()}`)
+      }
+      const data = await ordersRes.json()
+      const bookedNames = new Set(
+        (bookedRes.data || []).map((r) =>
+          String(r.shopify_order_name || '').replace(/^#/, '')
+        )
+      )
+      const filtered = (data.orders || []).filter(
+        (o) => !bookedNames.has(String(o.name || '').replace(/^#/, ''))
+      )
+      setOrders(filtered)
+    } catch (e) {
+      setError(e.message)
+    }
   }, [])
 
   useEffect(() => {
