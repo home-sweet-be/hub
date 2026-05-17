@@ -575,13 +575,36 @@ export default function SlotModal({ open, editing, onClose, onSaved, onChanged }
         zones: [...zones],
         updated_at: new Date().toISOString(),
       }
-      const res = editing?.slot
-        ? await supabase
+      const isNew = !editing?.slot
+      const res = isNew
+        ? await supabase.from('delivery_slots').insert(payload)
+        : await supabase
             .from('delivery_slots')
             .update(payload)
             .eq('id', editing.slot.id)
-        : await supabase.from('delivery_slots').insert(payload)
       if (res.error) throw res.error
+
+      // On creation only, notify waiting-list customers in the matching zones.
+      // Best-effort: a failure here shouldn't roll back the slot.
+      if (isNew) {
+        try {
+          fetch('/api/email/notify-zone-slot', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              zones: [...zones],
+              slotDate: day,
+            }),
+          }).catch((err) => {
+            // eslint-disable-next-line no-console
+            console.warn('notify-zone-slot network:', err)
+          })
+        } catch (err) {
+          // eslint-disable-next-line no-console
+          console.warn('notify-zone-slot:', err)
+        }
+      }
+
       onSaved?.()
     } catch (e) {
       setError(e.message || String(e))
