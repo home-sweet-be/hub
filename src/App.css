@@ -4036,6 +4036,41 @@
   word-break: break-word;
 }
 
+.marge-table__order-sep td {
+  border-top: 3px solid #1d1d1f !important;
+  background: #f5f5f7;
+  padding: 8px 12px !important;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #1d1d1f;
+}
+
+.marge-table tbody tr.marge-table__order-sep:first-child td {
+  border-top: none !important;
+}
+
+.marge-table__order-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-weight: 600;
+}
+
+.marge-table__order-customer {
+  color: var(--text-soft);
+  font-weight: 500;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+.marge-table__qty {
+  margin-left: 6px;
+  font-size: 11px;
+  color: var(--text-soft);
+  font-weight: 500;
+}
+
 /* ============================================================
    COMPTA — month tabs + orders table
    ============================================================ */

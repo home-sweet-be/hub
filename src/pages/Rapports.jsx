@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { Fragment, useCallback, useEffect, useMemo, useState } from 'react'
 import OrdersTableSkeleton from '../components/OrdersTableSkeleton'
 import { useReload } from '../lib/reload'
 
@@ -398,56 +398,63 @@ function CalculateurMarge() {
   const rowsCommande = useMemo(() => {
     if (!orders30 || tab !== 'par-commande') return []
     const term = search.trim().toLowerCase()
-    return orders30
-      .map((o) => {
-        const items = (o.lineItems || []).filter(
-          (li) => effectiveQuantity(li) > 0
+    const sortedOrders = [...orders30].sort(
+      (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+    )
+    const out = []
+    for (const o of sortedOrders) {
+      const items = (o.lineItems || []).filter(
+        (li) => effectiveQuantity(li) > 0
+      )
+      if (items.length === 0) continue
+      const customerName =
+        [o.customer?.firstName, o.customer?.lastName]
+          .filter(Boolean)
+          .join(' ') || ''
+      const enriched = items.map((li) => {
+        const qty = effectiveQuantity(li)
+        const lineTtc = Number(
+          li.discountedTotalSet?.shopMoney?.amount ||
+            (li.originalUnitPriceSet?.shopMoney?.amount || 0) * qty
         )
-        let totalHt = 0
-        let totalCostHt = 0
-        for (const li of items) {
-          const qty = effectiveQuantity(li)
-          const lineTtc = Number(
-            li.discountedTotalSet?.shopMoney?.amount ||
-              (li.originalUnitPriceSet?.shopMoney?.amount || 0) * qty
-          )
-          totalHt += (lineTtc || 0) / (1 + VAT_RATE)
-          const unitCost = Number(li.variant?.inventoryItem?.unitCost?.amount) || 0
-          totalCostHt += unitCost * qty
-        }
-        const priceTtc = Number(o.total) || 0
-        const priceHt = priceTtc / (1 + VAT_RATE)
-        const costHt = totalCostHt
-        const margeTtc = priceTtc - costHt
-        const margeTtcPct = priceTtc > 0 ? (margeTtc / priceTtc) * 100 : 0
-        const margeHt = priceHt - costHt
-        const margeHtPct = priceHt > 0 ? (margeHt / priceHt) * 100 : 0
-        const margePropre = margeHt - fraisParCmd
+        const lineHt = lineTtc / (1 + VAT_RATE)
+        const unitCost =
+          Number(li.variant?.inventoryItem?.unitCost?.amount) || 0
+        const costHt = unitCost * qty
+        return { li, qty, lineTtc, lineHt, costHt }
+      })
+      const orderHt = enriched.reduce((s, r) => s + r.lineHt, 0)
+      enriched.forEach((r, i) => {
+        const { li, qty, lineTtc, lineHt, costHt } = r
+        const fraisAlloc =
+          orderHt > 0
+            ? fraisParCmd * (lineHt / orderHt)
+            : fraisParCmd / enriched.length
+        const margeTtc = lineTtc - costHt
+        const margeTtcPct = lineTtc > 0 ? (margeTtc / lineTtc) * 100 : 0
+        const margeHt = lineHt - costHt
+        const margeHtPct = lineHt > 0 ? (margeHt / lineHt) * 100 : 0
+        const margePropre = margeHt - fraisAlloc
         const margeProprePct =
-          priceHt > 0 ? (margePropre / priceHt) * 100 : 0
-        const margePlNet = margeTtc - fraisParCmd
+          lineHt > 0 ? (margePropre / lineHt) * 100 : 0
+        const margePlNet = margeTtc - fraisAlloc
         const margePlNetPct =
-          priceTtc > 0 ? (margePlNet / priceTtc) * 100 : 0
-        const articles = items
-          .map((li) => {
-            const q = effectiveQuantity(li)
-            return q > 1 ? `${li.title} ×${q}` : li.title
-          })
-          .join(', ')
-        const customerName =
-          [o.customer?.firstName, o.customer?.lastName]
-            .filter(Boolean)
-            .join(' ') || ''
-        return {
-          id: o.id,
-          name: o.name,
-          createdAt: o.createdAt,
-          customerName,
+          lineTtc > 0 ? (margePlNet / lineTtc) * 100 : 0
+        out.push({
+          key: `${o.id}-${li.id || i}`,
+          orderId: o.id,
+          orderName: o.name,
+          orderDate: o.createdAt,
           adminUrl: o.adminUrl,
-          articles,
-          items,
-          priceTtc,
-          priceHt,
+          customerName,
+          isFirstOfOrder: i === 0,
+          title: li.title || '',
+          variantTitle: li.variantTitle || '',
+          sku: li.variant?.sku || li.sku || '',
+          imageUrl: li.image?.url || '',
+          qty,
+          priceTtc: lineTtc,
+          priceHt: lineHt,
           costHt,
           margeTtc,
           margeTtcPct,
@@ -458,17 +465,17 @@ function CalculateurMarge() {
           margePlNet,
           margePlNetPct,
           hasCost: costHt > 0,
-        }
+        })
       })
-      .filter((r) => {
-        if (!term) return true
-        return (
-          (r.name || '').toLowerCase().includes(term) ||
-          (r.customerName || '').toLowerCase().includes(term) ||
-          (r.articles || '').toLowerCase().includes(term)
-        )
-      })
-      .sort((a, b) => b.margeProprePct - a.margeProprePct)
+    }
+    if (!term) return out
+    return out.filter(
+      (r) =>
+        (r.title || '').toLowerCase().includes(term) ||
+        (r.sku || '').toLowerCase().includes(term) ||
+        (r.orderName || '').toLowerCase().includes(term) ||
+        (r.customerName || '').toLowerCase().includes(term)
+    )
   }, [orders30, search, fraisParCmd, tab])
 
   const isProduit = tab === 'par-produit'
@@ -653,12 +660,11 @@ function CalculateurMarge() {
           <table className="compta-table rapports-table marge-table">
             <thead>
               <tr>
-                <th>Date</th>
-                <th>N°</th>
-                <th>Client</th>
-                <th>Articles</th>
-                <th className="num">Total TTC</th>
-                <th className="num">Total HT</th>
+                <th aria-label="photo" />
+                <th>Produit</th>
+                <th>SKU</th>
+                <th className="num">Prix TTC</th>
+                <th className="num">Montant HT</th>
                 <th className="num">Coût HT</th>
                 <th className="num">Marge HT</th>
                 <th className="num">Marge nette</th>
@@ -669,78 +675,131 @@ function CalculateurMarge() {
             <tbody>
               {rowsCommande.length === 0 && (
                 <tr>
-                  <td colSpan={11} className="reception-table__empty">
+                  <td colSpan={10} className="reception-table__empty">
                     {search
-                      ? 'Aucune commande ne correspond à la recherche.'
+                      ? 'Aucun article ne correspond à la recherche.'
                       : 'Aucune commande sur les 30 derniers jours.'}
                   </td>
                 </tr>
               )}
               {rowsCommande.map((r) => {
                 const has = r.hasCost
-                const date = r.createdAt
-                  ? new Date(r.createdAt).toLocaleDateString('fr-BE', {
+                const date = r.orderDate
+                  ? new Date(r.orderDate).toLocaleDateString('fr-BE', {
                       day: '2-digit',
                       month: '2-digit',
                     })
                   : '—'
                 return (
-                  <tr key={r.id}>
-                    <td>{date}</td>
-                    <td>
-                      {r.adminUrl ? (
-                        <a
-                          href={r.adminUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="marge-table__order-link"
-                        >
-                          {r.name}
-                        </a>
-                      ) : (
-                        r.name
-                      )}
-                    </td>
-                    <td>{r.customerName || muted}</td>
-                    <td className="marge-table__articles">
-                      {r.articles || muted}
-                    </td>
-                    <td className="num">{formatPrice(r.priceTtc)}</td>
-                    <td className="num">{formatPrice(r.priceHt)}</td>
-                    <td className="num">{has ? formatPrice(r.costHt) : muted}</td>
-                    <td className="num marge-table__cell">
-                      {has ? (
-                        <>
-                          <div>{formatPrice(r.margeHt)}</div>
-                          <MargeBadge pct={r.margeHtPct} />
-                        </>
-                      ) : muted}
-                    </td>
-                    <td className="num marge-table__cell">
-                      {has ? (
-                        <>
-                          <div>{formatPrice(r.margePropre)}</div>
-                          <MargeBadge pct={r.margeProprePct} />
-                        </>
-                      ) : muted}
-                    </td>
-                    <td className="num marge-table__cell marge-table__divider">
-                      {has ? (
-                        <>
-                          <div>{formatPrice(r.margeTtc)}</div>
-                          <MargeBadge pct={r.margeTtcPct} />
-                        </>
-                      ) : muted}
-                    </td>
-                    <td className="num marge-table__cell">
-                      {has ? (
-                        <>
-                          <div>{formatPrice(r.margePlNet)}</div>
-                          <MargeBadge pct={r.margePlNetPct} />
-                        </>
-                      ) : muted}
-                    </td>
-                  </tr>
+                  <Fragment key={r.key}>
+                    {r.isFirstOfOrder && (
+                      <tr className="marge-table__order-sep">
+                        <td colSpan={10}>
+                          <span className="marge-table__order-tag">
+                            {date}
+                            {' · '}
+                            {r.adminUrl ? (
+                              <a
+                                href={r.adminUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="marge-table__order-link"
+                              >
+                                {r.orderName}
+                              </a>
+                            ) : (
+                              r.orderName
+                            )}
+                            {r.customerName && (
+                              <>
+                                {' · '}
+                                <span className="marge-table__order-customer">
+                                  {r.customerName}
+                                </span>
+                              </>
+                            )}
+                          </span>
+                        </td>
+                      </tr>
+                    )}
+                    <tr>
+                      <td className="rapports-table__img">
+                        {r.imageUrl ? (
+                          <img
+                            src={r.imageUrl}
+                            alt=""
+                            className="rapports-table__thumb"
+                          />
+                        ) : (
+                          <div
+                            className="rapports-table__thumb rapports-table__thumb--empty"
+                            aria-hidden="true"
+                          />
+                        )}
+                      </td>
+                      <td>
+                        <div className="rapports-table__title">
+                          {r.title}
+                          {r.qty > 1 && (
+                            <span className="marge-table__qty">×{r.qty}</span>
+                          )}
+                        </div>
+                        {r.variantTitle && (
+                          <div className="rapports-table__variant">
+                            {r.variantTitle}
+                          </div>
+                        )}
+                      </td>
+                      <td className="rapports-table__sku">
+                        {r.sku || muted}
+                      </td>
+                      <td className="num">{formatPrice(r.priceTtc)}</td>
+                      <td className="num">{formatPrice(r.priceHt)}</td>
+                      <td className="num">
+                        {has ? formatPrice(r.costHt) : muted}
+                      </td>
+                      <td className="num marge-table__cell">
+                        {has ? (
+                          <>
+                            <div>{formatPrice(r.margeHt)}</div>
+                            <MargeBadge pct={r.margeHtPct} />
+                          </>
+                        ) : (
+                          muted
+                        )}
+                      </td>
+                      <td className="num marge-table__cell">
+                        {has ? (
+                          <>
+                            <div>{formatPrice(r.margePropre)}</div>
+                            <MargeBadge pct={r.margeProprePct} />
+                          </>
+                        ) : (
+                          muted
+                        )}
+                      </td>
+                      <td className="num marge-table__cell marge-table__divider">
+                        {has ? (
+                          <>
+                            <div>{formatPrice(r.margeTtc)}</div>
+                            <MargeBadge pct={r.margeTtcPct} />
+                          </>
+                        ) : (
+                          muted
+                        )}
+                      </td>
+                      <td className="num marge-table__cell">
+                        {has ? (
+                          <>
+                            <div>{formatPrice(r.margePlNet)}</div>
+                            <MargeBadge pct={r.margePlNetPct} />
+                          </>
+                        ) : (
+                          muted
+                        )}
+                      </td>
+                    </tr>
+                  </Fragment>
                 )
               })}
             </tbody>
