@@ -2609,7 +2609,7 @@
 
 .zone-priorities__layout {
   display: grid;
-  grid-template-columns: minmax(220px, 280px) minmax(0, 1fr);
+  grid-template-columns: minmax(300px, 360px) minmax(0, 1fr);
   gap: 24px;
   align-items: stretch;
 }
@@ -2624,7 +2624,7 @@
   background: rgba(255, 255, 255, 0.55);
   border: 1px solid rgba(28, 28, 30, 0.08);
   border-radius: 12px;
-  min-height: 250px;
+  height: 300px;
   display: flex;
 }
 
