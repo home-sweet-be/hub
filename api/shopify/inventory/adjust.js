@@ -110,8 +110,11 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: 'No valid (inventoryItemId, delta) pairs in items' })
   }
 
+  // `available` is the only name we can adjust without supplying a
+  // ledgerDocumentUri. on_hand / incoming / etc. would require one in
+  // API 2025-04+. For receptions, "available" matches what the modal shows.
   const { json } = await shopifyGraphql(domain, token, ADJUST_MUTATION, {
-    input: { reason, name: 'on_hand', changes },
+    input: { reason, name: 'available', changes },
   })
 
   const userErrors = json.data?.inventoryAdjustQuantities?.userErrors || []
