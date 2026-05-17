@@ -174,7 +174,7 @@ export default function PlanificationLivraison() {
           not_ready:
             "Cette commande n'est pas encore prête à être livrée. Vous recevrez un nouvel e-mail dès qu'elle le sera.",
           no_zone:
-            "Impossible de déterminer la zone de livraison pour cette commande. Contactez-nous à contact@homesweet.be.",
+            "Impossible de déterminer la zone de livraison pour cette commande. Contactez-nous à contact@home-sweet.be.",
           missing_fields: 'Merci de remplir les deux champs.',
         }
         // eslint-disable-next-line no-console
@@ -348,7 +348,7 @@ export default function PlanificationLivraison() {
             </form>
             <p className="plani__help">
               Besoin d'aide ? Écrivez-nous à{' '}
-              <a href="mailto:contact@homesweet.be">contact@homesweet.be</a>.
+              <a href="mailto:contact@home-sweet.be">contact@home-sweet.be</a>.
             </p>
           </section>
         )}
@@ -460,7 +460,7 @@ export default function PlanificationLivraison() {
                 <div className="plani__no-slots-sub">
                   De nouveaux créneaux sont ajoutés chaque semaine — reviens
                   bientôt ou écris-nous à{' '}
-                  <a href="mailto:contact@homesweet.be">contact@homesweet.be</a>.
+                  <a href="mailto:contact@home-sweet.be">contact@home-sweet.be</a>.
                 </div>
               </div>
             )}
@@ -647,7 +647,7 @@ export default function PlanificationLivraison() {
             <p className="plani__help">
               Un e-mail de confirmation va vous être envoyé. Pour toute
               question, écrivez-nous à{' '}
-              <a href="mailto:contact@homesweet.be">contact@homesweet.be</a>.
+              <a href="mailto:contact@home-sweet.be">contact@home-sweet.be</a>.
             </p>
           </section>
         )}
