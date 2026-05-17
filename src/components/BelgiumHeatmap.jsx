@@ -6,6 +6,22 @@ import {
   BE_BBOX,
 } from './belgiumProvincesPaths.js'
 
+const [_LON_MIN, _LAT_MIN, _LON_MAX, _LAT_MAX] = BE_BBOX
+const mercY = (lat) => Math.log(Math.tan(Math.PI / 4 + (lat * Math.PI) / 360))
+const X_MIN_MERC = (_LON_MIN * Math.PI) / 180
+const X_MAX_MERC = (_LON_MAX * Math.PI) / 180
+const Y_MIN_MERC = mercY(_LAT_MIN)
+const Y_MAX_MERC = mercY(_LAT_MAX)
+
+function projectLonLat(lon, lat) {
+  const x =
+    (((lon * Math.PI) / 180 - X_MIN_MERC) / (X_MAX_MERC - X_MIN_MERC)) *
+    BE_VIEW_W
+  const y =
+    ((Y_MAX_MERC - mercY(lat)) / (Y_MAX_MERC - Y_MIN_MERC)) * BE_VIEW_H
+  return [x, y]
+}
+
 const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_TOKEN
 const MAPBOX_STYLE = 'mapbox/light-v11'
 
@@ -37,7 +53,7 @@ function colorFor(count, max, country, hasZone) {
   }
 }
 
-export default function BelgiumHeatmap({ zoneCounts, max }) {
+export default function BelgiumHeatmap({ zoneCounts, max, pins = [] }) {
   const mapUrl = buildMapboxUrl()
   return (
     <svg
@@ -88,6 +104,30 @@ export default function BelgiumHeatmap({ zoneCounts, max }) {
               {count > 0 ? ` — ${count} en attente` : ''}
             </title>
           </path>
+        )
+      })}
+      {pins.map((p, i) => {
+        const [x, y] = projectLonLat(p.lon, p.lat)
+        if (
+          x < -20 || x > BE_VIEW_W + 20 ||
+          y < -30 || y > BE_VIEW_H + 20
+        ) return null
+        return (
+          <g
+            key={p.key || i}
+            transform={`translate(${x},${y})`}
+            className="bemap__pin"
+          >
+            <path
+              d="M0,0 L-5.5,-8.5 A6,6 0 1 1 5.5,-8.5 Z"
+              fill="#ea4335"
+              stroke="#fff"
+              strokeWidth="1.2"
+              strokeLinejoin="round"
+            />
+            <circle cx="0" cy="-12" r="2.8" fill="#fff" />
+            {p.label && <title>{p.label}</title>}
+          </g>
         )
       })}
     </svg>

@@ -2640,6 +2640,18 @@
   pointer-events: none;
 }
 
+.bemap__pin {
+  filter: drop-shadow(0 2px 3px rgba(28, 28, 30, 0.35));
+  cursor: help;
+  transition: transform 0.12s ease;
+  transform-box: fill-box;
+  transform-origin: center bottom;
+}
+
+.bemap__pin:hover {
+  transform: scale(1.15);
+}
+
 .bemap__province {
   transition: filter 0.15s ease, transform 0.15s ease;
   transform-origin: center;

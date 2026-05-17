@@ -172,6 +172,18 @@ export default function LivraisonsPlanifier() {
     }
   }, [priorityVersion])
 
+  const waitingPins = useMemo(() => {
+    if (!waitingOrders) return []
+    return waitingOrders
+      .map((o) => {
+        const lat = o.shippingAddress?.latitude
+        const lon = o.shippingAddress?.longitude
+        if (typeof lat !== 'number' || typeof lon !== 'number') return null
+        return { lat, lon, key: o.id, label: o.name }
+      })
+      .filter(Boolean)
+  }, [waitingOrders])
+
   const zonePriorities = useMemo(() => {
     if (!waitingOrders) return null
     const counts = new Map()
@@ -350,6 +362,7 @@ export default function LivraisonsPlanifier() {
               )
             }
             max={zonePriorities?.rows?.[0]?.count || 0}
+            pins={waitingPins}
           />
         </aside>
         <div className="zone-priorities__main">
