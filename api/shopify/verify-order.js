@@ -10,7 +10,6 @@ const QUERY = `
           id
           name
           email
-          contactEmail
           createdAt
           tags
           customer {
@@ -119,13 +118,10 @@ export default async function handler(req, res) {
     }
 
     const edges = data.data?.orders?.edges || []
-    // Find one with matching email (order.email or order.contactEmail)
+    // Find one with matching email (order.email)
     const matched = edges
       .map((e) => e.node)
-      .find((o) => {
-        const candidates = [o.email, o.contactEmail].map(normalizeEmail)
-        return candidates.includes(email)
-      })
+      .find((o) => normalizeEmail(o.email) === email)
 
     if (!matched) {
       return res.status(200).json({ ok: false, code: 'not_found' })
