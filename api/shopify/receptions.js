@@ -7,6 +7,8 @@ const QUERY = `
         node {
           id
           name
+          email
+          phone
           createdAt
           tags
           totalPriceSet { shopMoney { amount currencyCode } }
@@ -123,6 +125,8 @@ export default async function handler(req, res) {
         return {
           id: o.id,
           name: o.name,
+          email: o.email,
+          phone: o.phone,
           createdAt: o.createdAt,
           tags: o.tags,
           total: o.totalPriceSet?.shopMoney?.amount,

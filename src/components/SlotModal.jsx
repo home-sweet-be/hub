@@ -249,19 +249,32 @@ function TimeRangeSlider({ startMin, endMin, onChange, disabled }) {
 /* ------------------------------------------------------------------ */
 /*  Capacity quick-selector                                            */
 /* ------------------------------------------------------------------ */
-function CapacitySelector({ value, onChange, disabled, min = 1, max = 7 }) {
+function CapacitySelector({ value, onChange, disabled, booked = 0, min = 1, max = 7 }) {
   return (
     <div className="caps">
       <div className="caps__chips">
         {Array.from({ length: max }, (_, i) => i + min).map((n) => {
+          const isBooked = n <= booked
           const active = n <= value
+          const canPick = n >= Math.max(min, booked)
+          const klass =
+            'caps__chip' +
+            (isBooked ? ' is-booked' : '') +
+            (active && !isBooked ? ' is-active' : '')
           return (
             <button
               key={n}
               type="button"
-              className={'caps__chip' + (active ? ' is-active' : '')}
-              onClick={() => onChange(n)}
-              disabled={disabled}
+              className={klass}
+              onClick={() => canPick && onChange(n)}
+              disabled={disabled || !canPick}
+              title={
+                isBooked
+                  ? `Place ${n} — réservée`
+                  : !canPick
+                  ? `Impossible : ${booked} place${booked > 1 ? 's' : ''} déjà réservée${booked > 1 ? 's' : ''}`
+                  : `${n} place${n > 1 ? 's' : ''}`
+              }
               aria-label={`${n} place${n > 1 ? 's' : ''}`}
             >
               <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
@@ -273,7 +286,95 @@ function CapacitySelector({ value, onChange, disabled, min = 1, max = 7 }) {
         })}
       </div>
       <div className="caps__count">
-        <strong>{value}</strong> place{value > 1 ? 's' : ''}
+        {booked > 0 ? (
+          <>
+            <strong>{booked}</strong>/<strong>{value}</strong>{' '}
+            place{value > 1 ? 's' : ''}
+          </>
+        ) : (
+          <>
+            <strong>{value}</strong> place{value > 1 ? 's' : ''}
+          </>
+        )}
+      </div>
+    </div>
+  )
+}
+
+/* ------------------------------------------------------------------ */
+/*  Bookings list (existing reservations for this slot)                */
+/* ------------------------------------------------------------------ */
+function activeLineItems(o) {
+  return (o?.lineItems || []).filter(
+    (li) => (li.currentQuantity ?? li.quantity ?? 0) > 0
+  )
+}
+
+function BookingsList({ bookings, loading }) {
+  if (loading) {
+    return <div className="slot-bookings__loading">Chargement…</div>
+  }
+  if (!bookings.length) return null
+  return (
+    <div className="slot-bookings">
+      <div className="slot-bookings__title">
+        {bookings.length} réservation{bookings.length > 1 ? 's' : ''}
+      </div>
+      <div className="slot-bookings__list">
+        {bookings.map((b) => {
+          const o = b.order
+          const first = o?.customer?.firstName || ''
+          const last = o?.customer?.lastName || ''
+          const items = o ? activeLineItems(o) : []
+          return (
+            <div key={b.id} className="slot-bookings__card">
+              <div className="slot-bookings__head">
+                <span className="slot-bookings__name">
+                  {first || last ? `${first} ${last}`.trim() : '—'}
+                </span>
+                <a
+                  href={o?.adminUrl || '#'}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="slot-bookings__order"
+                  title="Ouvrir la commande dans Shopify"
+                >
+                  #{b.shopify_order_name}
+                </a>
+              </div>
+              <div className="slot-bookings__contact">
+                {o?.email && (
+                  <a
+                    href={`mailto:${o.email}`}
+                    className="slot-bookings__chip"
+                  >
+                    ✉️ {o.email}
+                  </a>
+                )}
+                {o?.phone && (
+                  <a
+                    href={`tel:${o.phone}`}
+                    className="slot-bookings__chip"
+                  >
+                    📞 {o.phone}
+                  </a>
+                )}
+              </div>
+              {items.length > 0 && (
+                <ul className="slot-bookings__items">
+                  {items.map((li) => (
+                    <li key={li.id}>
+                      <span className="slot-bookings__qty">
+                        {li.currentQuantity ?? li.quantity}×
+                      </span>{' '}
+                      {li.title}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          )
+        })}
       </div>
     </div>
   )
@@ -290,6 +391,9 @@ export default function SlotModal({ open, editing, onClose, onSaved }) {
   const [zones, setZones] = useState(new Set())
   const [pending, setPending] = useState(false)
   const [error, setError] = useState(null)
+  // Bookings on this slot (only meaningful when editing an existing slot)
+  const [bookings, setBookings] = useState([])
+  const [bookingsLoading, setBookingsLoading] = useState(false)
 
   useEffect(() => {
     if (!open) return
@@ -311,6 +415,56 @@ export default function SlotModal({ open, editing, onClose, onSaved }) {
       setEndMin(18 * 60)
       setCapacity(4)
       setZones(new Set())
+    }
+  }, [open, editing])
+
+  // Load bookings + Shopify details when editing an existing slot
+  useEffect(() => {
+    if (!open || !editing?.slot?.id) {
+      setBookings([])
+      return
+    }
+    let cancelled = false
+    const load = async () => {
+      setBookingsLoading(true)
+      try {
+        const { data: bks, error } = await supabase
+          .from('delivery_bookings')
+          .select('id, shopify_order_name, status, created_at')
+          .eq('slot_id', editing.slot.id)
+          .eq('status', 'confirmed')
+        if (error) throw error
+        if (cancelled) return
+        if (!bks?.length) {
+          setBookings([])
+          return
+        }
+        // Batch-fetch Shopify order details
+        const names = bks.map((b) => b.shopify_order_name).filter(Boolean)
+        const q = names.map((n) => `name:${n}`).join(' OR ')
+        const r = await fetch(
+          '/api/shopify/receptions?q=' + encodeURIComponent(q) + '&first=50'
+        )
+        const data = r.ok ? await r.json() : { orders: [] }
+        const byName = new Map(
+          (data.orders || []).map((o) => [String(o.name).replace(/^#/, ''), o])
+        )
+        if (cancelled) return
+        setBookings(
+          bks.map((b) => ({
+            ...b,
+            order: byName.get(b.shopify_order_name) || null,
+          }))
+        )
+      } catch {
+        if (!cancelled) setBookings([])
+      } finally {
+        if (!cancelled) setBookingsLoading(false)
+      }
+    }
+    load()
+    return () => {
+      cancelled = true
     }
   }, [open, editing])
 
@@ -350,6 +504,8 @@ export default function SlotModal({ open, editing, onClose, onSaved }) {
     if (!day) return 'Date requise.'
     if (startMin >= endMin) return "L'heure de fin doit être après l'heure de début."
     if (capacity < 1 || capacity > 7) return 'Capacité entre 1 et 7.'
+    if (capacity < bookings.length)
+      return `Impossible : ${bookings.length} place${bookings.length > 1 ? 's' : ''} déjà réservée${bookings.length > 1 ? 's' : ''}.`
     if (zones.size === 0) return 'Sélectionne au moins une zone.'
     return null
   }
@@ -488,6 +644,11 @@ export default function SlotModal({ open, editing, onClose, onSaved }) {
                   value={capacity}
                   onChange={setCapacity}
                   disabled={pending}
+                  booked={bookings.length}
+                />
+                <BookingsList
+                  bookings={bookings}
+                  loading={bookingsLoading}
                 />
               </section>
             </div>
