@@ -191,17 +191,29 @@ for (const { meta, rings } of simplified) {
   }
 }
 
-const cosLat = Math.cos(((latMin + latMax) / 2) * (Math.PI / 180))
-const projWidth = (lonMax - lonMin) * cosLat
-const projHeight = latMax - latMin
+// Web Mercator projection — matches Mapbox so the background map aligns.
+// Both x and y in radians-equivalent so the aspect ratio works.
+function mercator(lon, lat) {
+  const x = (lon * Math.PI) / 180
+  const y = Math.log(Math.tan(Math.PI / 4 + (lat * Math.PI) / 360))
+  return [x, y]
+}
+
+const [xMinMerc] = mercator(lonMin, 0)
+const [xMaxMerc] = mercator(lonMax, 0)
+const [, yMinMerc] = mercator(0, latMin)
+const [, yMaxMerc] = mercator(0, latMax)
+const projWidth = xMaxMerc - xMinMerc
+const projHeight = yMaxMerc - yMinMerc
 const VIEW_H = Math.round(VIEW_W * (projHeight / projWidth))
 const scaleX = VIEW_W / projWidth
 const scaleY = VIEW_H / projHeight
 
 function project(lon, lat) {
+  const [x, y] = mercator(lon, lat)
   return [
-    Math.round((lon - lonMin) * cosLat * scaleX * 10) / 10,
-    Math.round((latMax - lat) * scaleY * 10) / 10,
+    Math.round((x - xMinMerc) * scaleX * 10) / 10,
+    Math.round((yMaxMerc - y) * scaleY * 10) / 10,
   ]
 }
 
@@ -232,6 +244,10 @@ provinces.sort((a, b) => {
 const out = `// AUTO-GENERATED from public/geoexample.json by scripts/build-be-map.mjs
 // Regenerate: node scripts/build-be-map.mjs
 export const BE_VIEW_BOX = '0 0 ${VIEW_W} ${VIEW_H}'
+export const BE_VIEW_W = ${VIEW_W}
+export const BE_VIEW_H = ${VIEW_H}
+// [lonMin, latMin, lonMax, latMax] — bbox of zones in lon/lat, for Mapbox URL
+export const BE_BBOX = [${lonMin}, ${latMin}, ${lonMax}, ${latMax}]
 export const BE_PROVINCES = ${JSON.stringify(provinces, null, 2)}
 `
 

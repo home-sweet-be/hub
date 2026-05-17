@@ -1,19 +1,35 @@
-import { BE_PROVINCES, BE_VIEW_BOX } from './belgiumProvincesPaths.js'
+import {
+  BE_PROVINCES,
+  BE_VIEW_BOX,
+  BE_VIEW_W,
+  BE_VIEW_H,
+  BE_BBOX,
+} from './belgiumProvincesPaths.js'
+
+const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_TOKEN
+const MAPBOX_STYLE = 'mapbox/light-v11'
+
+function buildMapboxUrl() {
+  if (!MAPBOX_TOKEN) return null
+  const [lonMin, latMin, lonMax, latMax] = BE_BBOX
+  const bbox = `[${lonMin},${latMin},${lonMax},${latMax}]`
+  // Cap width at 1280 (Mapbox Static API limit)
+  const w = Math.min(1280, BE_VIEW_W)
+  const h = Math.round((w * BE_VIEW_H) / BE_VIEW_W)
+  return `https://api.mapbox.com/styles/v1/${MAPBOX_STYLE}/static/${bbox}/${w}x${h}@2x?access_token=${MAPBOX_TOKEN}&logo=false&attribution=false`
+}
 
 function colorFor(count, max, country, hasZone) {
-  // Background context countries: very faint
-  if (country === 'CTX') {
-    return { fill: 'rgba(28,28,30,0.02)', stroke: 'rgba(28,28,30,0.06)' }
-  }
-  // Untagged / no waiting orders → neutral by country
+  // No waiting orders: keep the zone visible but very faint so the
+  // underlying Mapbox basemap shows through.
   if (count === 0) {
-    if (country === 'FR' && !hasZone) {
-      return { fill: '#f6f6f8', stroke: 'rgba(28,28,30,0.1)' }
+    return {
+      fill: 'rgba(255, 255, 255, 0.18)',
+      stroke: 'rgba(28, 28, 30, 0.45)',
     }
-    return { fill: '#eceff3', stroke: 'rgba(28,28,30,0.18)' }
   }
   const f = max > 0 ? count / max : 0
-  const opacity = 0.35 + 0.55 * f
+  const opacity = 0.55 + 0.35 * f
   const hue = 30 - 30 * f
   return {
     fill: `hsla(${hue}, 95%, 50%, ${opacity})`,
@@ -22,6 +38,7 @@ function colorFor(count, max, country, hasZone) {
 }
 
 export default function BelgiumHeatmap({ zoneCounts, max }) {
+  const mapUrl = buildMapboxUrl()
   return (
     <svg
       viewBox={BE_VIEW_BOX}
@@ -30,6 +47,17 @@ export default function BelgiumHeatmap({ zoneCounts, max }) {
       aria-label="Carte régionale — heatmap des zones en attente"
       preserveAspectRatio="xMidYMid meet"
     >
+      {mapUrl && (
+        <image
+          href={mapUrl}
+          x="0"
+          y="0"
+          width={BE_VIEW_W}
+          height={BE_VIEW_H}
+          preserveAspectRatio="none"
+          opacity="0.85"
+        />
+      )}
       {BE_PROVINCES.map((p) => {
         const count = p.zones.reduce(
           (sum, z) => sum + (zoneCounts.get(z) || 0),
