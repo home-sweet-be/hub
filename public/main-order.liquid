@@ -1,0 +1,1028 @@
+<style>
+  #shopify-section-{{ section.id }} {
+    --section-padding-top: {{ section.settings.padding_top }}px;
+    --section-padding-bottom: {{ section.settings.padding_bottom }}px;
+  }
+
+  /* ============================================
+     HOMESWEET — DÉTAIL COMMANDE — DESIGN PREMIUM
+     ============================================ */
+
+  :root {
+    --hs-bg: #ffffff;
+    --hs-sand: #E8E0D4;
+    --hs-taupe: #B5A898;
+    --hs-brown: #7A6A5A;
+    --hs-dark: #1C1A17;
+    --hs-accent: #3D6B4F;
+    --hs-accent-light: #E8F0EC;
+    --hs-border: #DDD5C8;
+    --hs-surface: #F7F5F2;
+    --hs-red: #C0392B;
+    --hs-red-light: #FDECEA;
+    --hs-gold: #B8975A;
+    --hs-gold-light: #FAF4E8;
+  }
+
+  /* --- WRAPPER --- */
+  .hs-order-page {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 0 60px 80px;
+  }
+
+  @media (max-width: 768px) {
+    .hs-order-page { padding: 0 20px 60px; }
+  }
+
+  /* --- TOPBAR : retour + titre --- */
+  .hs-order-topbar {
+    padding: 32px 0 40px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 24px;
+    flex-wrap: wrap;
+    border-bottom: 1px solid var(--hs-border);
+    margin-bottom: 40px;
+  }
+
+  .hs-back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--hs-brown);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+
+  .hs-back-link:hover { color: var(--hs-dark); }
+
+  .hs-back-link svg {
+    width: 14px; height: 14px;
+    transition: transform 0.2s;
+  }
+
+  .hs-back-link:hover svg { transform: translateX(-3px); }
+
+  .hs-order-headline {}
+
+  .hs-order-headline__num {
+    font-size: 28px;
+    font-weight: 600;
+    color: var(--hs-dark);
+    margin: 0 0 4px;
+    letter-spacing: -0.01em;
+  }
+
+  .hs-order-headline__date {
+    font-size: 13px;
+    color: var(--hs-taupe);
+    font-weight: 300;
+  }
+
+  /* --- LAYOUT PRINCIPAL --- */
+  .hs-order-layout {
+    display: grid;
+    grid-template-columns: 1fr 300px;
+    gap: 48px;
+    align-items: start;
+  }
+
+  @media (max-width: 1024px) {
+    .hs-order-layout {
+      grid-template-columns: 1fr;
+      gap: 40px;
+    }
+  }
+
+  /* ================================================
+     BLOCS DE STATUT
+  ================================================ */
+
+  /* --- LIVRÉ --- */
+  .hs-status-delivered {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 24px 28px;
+    background: var(--hs-accent-light);
+    border: 1px solid var(--hs-accent);
+    border-left: 4px solid var(--hs-accent);
+    margin-bottom: 32px;
+  }
+
+  .hs-status-delivered img {
+    width: 36px;
+    height: 36px;
+    object-fit: contain;
+    flex-shrink: 0;
+    filter: brightness(0) saturate(100%) invert(32%) sepia(30%) saturate(800%) hue-rotate(100deg) brightness(90%);
+  }
+
+  .hs-status-delivered__text {
+    font-size: 15px;
+    font-weight: 400;
+    color: var(--hs-accent);
+  }
+
+  .hs-status-delivered__text strong {
+    font-weight: 600;
+  }
+
+  /* --- EN COURS DE FABRICATION (progress bar) --- */
+  .hs-status-progress {
+    margin-bottom: 32px;
+    border: 1px solid var(--hs-border);
+    overflow: hidden;
+  }
+
+  .hs-status-progress__bar-track {
+    height: 3px;
+    background: var(--hs-sand);
+  }
+
+  .hs-status-progress__bar-fill {
+    height: 100%;
+    width: 0;
+    background: var(--hs-dark);
+    transition: width 1s ease;
+  }
+
+  .hs-status-progress__steps {
+    display: flex;
+    justify-content: space-around;
+    gap: 0;
+    padding: 28px 20px;
+    position: relative;
+  }
+
+  .hs-step {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    text-align: center;
+    padding: 0 12px;
+    position: relative;
+  }
+
+  .hs-step:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: 20px;
+    height: 1px;
+    width: 100%;
+    background: var(--hs-border);
+    left: 50%;
+    z-index: 0;
+  }
+
+  .hs-step__icon {
+    width: 44px;
+    height: 44px;
+    background: var(--hs-surface);
+    border: 1px solid var(--hs-border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    z-index: 1;
+    flex-shrink: 0;
+  }
+
+  .hs-step__icon img {
+    width: 22px;
+    height: 22px;
+    object-fit: contain;
+    opacity: 0.7;
+  }
+
+  .hs-step__label {
+    font-size: 11px;
+    color: var(--hs-brown);
+    line-height: 1.4;
+    font-weight: 400;
+  }
+
+  .hs-step__date {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--hs-dark);
+    margin-top: 2px;
+    display: block;
+  }
+
+  @media (max-width: 640px) {
+    .hs-status-progress__steps { flex-direction: column; gap: 16px; }
+    .hs-step { flex-direction: row; text-align: left; align-items: flex-start; }
+    .hs-step::after { display: none; }
+  }
+
+  /* --- PRÊT À LIVRER (CTA) --- */
+  .hs-status-ready {
+    margin-bottom: 32px;
+    border: 1px solid var(--hs-gold);
+    background: var(--hs-gold-light);
+    padding: 32px;
+    text-align: center;
+  }
+
+  .hs-status-ready__icon {
+    width: 48px;
+    height: 48px;
+    margin: 0 auto 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: white;
+    border: 1px solid var(--hs-gold);
+  }
+
+  .hs-status-ready__icon img {
+    width: 28px;
+    object-fit: contain;
+  }
+
+  .hs-status-ready__title {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--hs-dark);
+    margin: 0 0 8px;
+  }
+
+  .hs-status-ready__sub {
+    font-size: 13px;
+    color: var(--hs-brown);
+    margin: 0 0 24px;
+    font-weight: 300;
+  }
+
+  .hs-status-ready__date {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: white;
+    border: 1px solid var(--hs-gold);
+    padding: 14px 28px;
+    margin-bottom: 0;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--hs-dark);
+  }
+
+  .hs-status-ready__date svg {
+    width: 16px; height: 16px;
+    color: var(--hs-gold);
+  }
+
+  .hs-cta-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 16px 36px;
+    background: var(--hs-dark);
+    color: white;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    transition: background 0.2s;
+  }
+
+  .hs-cta-btn:hover { background: var(--hs-brown); color: white; }
+
+  .hs-cta-btn svg { width: 16px; height: 16px; }
+
+  /* --- EN STOCK --- */
+  .hs-status-instock {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 20px 24px;
+    background: var(--hs-surface);
+    border: 1px solid var(--hs-border);
+    border-left: 4px solid var(--hs-gold);
+    margin-bottom: 32px;
+  }
+
+  .hs-status-instock__dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    background: var(--hs-gold);
+    flex-shrink: 0;
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(1.3); }
+  }
+
+  .hs-status-instock__text {
+    font-size: 14px;
+    color: var(--hs-dark);
+    font-weight: 400;
+  }
+
+  .hs-status-instock__text span {
+    color: var(--hs-taupe);
+    font-size: 12px;
+    display: block;
+    margin-top: 2px;
+    font-weight: 300;
+  }
+
+  /* --- REÇU (loader) --- */
+  .hs-status-received {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 20px 24px;
+    background: var(--hs-surface);
+    border: 1px solid var(--hs-border);
+    border-left: 4px solid var(--hs-taupe);
+    margin-bottom: 32px;
+  }
+
+  .hs-status-received img.loader {
+    width: 24px; height: 24px;
+    flex-shrink: 0;
+  }
+
+  .hs-status-received__text {
+    font-size: 14px;
+    color: var(--hs-dark);
+    font-weight: 400;
+  }
+
+  /* ================================================
+     TABLEAU PRODUITS
+  ================================================ */
+
+  .hs-items-section {
+    margin-bottom: 0;
+  }
+
+  .hs-items-section__title {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--hs-taupe);
+    margin-bottom: 16px;
+  }
+
+  .hs-order-table {
+    width: 100%;
+    border-collapse: collapse;
+    border: 1px solid var(--hs-border);
+  }
+
+  .hs-order-table thead {
+    background: var(--hs-surface);
+    border-bottom: 1px solid var(--hs-border);
+  }
+
+  .hs-order-table th {
+    padding: 14px 16px;
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--hs-taupe);
+    text-align: left;
+  }
+
+  .hs-order-table th:last-child { text-align: right; }
+
+  .hs-order-table tbody tr {
+    border-bottom: 1px solid var(--hs-border);
+    transition: background 0.15s;
+  }
+
+  .hs-order-table tbody tr:last-child { border-bottom: none; }
+  .hs-order-table tbody tr:hover { background: var(--hs-surface); }
+
+  .hs-order-table td {
+    padding: 20px 16px;
+    font-size: 14px;
+    color: var(--hs-dark);
+    vertical-align: middle;
+  }
+
+  .hs-order-table td:last-child { text-align: right; }
+
+  /* Cellule produit */
+  .hs-item-cell {
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+  }
+
+  .hs-item-img {
+    width: 72px;
+    height: 72px;
+    flex-shrink: 0;
+    overflow: hidden;
+    border: 1px solid var(--hs-border);
+    background: var(--hs-surface);
+  }
+
+  .hs-item-img img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .hs-item-info {}
+
+  .hs-item-info__name {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--hs-dark);
+    text-decoration: none;
+    display: block;
+    margin-bottom: 4px;
+    line-height: 1.3;
+  }
+
+  .hs-item-info__name:hover { color: var(--hs-brown); }
+
+  .hs-item-info__variant {
+    font-size: 12px;
+    color: var(--hs-taupe);
+    font-weight: 300;
+  }
+
+  /* Délai badge */
+  .hs-delai-badge {
+    display: inline-block;
+    padding: 3px 8px;
+    background: var(--hs-surface);
+    border: 1px solid var(--hs-border);
+    font-size: 11px;
+    color: var(--hs-brown);
+    letter-spacing: 0.04em;
+  }
+
+  /* Tfoot totaux */
+  .hs-order-table tfoot tr {
+    border-top: 1px solid var(--hs-border);
+  }
+
+  .hs-order-table tfoot td {
+    padding: 12px 16px;
+    font-size: 13px;
+    color: var(--hs-brown);
+  }
+
+  .hs-order-table tfoot td:last-child { text-align: right; }
+
+  .hs-order-table tfoot tr.hs-total-row td {
+    padding-top: 16px;
+    padding-bottom: 16px;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--hs-dark);
+    border-top: 2px solid var(--hs-dark);
+    background: var(--hs-surface);
+  }
+
+  /* ================================================
+     SIDEBAR ADRESSES
+  ================================================ */
+
+  .hs-order-sidebar {}
+
+  .hs-addr-block {
+    border: 1px solid var(--hs-border);
+    padding: 24px;
+    margin-bottom: 16px;
+    background: white;
+  }
+
+  .hs-addr-block__title {
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--hs-taupe);
+    margin-bottom: 16px;
+  }
+
+  .hs-addr-block__status {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    border: 1px solid var(--hs-border);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    color: var(--hs-brown);
+    margin-bottom: 16px;
+    background: var(--hs-surface);
+  }
+
+  .hs-addr-block__lines {
+    font-size: 13px;
+    line-height: 1.8;
+    color: var(--hs-brown);
+    font-weight: 300;
+  }
+
+  .hs-addr-block__lines address { font-style: normal; }
+
+  /* Annulation */
+  .hs-cancelled-notice {
+    padding: 20px 24px;
+    background: var(--hs-red-light);
+    border: 1px solid var(--hs-red);
+    border-left: 4px solid var(--hs-red);
+    font-size: 13px;
+    color: var(--hs-red);
+    margin-bottom: 32px;
+    line-height: 1.6;
+  }
+</style>
+
+{{ 'customer.css' | asset_url | stylesheet_tag }}
+
+{%- assign order_date_iso = order.created_at | date: "%Y-%m-%dT%H:%M:%S%z" -%}
+{%- assign order_date = order.created_at | time_tag: format: "date_at_time" -%}
+
+<div class="hs-order-page">
+
+  <!-- TOPBAR -->
+  <div class="hs-order-topbar">
+    <div>
+      <a href="{{ routes.account_url }}" class="hs-back-link" style="margin-bottom:16px; display:inline-flex;">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M10 3L5 8l5 5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        Retour au compte
+      </a>
+      <h1 class="hs-order-headline__num">Commande {{ order.name }}</h1>
+      <p class="hs-order-headline__date">{{ 'customer.order.date_html' | t: date: order_date }}</p>
+    </div>
+  </div>
+
+  <div class="hs-order-layout">
+
+    <!-- COLONNE PRINCIPALE -->
+    <div>
+
+      <!-- BLOC STATUT -->
+
+      {%- if order.cancelled -%}
+        {%- assign cancelled_at = order.cancelled_at | time_tag: format: "date_at_time" -%}
+        <div class="hs-cancelled-notice">
+          <strong>Commande annulée</strong> — {{ 'customer.order.cancelled_html' | t: date: cancelled_at }}<br>
+          Motif : {{ order.cancel_reason_label }}
+        </div>
+
+      {%- elsif order.fulfillment_status == 'fulfilled' -%}
+
+        <div class="hs-status-delivered">
+          <img src="https://cdn.shopify.com/s/files/1/0919/0581/8947/files/iconcamion.png?v=1753216842" alt="Livré">
+          <div class="hs-status-delivered__text">
+            Livré le <strong>{{ order.fulfillments[0].created_at | date: "%d %B %Y" }}</strong>
+          </div>
+        </div>
+
+      {%- elsif order.tags contains "PretPourLaLivraison" -%}
+
+        <div class="hs-status-ready">
+          <div class="hs-status-ready__icon">
+            <img src="https://cdn.shopify.com/s/files/1/0919/0581/8947/files/iconcamion.png?v=1753216842" alt="Prêt">
+          </div>
+
+          {%- if order.metafields.custom.date_de_livraison_client != blank -%}
+
+            <h3 class="hs-status-ready__title">Créneau de livraison confirmé</h3>
+            <p class="hs-status-ready__sub">Votre commande sera livrée à la date suivante :</p>
+            <div class="hs-status-ready__date">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
+              </svg>
+              {{ order.metafields.custom.date_de_livraison_client }}
+            </div>
+
+          {%- else -%}
+
+            <h3 class="hs-status-ready__title">Votre commande est prête à être livrée</h3>
+            <p class="hs-status-ready__sub">Choisissez votre créneau de livraison ci-dessous.</p>
+
+            {%- assign delivery_url = "https://home-sweet.be/pages/planifier-ma-livraison-selection-de-zone" -%}
+            {%- if customer.tags contains "BE-Hainaut-Est" -%}{%- assign delivery_url = "https://home-sweet.be/pages/planifier-ma-livraison-zone-hainaut-est" -%}
+            {%- elsif customer.tags contains "BE-Hainaut-Ouest" -%}{%- assign delivery_url = "https://home-sweet.be/pages/planifier-ma-livraison-zone-hainaut-ouest" -%}
+            {%- elsif customer.tags contains "BE-Limbourg" -%}{%- assign delivery_url = "https://home-sweet.be/pages/planifier-ma-livraison-zone-limbourg" -%}
+            {%- elsif customer.tags contains "BE-Liège" -%}{%- assign delivery_url = "https://home-sweet.be/pages/planifier-ma-livraison-zone-liege" -%}
+            {%- elsif customer.tags contains "BE-Flandre-Orientale" -%}{%- assign delivery_url = "https://home-sweet.be/pages/planifier-ma-livraison-zone-Flandre-Orientale" -%}
+            {%- elsif customer.tags contains "BE-Flandre-Occidentale" -%}{%- assign delivery_url = "https://home-sweet.be/pages/planifier-ma-livraison-zone-Flandre-Occidentale" -%}
+            {%- elsif customer.tags contains "BE-Anvers" -%}{%- assign delivery_url = "https://home-sweet.be/pages/planifier-ma-livraison-zone-Anvers" -%}
+            {%- elsif customer.tags contains "BE-Namur" -%}{%- assign delivery_url = "https://home-sweet.be/pages/planifier-ma-livraison-zone-namur" -%}
+            {%- elsif customer.tags contains "BE-Luxembourg" -%}{%- assign delivery_url = "https://home-sweet.be/pages/planifier-ma-livraison-zone-belgique-luxembourg" -%}
+            {%- elsif customer.tags contains "FR-Est" -%}{%- assign delivery_url = "https://home-sweet.be/pages/planifier-ma-livraison-zone-france-est" -%}
+            {%- elsif customer.tags contains "FR-Nord" -%}{%- assign delivery_url = "https://home-sweet.be/pages/planifier-ma-livraison-zone-france-nord" -%}
+            {%- elsif customer.tags contains "BE-Bruxelles" -%}{%- assign delivery_url = "https://home-sweet.be/pages/planifier-ma-livraison-zone-bruxelles" -%}
+            {%- elsif customer.tags contains "LU" -%}{%- assign delivery_url = "https://home-sweet.be/pages/planifier-ma-livraison-zone-pays-luxembourg" -%}
+            {%- endif -%}
+
+            {%- assign sep = '?' -%}
+            {%- if delivery_url contains '?' -%}{%- assign sep = '&' -%}{%- endif -%}
+            <a href="{{ delivery_url }}{{ sep }}order={{ order.name | url_encode }}&email={{ customer.email | url_encode }}" class="hs-cta-btn">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
+              </svg>
+              Sélectionner un créneau de livraison
+            </a>
+
+          {%- endif -%}
+        </div>
+
+      {%- elsif order.tags contains "ProduitEnStock" -%}
+
+        <div class="hs-status-instock">
+          <div class="hs-status-instock__dot"></div>
+          <div class="hs-status-instock__text">
+            En stock — disponible immédiatement
+            <span>Vous recevrez un e-mail sous 72h pour planifier votre livraison.</span>
+          </div>
+        </div>
+
+      {%- elsif order.tags contains "SentToSupplier" -%}
+
+        <div class="hs-status-progress"
+             id="order-status"
+             data-order-date="{{ order_date_iso }}"
+             data-date-livraison="{{ order.metafields.custom.date_de_livraison_client }}">
+          <div class="hs-status-progress__bar-track">
+            <div class="hs-status-progress__bar-fill" id="progress-bar-fill"></div>
+          </div>
+          <div class="hs-status-progress__steps">
+
+            <div class="hs-step">
+              <div class="hs-step__icon">
+                <img src="https://cdn.shopify.com/s/files/1/0919/0581/8947/files/iconorder.png?v=1753216853" alt="Commande">
+              </div>
+              <div class="hs-step__label">
+                Commande passée
+                <strong class="hs-step__date" id="order-date-display">—</strong>
+              </div>
+            </div>
+
+            <div class="hs-step">
+              <div class="hs-step__icon">
+                <img src="https://cdn.shopify.com/s/files/1/0919/0581/8947/files/iconcanap.png?v=1753216831" alt="Confection">
+              </div>
+              <div class="hs-step__label">
+                Confection de votre produit
+                <strong class="hs-step__date" id="date-plus-8">—</strong>
+              </div>
+            </div>
+
+            <div class="hs-step">
+              <div class="hs-step__icon">
+                <img src="https://cdn.shopify.com/s/files/1/0919/0581/8947/files/iconcamion.png?v=1753216842" alt="Livraison">
+              </div>
+              <div class="hs-step__label" id="delivery-date-text">—</div>
+            </div>
+
+          </div>
+        </div>
+
+      {%- else -%}
+
+        <div class="hs-status-received">
+          <img class="loader" src="https://cdn.shopify.com/s/files/1/0919/0581/8947/files/loading.gif?v=1753216986" alt="En attente">
+          <div class="hs-status-received__text">Commande reçue par HomeSweet — traitement en cours</div>
+        </div>
+
+      {%- endif -%}
+
+      <!-- hidden délais -->
+      {% for line_item in order.line_items %}
+        <span class="product-delai" data-delai="{{ line_item.product.metafields.custom.delai_de_livraison }}" style="display:none"></span>
+      {% endfor %}
+
+      <!-- TABLEAU ARTICLES -->
+      <div class="hs-items-section">
+        <div class="hs-items-section__title">Articles commandés</div>
+
+        <table role="table" class="hs-order-table">
+          <caption class="sr-only">{{ 'customer.order.title' | t: name: order.name }}</caption>
+          <thead>
+            <tr>
+              <th id="ColumnProduct">{{ 'customer.order.product' | t }}</th>
+              <th id="ColumnLivraison">Livraison</th>
+              <th id="ColumnPrice">{{ 'customer.order.price' | t }}</th>
+              <th id="ColumnQuantity">{{ 'customer.order.quantity' | t }}</th>
+              <th id="ColumnTotal">{{ 'customer.order.total' | t }}</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            {%- for line_item in order.line_items -%}
+              <tr>
+                <td headers="ColumnProduct">
+                  <div class="hs-item-cell">
+                    {%- if line_item.image -%}
+                      <div class="hs-item-img">
+                        <img src="{{ line_item.image | img_url: '160x160', crop: 'center' }}" alt="{{ line_item.title | escape }}" loading="lazy">
+                      </div>
+                    {%- endif -%}
+                    <div class="hs-item-info">
+                      {%- if line_item.product.url != blank -%}
+                        <a class="hs-item-info__name" href="{{ line_item.product.url }}">{{ line_item.title }}</a>
+                      {%- else -%}
+                        <span class="hs-item-info__name">{{ line_item.title }}</span>
+                      {%- endif -%}
+                      {%- unless line_item.product.has_only_default_variant -%}
+                        <div class="hs-item-info__variant">{{ line_item.variant.title }}</div>
+                      {%- endunless -%}
+                      {%- if line_item.selling_plan_allocation -%}
+                        <div class="hs-item-info__variant">{{ line_item.selling_plan_allocation.selling_plan.name }}</div>
+                      {%- endif -%}
+                      {%- assign property_size = line_item.properties | size -%}
+                      {%- if property_size != 0 -%}
+                        {%- for property in line_item.properties -%}
+                          {%- assign property_first_char = property.first | slice: 0 -%}
+                          {%- if property.last != blank and property_first_char != '_' -%}
+                            <div class="hs-item-info__variant">{{ property.first }}: {{ property.last }}</div>
+                          {%- endif -%}
+                        {%- endfor -%}
+                      {%- endif -%}
+                      {%- if line_item.fulfillment -%}
+                        {%- assign created_at = line_item.fulfillment.created_at | time_tag: format: 'date' -%}
+                        <div class="hs-item-info__variant" style="color:var(--hs-accent); margin-top:4px;">
+                          {{ 'customer.order.fulfilled_at_html' | t: date: created_at }}
+                          {%- if line_item.fulfillment.tracking_url -%}
+                            — <a href="{{ line_item.fulfillment.tracking_url }}" style="color:var(--hs-accent);">Suivre</a>
+                          {%- endif -%}
+                        </div>
+                      {%- endif -%}
+                    </div>
+                  </div>
+                </td>
+
+                <td headers="ColumnLivraison">
+                  <span class="hs-delai-badge">
+                    {%- if order.tags contains "ProduitEnStock" -%}
+                      En stock
+                    {%- elsif line_item.product.metafields.custom.delai_de_livraison == "8 à 12 semaines" -%}
+                      8–12 sem.
+                    {%- elsif line_item.product.metafields.custom.delai_de_livraison == "5 à 7 semaines" -%}
+                      5–7 sem.
+                    {%- else -%}
+                      4–6 sem.
+                    {%- endif -%}
+                  </span>
+                </td>
+
+                <td headers="ColumnPrice">
+                  {%- if line_item.original_price != line_item.final_price -%}
+                    <span style="text-decoration:line-through; color:var(--hs-taupe); font-size:12px; display:block;">{{ line_item.original_price | money }}</span>
+                    <span>{{ line_item.final_price | money }}</span>
+                  {%- else -%}
+                    {{ line_item.final_price | money }}
+                  {%- endif -%}
+                </td>
+
+                <td headers="ColumnQuantity">{{ line_item.quantity }}</td>
+
+                <td headers="ColumnTotal">
+                  {%- if line_item.original_line_price != line_item.final_line_price -%}
+                    <span style="text-decoration:line-through; color:var(--hs-taupe); font-size:12px; display:block;">{{ line_item.original_line_price | money }}</span>
+                    <span>{{ line_item.final_line_price | money }}</span>
+                  {%- else -%}
+                    {{ line_item.final_line_price | money }}
+                  {%- endif -%}
+                </td>
+              </tr>
+            {%- endfor -%}
+          </tbody>
+
+          <tfoot>
+            <tr>
+              <td colspan="4">{{ 'customer.order.subtotal' | t }}</td>
+              <td>{{ order.line_items_subtotal_price | money }}</td>
+            </tr>
+            {%- for discount_application in order.cart_level_discount_applications -%}
+              <tr>
+                <td colspan="4">{{ 'customer.order.discount' | t }} ({{ discount_application.title }})</td>
+                <td>-{{ discount_application.total_allocated_amount | money }}</td>
+              </tr>
+            {%- endfor -%}
+            {%- for shipping_method in order.shipping_methods -%}
+              <tr>
+                <td colspan="4">{{ 'customer.order.shipping' | t }} ({{ shipping_method.title }})</td>
+                <td>{{ shipping_method.price | money }}</td>
+              </tr>
+            {%- endfor -%}
+            {%- for tax_line in order.tax_lines -%}
+              <tr>
+                <td colspan="4">{{ 'customer.order.tax' | t }} ({{ tax_line.title }} {{ tax_line.rate | times: 100 }}%)</td>
+                <td>{{ tax_line.price | money }}</td>
+              </tr>
+            {%- endfor -%}
+            {%- if order.total_duties -%}
+              <tr>
+                <td colspan="4">{{ 'customer.order.total_duties' | t }}</td>
+                <td>{{ order.total_duties | money }}</td>
+              </tr>
+            {%- endif -%}
+            {%- if order.total_refunded_amount > 0 -%}
+              <tr>
+                <td colspan="4">{{ 'customer.order.total_refunded' | t }}</td>
+                <td>-{{ order.total_refunded_amount | money }}</td>
+              </tr>
+            {%- endif -%}
+            <tr class="hs-total-row">
+              <td colspan="4">{{ 'customer.order.total' | t }}</td>
+              <td>{{ order.total_net_amount | money_with_currency }}</td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+
+    </div>
+
+    <!-- SIDEBAR ADRESSES -->
+    <aside class="hs-order-sidebar">
+
+      <div class="hs-addr-block">
+        <div class="hs-addr-block__title">{{ 'customer.order.billing_address' | t }}</div>
+        <div class="hs-addr-block__status">{{ order.financial_status_label }}</div>
+        <div class="hs-addr-block__lines">
+          <address>{{ order.billing_address | format_address }}</address>
+        </div>
+      </div>
+
+      <div class="hs-addr-block">
+        <div class="hs-addr-block__title">{{ 'customer.order.shipping_address' | t }}</div>
+        <div class="hs-addr-block__status">{{ order.fulfillment_status_label }}</div>
+        <div class="hs-addr-block__lines">
+          <address>{{ order.shipping_address | format_address }}</address>
+        </div>
+      </div>
+
+    </aside>
+
+  </div>
+</div>
+
+<!-- JAVASCRIPT (inchangé, logique préservée) -->
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const container = document.getElementById("order-status");
+  if (!container) return;
+
+  const orderDateStr = container.dataset.orderDate;
+  const livraisonDate = container.dataset.dateLivraison;
+  if (!orderDateStr) return;
+
+  const monthNames = ["janvier","février","mars","avril","mai","juin","juillet","août","septembre","octobre","novembre","décembre"];
+
+  function formatDate(date) {
+    const d = new Date(date);
+    return `${d.getDate()} ${monthNames[d.getMonth()]}`;
+  }
+
+  function addDays(date, days) {
+    const d = new Date(date);
+    d.setDate(d.getDate() + days);
+    return d;
+  }
+
+  const orderDateDisplay = document.getElementById("order-date-display");
+  if (orderDateDisplay) orderDateDisplay.textContent = formatDate(orderDateStr);
+
+  const datePlus8 = document.getElementById("date-plus-8");
+  if (datePlus8) datePlus8.textContent = formatDate(addDays(orderDateStr, 8));
+
+  const deliveryText = document.getElementById("delivery-date-text");
+  if (deliveryText) {
+    if (livraisonDate && livraisonDate.trim() !== "") {
+      deliveryText.innerHTML = `Livraison prévue<br><strong>${livraisonDate}</strong>`;
+    } else {
+      const delaiEls = document.querySelectorAll(".product-delai");
+      let minDays = 28, maxDays = 42;
+      delaiEls.forEach(el => {
+        const val = (el.dataset.delai || "").toLowerCase();
+        if (val.includes("8") && val.includes("12")) { minDays = Math.max(minDays, 56); maxDays = Math.max(maxDays, 80); }
+        else if (val.includes("6") && val.includes("8")) { minDays = Math.max(minDays, 42); maxDays = Math.max(maxDays, 56); }
+        else if (val.includes("5") && val.includes("7")) { minDays = Math.max(minDays, 35); maxDays = Math.max(maxDays, 49); }
+        else if (val.includes("4") && val.includes("6")) { minDays = Math.max(minDays, 28); maxDays = Math.max(maxDays, 42); }
+      });
+      deliveryText.innerHTML = `Livraison estimée<br><strong>${formatDate(addDays(orderDateStr, minDays))}</strong> – <strong>${formatDate(addDays(orderDateStr, maxDays))}</strong>`;
+    }
+  }
+
+  const progressBarFill = document.getElementById("progress-bar-fill");
+  if (progressBarFill) {
+    const now = new Date();
+    const orderDate = new Date(orderDateStr);
+    const diffDays = (now - orderDate) / (1000 * 60 * 60 * 24);
+    const progressPercent = Math.min(100, Math.max(5, (diffDays / 80) * 95 + 5));
+    progressBarFill.style.width = progressPercent + "%";
+  }
+});
+</script>
+
+{% schema %}
+{
+  "name": "t:sections.main-order.name",
+  "settings": [
+    {
+      "type": "header",
+      "content": "t:sections.global.settings.header__heading.content"
+    },
+    {
+      "type": "select",
+      "id": "heading_size",
+      "options": [
+        { "value": "title-sm", "label": "t:sections.global.settings.heading_size.options__1.label" },
+        { "value": "title-md", "label": "t:sections.global.settings.heading_size.options__2.label" },
+        { "value": "title-lg tracking-heading", "label": "t:sections.global.settings.heading_size.options__3.label" },
+        { "value": "title-xl tracking-heading", "label": "t:sections.global.settings.heading_size.options__4.label" }
+      ],
+      "default": "title-xl tracking-heading",
+      "label": "t:sections.global.settings.heading_size.label"
+    },
+    {
+      "type": "select",
+      "id": "heading_alignment",
+      "label": "t:sections.global.settings.heading_alignment.label",
+      "options": [
+        { "value": "md:items-end", "label": "t:sections.global.settings.heading_alignment.options__1.label" },
+        { "value": "md:items-center md:flex-col", "label": "t:sections.global.settings.heading_alignment.options__2.label" },
+        { "value": "md:items-end md:flex-row-reverse", "label": "t:sections.global.settings.heading_alignment.options__3.label" }
+      ],
+      "default": "md:items-end"
+    },
+    {
+      "type": "select",
+      "id": "heading_tag",
+      "options": [
+        { "value": "h1", "label": "t:sections.global.settings.heading_tag.options__1.label" },
+        { "value": "h2", "label": "t:sections.global.settings.heading_tag.options__2.label" },
+        { "value": "h3", "label": "t:sections.global.settings.heading_tag.options__3.label" },
+        { "value": "h4", "label": "t:sections.global.settings.heading_tag.options__4.label" },
+        { "value": "h5", "label": "t:sections.global.settings.heading_tag.options__5.label" },
+        { "value": "h6", "label": "t:sections.global.settings.heading_tag.options__6.label" },
+        { "value": "div", "label": "t:sections.global.settings.heading_tag.options__7.label" },
+        { "value": "span", "label": "t:sections.global.settings.heading_tag.options__8.label" },
+        { "value": "p", "label": "t:sections.global.settings.heading_tag.options__9.label" }
+      ],
+      "default": "h1",
+      "label": "t:sections.global.settings.heading_tag.label",
+      "info": "t:sections.global.settings.heading_tag.info"
+    },
+    {
+      "type": "header",
+      "content": "t:sections.global.settings.header__section.content"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0, "max": 120, "step": 4, "unit": "px",
+      "label": "t:sections.global.settings.padding_top.label",
+      "default": 72
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0, "max": 120, "step": 4, "unit": "px",
+      "label": "t:sections.global.settings.padding_bottom.label",
+      "default": 100
+    },
+    {
+      "type": "checkbox",
+      "id": "divider",
+      "label": "t:sections.global.settings.divider.label",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "full_width",
+      "label": "t:sections.global.settings.full_width.label",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "rounded",
+      "default": false,
+      "label": "t:sections.global.settings.rounded.label"
+    }
+  ]
+}
+{% endschema %}

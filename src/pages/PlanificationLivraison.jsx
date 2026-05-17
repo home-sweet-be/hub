@@ -120,11 +120,26 @@ function shippingTierKey(title) {
   return 'other'
 }
 
+function readPrefillFromUrl() {
+  try {
+    const p = new URLSearchParams(window.location.search)
+    const o = (p.get('order') || '').trim()
+    const m = (p.get('email') || '').trim()
+    return { orderName: o, email: m }
+  } catch {
+    return { orderName: '', email: '' }
+  }
+}
+
 export default function PlanificationLivraison() {
+  const initialPrefill = useMemo(() => readPrefillFromUrl(), [])
+  const hasPrefill = Boolean(initialPrefill.orderName && initialPrefill.email)
+
   const [step, setStep] = useState('auth') // auth | pick | done
-  const [orderName, setOrderName] = useState('')
-  const [email, setEmail] = useState('')
+  const [orderName, setOrderName] = useState(initialPrefill.orderName)
+  const [email, setEmail] = useState(initialPrefill.email)
   const [verifying, setVerifying] = useState(false)
+  const [autoVerifying, setAutoVerifying] = useState(hasPrefill)
   const [authError, setAuthError] = useState(null)
   const [order, setOrder] = useState(null)
 
@@ -169,16 +184,19 @@ export default function PlanificationLivraison() {
   }, [])
 
   // ---- Step 1: verify order ----
-  const submitAuth = async (e) => {
+  const submitAuth = async (e, overrides) => {
     e?.preventDefault?.()
     if (verifying) return
+    const useOrderName = overrides?.orderName ?? orderName
+    const useEmail = overrides?.email ?? email
+    if (!useOrderName || !useEmail) return
     setAuthError(null)
     setVerifying(true)
     try {
       const r = await fetch('/api/shopify/verify-order', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ orderName, email }),
+        body: JSON.stringify({ orderName: useOrderName, email: useEmail }),
       })
       let data = null
       try {
@@ -192,6 +210,7 @@ export default function PlanificationLivraison() {
         const detail =
           data?.error || data?.message || `HTTP ${r.status}`
         setAuthError(`Erreur serveur — ${detail}`)
+        setAutoVerifying(false)
         return
       }
       if (!data?.ok) {
@@ -210,6 +229,7 @@ export default function PlanificationLivraison() {
           map[data?.code] ||
             `Une erreur est survenue${data?.code ? ` (${data.code})` : ''}. Réessayez ou contactez-nous.`
         )
+        setAutoVerifying(false)
         return
       }
       setOrder(data.order)
@@ -236,10 +256,18 @@ export default function PlanificationLivraison() {
       // eslint-disable-next-line no-console
       console.error('verify-order network:', err)
       setAuthError(err.message || 'Erreur réseau, réessaie.')
+      setAutoVerifying(false)
     } finally {
       setVerifying(false)
     }
   }
+
+  // Auto-submit when arriving with ?order=...&email=... in the URL
+  useEffect(() => {
+    if (!hasPrefill) return
+    queueMicrotask(() => submitAuth(null, initialPrefill))
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   // ---- Step 2: load ALL upcoming slots for this zone (once per order) ----
   useEffect(() => {
@@ -344,7 +372,14 @@ export default function PlanificationLivraison() {
   return (
     <div className="plani">
       <main className="plani__main">
-        {step === 'auth' && (
+        {step === 'auth' && autoVerifying && (
+          <section className="plani__card plani__card--loading">
+            <div className="plani__loading-spinner" aria-hidden="true" />
+            <p className="plani__loading-text">Chargement de votre commande…</p>
+          </section>
+        )}
+
+        {step === 'auth' && !autoVerifying && (
           <section className="plani__card">
             <h1 className="plani__title">Planifiez votre livraison</h1>
             <p className="plani__lead">
