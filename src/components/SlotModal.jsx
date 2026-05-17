@@ -2,6 +2,13 @@ import { useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { supabase } from '../lib/supabase'
 import { ZONES_BY_COUNTRY } from './ZoneModal'
+import ZoneMapPicker from './ZoneMapPicker'
+
+function zoneLabel(z) {
+  if (z === 'LU') return 'Luxembourg'
+  if (z === 'LIV-Externe') return 'Externe'
+  return z.replace(/^[A-Z]{2}-/, '').replace(/-/g, ' ')
+}
 
 const HOUR_MIN = 9
 const HOUR_MAX = 22
@@ -434,31 +441,34 @@ export default function SlotModal({ open, editing, onClose, onSaved }) {
 
             <section className="slot-modal__section slot-modal__col--zones">
               <div className="slot-modal__section-title">Zones desservies</div>
-              <div className="slot-modal__zones-scroll">
-                {Object.entries(ZONES_BY_COUNTRY).map(([country, list]) => (
-                  <div key={country} className="slot-modal__zone-group">
-                    <div className="slot-modal__country">{country}</div>
-                    <div className="slot-modal__zones">
-                      {list.map((z) => (
-                        <button
-                          key={z}
-                          type="button"
-                          className={
-                            'slot-modal__zone' +
-                            (zones.has(z) ? ' is-active' : '')
-                          }
-                          onClick={() => toggleZone(z)}
-                          disabled={pending}
-                        >
-                          {z === 'LU'
-                            ? 'Pays entier'
-                            : z.replace(/^[A-Z]{2}-/, '').replace(/-/g, ' ')}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                ))}
+              <div className="slot-modal__zones-summary">
+                {zones.size === 0 ? (
+                  <span className="slot-modal__zones-empty">
+                    Clique sur la carte pour sélectionner les zones.
+                  </span>
+                ) : (
+                  <>
+                    <strong>{zones.size}</strong>{' '}
+                    zone{zones.size > 1 ? 's' : ''} : {[...zones].map(zoneLabel).join(', ')}
+                  </>
+                )}
               </div>
+              <ZoneMapPicker
+                selected={zones}
+                onToggle={toggleZone}
+                disabled={pending}
+              />
+              <button
+                type="button"
+                className={
+                  'slot-modal__zone slot-modal__zone--extra' +
+                  (zones.has('LIV-Externe') ? ' is-active' : '')
+                }
+                onClick={() => toggleZone('LIV-Externe')}
+                disabled={pending}
+              >
+                + Externe (hors carte)
+              </button>
             </section>
 
             <div className="slot-modal__col--right">
