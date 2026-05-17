@@ -3722,6 +3722,164 @@
 }
 
 /* ============================================================
+   RAPPORTS — meilleures ventes
+   ============================================================ */
+.rapports__head {
+  margin-bottom: 12px;
+}
+
+.rapports__title {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.rapports__subpages {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 18px;
+  padding: 6px;
+  background: rgba(28, 28, 30, 0.04);
+  border: 1px solid rgba(28, 28, 30, 0.06);
+  border-radius: 12px;
+}
+
+.rapports__subpage {
+  padding: 8px 14px;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  background: transparent;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-soft);
+  cursor: pointer;
+}
+
+.rapports__subpage.is-active {
+  background: #1d1d1f;
+  color: #fff;
+  font-weight: 600;
+}
+
+.rapports__panel {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.rapports__toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.rapports__range,
+.rapports__tabs {
+  display: inline-flex;
+  gap: 4px;
+  padding: 4px;
+  background: rgba(28, 28, 30, 0.04);
+  border-radius: 999px;
+  border: 1px solid rgba(28, 28, 30, 0.06);
+}
+
+.rapports__chip,
+.rapports__tab {
+  padding: 6px 14px;
+  border-radius: 999px;
+  border: none;
+  background: transparent;
+  font-family: inherit;
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--text-soft);
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.rapports__chip:hover:not(.is-active),
+.rapports__tab:hover:not(.is-active) {
+  background: rgba(255, 255, 255, 0.7);
+  color: var(--text);
+}
+
+.rapports__chip.is-active,
+.rapports__tab.is-active {
+  background: #fff;
+  color: var(--text);
+  font-weight: 600;
+  box-shadow: 0 1px 4px rgba(28, 28, 30, 0.12);
+}
+
+.rapports__summary {
+  display: flex;
+  gap: 24px;
+  font-size: 13px;
+  color: var(--text-soft);
+  padding: 4px 4px 8px;
+}
+
+.rapports__summary strong {
+  color: var(--text);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.rapports-table__rank {
+  width: 40px;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  color: var(--text-soft);
+}
+
+.rapports-table__img {
+  width: 60px;
+  padding: 6px 8px !important;
+}
+
+.rapports-table__thumb {
+  display: block;
+  width: 48px;
+  height: 36px;
+  object-fit: cover;
+  border-radius: 5px;
+  background: rgba(28, 28, 30, 0.05);
+}
+
+.rapports-table__thumb--empty {
+  background: rgba(28, 28, 30, 0.06);
+  border: 1px dashed rgba(28, 28, 30, 0.12);
+}
+
+.rapports-table__title {
+  font-weight: 500;
+  color: var(--text);
+  line-height: 1.3;
+}
+
+.rapports-table__variant {
+  font-size: 11.5px;
+  color: var(--text-soft);
+  margin-top: 1px;
+}
+
+.rapports-table__sku {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 11.5px;
+  color: var(--text-soft);
+}
+
+.rapports-table__value {
+  font-weight: 700;
+  font-size: 14px;
+}
+
+/* ============================================================
    COMPTA — month tabs + orders table
    ============================================================ */
 .compta__head {

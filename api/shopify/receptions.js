@@ -1,8 +1,8 @@
 const API_VERSION = process.env.SHOPIFY_API_VERSION || '2025-04'
 
 const QUERY = `
-  query receptions($first: Int!, $query: String!) {
-    orders(first: $first, query: $query, sortKey: CREATED_AT, reverse: true) {
+  query receptions($first: Int!, $query: String!, $after: String) {
+    orders(first: $first, query: $query, sortKey: CREATED_AT, reverse: true, after: $after) {
       edges {
         node {
           id
@@ -81,6 +81,7 @@ export default async function handler(req, res) {
   }
 
   const first = Math.min(Number(req.query.first) || 250, 250)
+  const after = req.query.after || null
   const filter =
     req.query.q ||
     '(tag:SentToSupplier OR tag:ProduitEnStock) AND NOT tag:removed AND NOT fulfillment_status:fulfilled AND NOT financial_status:refunded AND NOT financial_status:partially_refunded AND total_price:>1'
@@ -96,7 +97,7 @@ export default async function handler(req, res) {
         },
         body: JSON.stringify({
           query: QUERY,
-          variables: { first, query: filter },
+          variables: { first, query: filter, after },
         }),
       }
     )
