@@ -277,8 +277,8 @@ function MargeBadge({ pct }) {
 }
 
 const MARGE_TABS = [
-  { id: 'par-produit', label: 'Par produit' },
   { id: 'par-commande', label: 'Par commande' },
+  { id: 'par-produit', label: 'Par produit' },
 ]
 
 function CalculateurMarge() {
@@ -291,7 +291,7 @@ function CalculateurMarge() {
     return stored ? Number(stored) : 5000
   })
   const [search, setSearch] = useState('')
-  const [tab, setTab] = useState('par-produit')
+  const [tab, setTab] = useState('par-commande')
   const { reloadKey } = useReload()
 
   useEffect(() => {
@@ -472,7 +472,6 @@ function CalculateurMarge() {
   }, [orders30, search, fraisParCmd, tab])
 
   const isProduit = tab === 'par-produit'
-  const divisor = isProduit ? safeNbUnits : safeNbCmd
   const divisorReel = isProduit ? nbUnits : nbCmd
   const fraisPar = isProduit ? fraisParUnite : fraisParCmd
   const divisorLabel = isProduit
@@ -523,9 +522,6 @@ function CalculateurMarge() {
           <span>{fraisLabel}</span>
           <div className="marge__val">
             <strong>{formatPrice(fraisPar, 'EUR', 2)}</strong>
-            <span className="marge__val-hint">
-              {formatPrice(fixedCosts, 'EUR', 0)} / {divisor}
-            </span>
           </div>
         </div>
         <label className="marge__field marge__field--search">
