@@ -172,6 +172,14 @@ export default function LivraisonsPlanifier() {
     }
   }, [priorityVersion])
 
+  const coveredZones = useMemo(() => {
+    const set = new Set()
+    for (const r of zonePriorities?.rows || []) {
+      if (r.coverage !== null && r.coverage >= r.count) set.add(r.zone)
+    }
+    return set
+  }, [zonePriorities])
+
   const waitingPins = useMemo(() => {
     if (!waitingOrders) return []
     return waitingOrders
@@ -187,6 +195,8 @@ export default function LivraisonsPlanifier() {
           active.length > 1
             ? `${firstTitle} +${active.length - 1}`
             : firstTitle
+        const zone = extractZone(o)
+        const covered = zone ? coveredZones.has(zone) : false
         return {
           lat,
           lon,
@@ -194,10 +204,11 @@ export default function LivraisonsPlanifier() {
           orderName: o.name,
           city: o.shippingAddress?.city || '',
           product,
+          covered,
         }
       })
       .filter(Boolean)
-  }, [waitingOrders])
+  }, [waitingOrders, coveredZones])
 
   const zonePriorities = useMemo(() => {
     if (!waitingOrders) return null
