@@ -41,8 +41,8 @@ function activeLineItems(order) {
 }
 
 const SHIPPING_TIERS = [
-  { match: /premium/i, label: 'Premium', emojis: ['🚚', '🧑', '🛠️'] },
-  { match: /confort/i, label: 'Confort', emojis: ['🚚', '🧑'] },
+  { match: /premium/i, label: 'Premium', emojis: ['🚚', '🏋️', '🛠️'] },
+  { match: /confort/i, label: 'Confort', emojis: ['🚚', '🏋️'] },
   { match: /standard/i, label: 'Standard', emojis: ['🚚'] },
 ]
 
