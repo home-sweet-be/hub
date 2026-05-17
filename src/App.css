@@ -100,6 +100,50 @@
   -webkit-backdrop-filter: blur(12px);
 }
 
+.hub-header__reload {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  margin-left: 8px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  background: rgba(255, 255, 255, 0.5);
+  color: var(--text);
+  cursor: pointer;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  transition: background 0.15s ease, transform 0.08s ease;
+}
+
+.hub-header__reload:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.8);
+}
+
+.hub-header__reload:active:not(:disabled) {
+  transform: scale(0.94);
+}
+
+.hub-header__reload:disabled {
+  cursor: progress;
+}
+
+.hub-header__reload svg {
+  width: 18px;
+  height: 18px;
+  transition: transform 0.3s ease;
+}
+
+.hub-header__reload.is-spinning svg {
+  animation: hub-reload-spin 0.9s cubic-bezier(0.4, 0.0, 0.2, 1);
+}
+
+@keyframes hub-reload-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
 .hub-header__burger {
   display: none;
   align-items: center;

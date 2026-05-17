@@ -3,6 +3,7 @@ import { supabase } from '../lib/supabase'
 import SlotModal from '../components/SlotModal'
 import { ZoneFlag, zoneCode } from '../components/ZoneFlag'
 import BelgiumHeatmap from '../components/BelgiumHeatmap'
+import { useReload } from '../lib/reload'
 
 const DAY_LABELS_BY_DOW = ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam']
 const ZONE_TAG_PATTERN = /^(BE|FR|LU|NL|DE|LIV)(-|$)/i
@@ -82,6 +83,14 @@ export default function LivraisonsPlanifier() {
     setPriorityVersion((v) => v + 1)
   }, [])
 
+  const { reloadKey } = useReload()
+
+  // Header refresh button → trigger weekly load + priorities recompute
+  useEffect(() => {
+    if (reloadKey === 0) return
+    refreshPriorities()
+  }, [reloadKey, refreshPriorities])
+
   const weekEnd = useMemo(() => addDays(weekStart, 7), [weekStart])
 
   const load = useCallback(async () => {
@@ -118,7 +127,7 @@ export default function LivraisonsPlanifier() {
 
   useEffect(() => {
     load()
-  }, [load])
+  }, [load, reloadKey])
 
   // Load waiting-list orders + all upcoming slots to compute coverage
   useEffect(() => {

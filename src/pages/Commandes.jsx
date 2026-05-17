@@ -3,6 +3,7 @@ import { ZoneFlag, zoneCode } from '../components/ZoneFlag'
 import ZoneModal from '../components/ZoneModal'
 import AddressModal from '../components/AddressModal'
 import OrdersTableSkeleton from '../components/OrdersTableSkeleton'
+import { useReload } from '../lib/reload'
 
 const ZONE_TAG_PATTERN = /^(BE|FR|LU|NL|DE|LIV)(-|$)/i
 
@@ -88,6 +89,7 @@ export default function Commandes() {
   const [error, setError] = useState(null)
   const [zoneEditing, setZoneEditing] = useState(null)
   const [addressViewing, setAddressViewing] = useState(null)
+  const { reloadKey } = useReload()
 
   const load = useCallback(() => {
     setOrders(null)
@@ -112,7 +114,7 @@ export default function Commandes() {
 
   useEffect(() => {
     load()
-  }, [load])
+  }, [load, reloadKey])
 
   const sorted = useMemo(() => {
     if (!orders) return []

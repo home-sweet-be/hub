@@ -4,6 +4,7 @@ import ZoneModal from '../components/ZoneModal'
 import AddressModal from '../components/AddressModal'
 import StockAdjustModal from '../components/StockAdjustModal'
 import OrdersTableSkeleton from '../components/OrdersTableSkeleton'
+import { useReload } from '../lib/reload'
 
 const ZONE_TAG_PATTERN = /^(BE|FR|LU|NL|DE|LIV)(-|$)/i
 
@@ -131,6 +132,7 @@ export default function Fournisseurs() {
   const [zoneEditing, setZoneEditing] = useState(null) // order being edited
   const [addressViewing, setAddressViewing] = useState(null) // order whose address is shown
   const [adjustItems, setAdjustItems] = useState(null) // null = closed, [] = open
+  const { reloadKey } = useReload()
 
   const load = useCallback(() => {
     setOrders(null)
@@ -155,7 +157,7 @@ export default function Fournisseurs() {
 
   useEffect(() => {
     load()
-  }, [load])
+  }, [load, reloadKey])
 
   // Clear selection when changing tab (avoid mixing suppliers in stock adjust)
   useEffect(() => {

@@ -31,7 +31,9 @@
       "Bash(git reset *)",
       "WebFetch(domain:github.com)",
       "Bash(node *)",
-      "Bash(npm install *)"
+      "Bash(npm install *)",
+      "Bash(ls -la vercel.json)",
+      "Bash(cat vercel.json)"
     ]
   }
 }

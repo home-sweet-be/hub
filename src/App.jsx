@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate, NavLink, Outlet, useLocation } from 'react-router-dom'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import logo from './assets/homesweet.png'
+import { ReloadContext } from './lib/reload'
 import Commandes from './pages/Commandes'
 import Logistique from './pages/Logistique'
 import Livraisons from './pages/Livraisons'
@@ -24,6 +25,22 @@ const MODULES = [
 function Shell() {
   const [drawerOpen, setDrawerOpen] = useState(false)
   const location = useLocation()
+  const [reloadKey, setReloadKey] = useState(0)
+  const [reloading, setReloading] = useState(false)
+  const reloadTimerRef = useRef(null)
+
+  const triggerReload = useCallback(() => {
+    setReloadKey((k) => k + 1)
+    setReloading(true)
+    if (reloadTimerRef.current) clearTimeout(reloadTimerRef.current)
+    reloadTimerRef.current = setTimeout(() => setReloading(false), 900)
+  }, [])
+
+  useEffect(() => {
+    return () => {
+      if (reloadTimerRef.current) clearTimeout(reloadTimerRef.current)
+    }
+  }, [])
 
   // Close drawer on route change
   useEffect(() => {
@@ -41,6 +58,7 @@ function Shell() {
   }, [drawerOpen])
 
   return (
+    <ReloadContext.Provider value={{ reloadKey, reloading, triggerReload }}>
     <div className="hub-shell">
       <div className="hub-bg" aria-hidden="true" />
 
@@ -78,6 +96,22 @@ function Shell() {
           <span role="img" aria-label="wave">👋</span>
           <span>Bienvenue Alessandro</span>
         </div>
+
+        <button
+          type="button"
+          className={'hub-header__reload' + (reloading ? ' is-spinning' : '')}
+          onClick={triggerReload}
+          disabled={reloading}
+          aria-label="Rafraîchir les données"
+          title="Rafraîchir les données"
+        >
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M3 12a9 9 0 0 1 15.49-6.27L21 8" />
+            <path d="M21 3v5h-5" />
+            <path d="M21 12a9 9 0 0 1-15.49 6.27L3 16" />
+            <path d="M3 21v-5h5" />
+          </svg>
+        </button>
       </header>
 
       <div className="hub-body">
@@ -115,6 +149,7 @@ function Shell() {
         </main>
       </div>
     </div>
+    </ReloadContext.Provider>
   )
 }
 

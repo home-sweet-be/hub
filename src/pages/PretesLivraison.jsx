@@ -4,6 +4,7 @@ import { ZoneFlag, zoneCode } from '../components/ZoneFlag'
 import ZoneModal from '../components/ZoneModal'
 import AddressModal from '../components/AddressModal'
 import OrdersTableSkeleton from '../components/OrdersTableSkeleton'
+import { useReload } from '../lib/reload'
 
 const ZONE_TAG_PATTERN = /^(BE|FR|LU|NL|DE|LIV)(-|$)/i
 
@@ -84,6 +85,7 @@ export default function PretesLivraison() {
   const [selectedIds, setSelectedIds] = useState(() => new Set())
   const [pending, setPending] = useState(false)
   const headerCheckRef = useRef(null)
+  const { reloadKey } = useReload()
 
   const load = useCallback(() => {
     setOrders(null)
@@ -109,7 +111,7 @@ export default function PretesLivraison() {
 
   useEffect(() => {
     load()
-  }, [load])
+  }, [load, reloadKey])
 
   const sorted = useMemo(() => {
     if (!orders) return []

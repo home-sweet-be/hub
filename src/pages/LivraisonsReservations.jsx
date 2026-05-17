@@ -3,6 +3,7 @@ import { ZoneFlag, zoneCode } from '../components/ZoneFlag'
 import ZoneModal from '../components/ZoneModal'
 import AddressModal from '../components/AddressModal'
 import OrdersTableSkeleton from '../components/OrdersTableSkeleton'
+import { useReload } from '../lib/reload'
 
 const ZONE_TAG_PATTERN = /^(BE|FR|LU|NL|DE|LIV)(-|$)/i
 const WAITLIST_TAG = 'WaitingList'
@@ -480,6 +481,7 @@ export default function LivraisonsReservations() {
   const [zoneEditing, setZoneEditing] = useState(null)
   const [addressViewing, setAddressViewing] = useState(null)
   const [pendingId, setPendingId] = useState(null)
+  const { reloadKey } = useReload()
 
   const load = useCallback(() => {
     setOrders(null)
@@ -504,7 +506,7 @@ export default function LivraisonsReservations() {
 
   useEffect(() => {
     load()
-  }, [load])
+  }, [load, reloadKey])
 
   const removeFromWaitlist = async (o) => {
     setPendingId(o.id)
