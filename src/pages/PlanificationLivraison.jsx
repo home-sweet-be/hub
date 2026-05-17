@@ -119,7 +119,7 @@ export default function PlanificationLivraison() {
     }
   }
 
-  // ---- Step 2: load slots for the visible week, filtered by zone ----
+  // ---- Step 2: load ALL upcoming slots for this zone (once per order) ----
   useEffect(() => {
     if (step !== 'pick' || !order) return
     let cancelled = false
@@ -130,8 +130,7 @@ export default function PlanificationLivraison() {
         const { data: slotData, error } = await supabase
           .from('delivery_slots')
           .select('*')
-          .gte('starts_at', weekStart.toISOString())
-          .lt('starts_at', weekEnd.toISOString())
+          .gte('starts_at', new Date().toISOString())
           .contains('zones', [order.zone])
           .order('starts_at', { ascending: true })
         if (error) throw error
@@ -163,7 +162,14 @@ export default function PlanificationLivraison() {
     return () => {
       cancelled = true
     }
-  }, [step, order, weekStart, weekEnd])
+  }, [step, order])
+
+  const totalAvailable = useMemo(() => {
+    if (!slots) return 0
+    return slots.filter(
+      (s) => !isPast(new Date(s.starts_at)) && (bookings[s.id] || 0) < s.capacity
+    ).length
+  }, [slots, bookings])
 
   const days = useMemo(() => {
     const arr = []
@@ -287,32 +293,63 @@ export default function PlanificationLivraison() {
               </div>
             </div>
 
-            <h2 className="plani__step-title">Choisis un créneau</h2>
-
-            <div className="plani__week-nav">
-              <button
-                type="button"
-                className="plani__nav-btn"
-                onClick={() => setWeekStart(addDays(weekStart, -7))}
-                disabled={weekStart <= startOfToday()}
-                aria-label="Semaine précédente"
-              >
-                ‹
-              </button>
-              <div className="plani__week-label">{weekLabel}</div>
-              <button
-                type="button"
-                className="plani__nav-btn"
-                onClick={() => setWeekStart(addDays(weekStart, 7))}
-                aria-label="Semaine suivante"
-              >
-                ›
-              </button>
+            <div className="plani__step-header">
+              <h2 className="plani__step-title">Choisis un créneau</h2>
+              {!loadingSlots && (
+                <span className="plani__available-count">
+                  {totalAvailable}{' '}
+                  créneau{totalAvailable > 1 ? 'x' : ''} disponible
+                  {totalAvailable > 1 ? 's' : ''}
+                </span>
+              )}
             </div>
+
+            {!loadingSlots && totalAvailable === 0 && (
+              <div className="plani__no-slots">
+                <div className="plani__no-slots-icon" aria-hidden="true">
+                  📭
+                </div>
+                <div className="plani__no-slots-title">
+                  Aucun créneau actuellement disponible sur la zone{' '}
+                  <strong>{zoneLabel(order.zone)}</strong>.
+                </div>
+                <div className="plani__no-slots-sub">
+                  De nouveaux créneaux sont ajoutés chaque semaine — reviens
+                  bientôt ou écris-nous à{' '}
+                  <a href="mailto:contact@homesweet.be">contact@homesweet.be</a>.
+                </div>
+              </div>
+            )}
+
+            {totalAvailable > 0 && (
+              <div className="plani__week-nav">
+                <button
+                  type="button"
+                  className="plani__nav-btn"
+                  onClick={() => setWeekStart(addDays(weekStart, -7))}
+                  disabled={weekStart <= startOfToday()}
+                  aria-label="Semaine précédente"
+                >
+                  ‹
+                </button>
+                <div className="plani__week-label">{weekLabel}</div>
+                <button
+                  type="button"
+                  className="plani__nav-btn"
+                  onClick={() => setWeekStart(addDays(weekStart, 7))}
+                  aria-label="Semaine suivante"
+                >
+                  ›
+                </button>
+              </div>
+            )}
 
             {slotsError && <div className="plani__error">{slotsError}</div>}
 
-            <div className="plani__week">
+            <div
+              className="plani__week"
+              style={totalAvailable === 0 ? { display: 'none' } : undefined}
+            >
               {days.map((d, i) => {
                 const list = slotsByDay.get(ymdLocal(d)) || []
                 return (
@@ -360,37 +397,65 @@ export default function PlanificationLivraison() {
               })}
             </div>
 
-            <footer className="plani__footer">
-              {bookingError && (
-                <div className="plani__error">{bookingError}</div>
-              )}
-              <div className="plani__footer-row">
-                <div className="plani__selected">
-                  {selectedSlot ? (
-                    <>
-                      <span className="plani__selected-label">Créneau choisi</span>
-                      <span className="plani__selected-value">
-                        {fmtFullDate(new Date(selectedSlot.starts_at))} ·{' '}
-                        {fmtTime(new Date(selectedSlot.starts_at))} –{' '}
-                        {fmtTime(new Date(selectedSlot.ends_at))}
-                      </span>
-                    </>
-                  ) : (
-                    <span className="plani__selected-empty">
-                      Sélectionne un créneau pour continuer
-                    </span>
-                  )}
+            {totalAvailable > 0 && (
+              <aside className="plani__note">
+                <div className="plani__note-row">
+                  <span aria-hidden="true">📝</span>
+                  <span>
+                    <strong>Note :</strong> l'heure indiquée correspond au{' '}
+                    <strong>début du créneau</strong>. Il s'agit de l'heure à
+                    partir de laquelle vous devez être disponible.
+                  </span>
                 </div>
-                <button
-                  type="button"
-                  className="plani__cta"
-                  onClick={confirmBooking}
-                  disabled={!selectedSlot || booking}
-                >
-                  {booking ? 'Confirmation…' : 'Confirmer la livraison'}
-                </button>
-              </div>
-            </footer>
+                <div className="plani__note-row">
+                  <span aria-hidden="true">⏰</span>
+                  <span>
+                    Ex : 12:00 pour le créneau (12:00 – 20:00)
+                  </span>
+                </div>
+                <div className="plani__note-row">
+                  <span aria-hidden="true">📧</span>
+                  <span>
+                    Vous recevrez en temps réel un e-mail pour suivre la
+                    position de votre livreur.
+                  </span>
+                </div>
+              </aside>
+            )}
+
+            {totalAvailable > 0 && (
+              <footer className="plani__footer">
+                {bookingError && (
+                  <div className="plani__error">{bookingError}</div>
+                )}
+                <div className="plani__footer-row">
+                  <div className="plani__selected">
+                    {selectedSlot ? (
+                      <>
+                        <span className="plani__selected-label">Créneau choisi</span>
+                        <span className="plani__selected-value">
+                          {fmtFullDate(new Date(selectedSlot.starts_at))} ·{' '}
+                          {fmtTime(new Date(selectedSlot.starts_at))} –{' '}
+                          {fmtTime(new Date(selectedSlot.ends_at))}
+                        </span>
+                      </>
+                    ) : (
+                      <span className="plani__selected-empty">
+                        Sélectionne un créneau pour continuer
+                      </span>
+                    )}
+                  </div>
+                  <button
+                    type="button"
+                    className="plani__cta"
+                    onClick={confirmBooking}
+                    disabled={!selectedSlot || booking}
+                  >
+                    {booking ? 'Confirmation…' : 'Confirmer la livraison'}
+                  </button>
+                </div>
+              </footer>
+            )}
           </section>
         )}
 
