@@ -2,17 +2,14 @@ import { useEffect, useMemo, useState } from 'react'
 import logo from '../assets/homesweet.png'
 import { supabase } from '../lib/supabase'
 
-const DAY_LABELS = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim']
+const DAY_LABELS_BY_DOW = ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam']
 const MONTH_LABELS = [
   'janvier', 'février', 'mars', 'avril', 'mai', 'juin',
   'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre',
 ]
 
-function startOfWeek(date) {
-  const d = new Date(date)
-  const day = d.getDay()
-  const diff = day === 0 ? -6 : 1 - day
-  d.setDate(d.getDate() + diff)
+function startOfToday() {
+  const d = new Date()
   d.setHours(0, 0, 0, 0)
   return d
 }
@@ -35,7 +32,7 @@ function fmtTime(date) {
 }
 
 function fmtFullDate(d) {
-  return `${DAY_LABELS[(d.getDay() + 6) % 7]} ${d.getDate()} ${MONTH_LABELS[d.getMonth()]}`
+  return `${DAY_LABELS_BY_DOW[d.getDay()]} ${d.getDate()} ${MONTH_LABELS[d.getMonth()]}`
 }
 
 function isPast(date) {
@@ -55,7 +52,7 @@ export default function PlanificationLivraison() {
   const [authError, setAuthError] = useState(null)
   const [order, setOrder] = useState(null)
 
-  const [weekStart, setWeekStart] = useState(() => startOfWeek(new Date()))
+  const [weekStart, setWeekStart] = useState(() => startOfToday())
   const [slots, setSlots] = useState(null)
   const [bookings, setBookings] = useState({})
   const [loadingSlots, setLoadingSlots] = useState(false)
@@ -297,7 +294,7 @@ export default function PlanificationLivraison() {
                 type="button"
                 className="plani__nav-btn"
                 onClick={() => setWeekStart(addDays(weekStart, -7))}
-                disabled={weekStart <= startOfWeek(new Date())}
+                disabled={weekStart <= startOfToday()}
                 aria-label="Semaine précédente"
               >
                 ‹
@@ -321,7 +318,7 @@ export default function PlanificationLivraison() {
                 return (
                   <div key={i} className="plani__day">
                     <header className="plani__day-head">
-                      <span className="plani__day-name">{DAY_LABELS[i]}</span>
+                      <span className="plani__day-name">{DAY_LABELS_BY_DOW[d.getDay()]}</span>
                       <span className="plani__day-date">{d.getDate()}</span>
                     </header>
                     <div className="plani__day-slots">
