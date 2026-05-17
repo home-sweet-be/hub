@@ -300,13 +300,6 @@ export default function LivraisonsPlanifier() {
           </button>
           <h2 className="livraisons__title">{weekLabel}</h2>
         </div>
-        <button
-          type="button"
-          className="btn btn--blue"
-          onClick={() => setEditing({ day: new Date() })}
-        >
-          + Créer un créneau
-        </button>
       </div>
 
       {error && <p style={{ color: '#c00' }}>Erreur : {error}</p>}
