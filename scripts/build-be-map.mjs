@@ -16,6 +16,9 @@ const OUT = 'src/components/belgiumProvincesPaths.js'
 const EPS_DEG = 0.0025
 const VIEW_W = 1000
 
+// Hainaut splits at Mons longitude → BE-Hainaut-Ouest / BE-Hainaut-Est
+const HAINAUT_CUT_LON = 3.9514 // Mons
+
 // id (from properties.id) → metadata + matching Shopify zone tags
 const ZONE_META = {
   // Belgium provinces / regions
@@ -23,7 +26,8 @@ const ZONE_META = {
   BEVOV: { id: 'oost-vl', label: 'Flandre orientale', zones: ['BE-Flandre-Orientale'], country: 'BE' },
   BEVWV: { id: 'west-vl', label: 'Flandre occidentale', zones: ['BE-Flandre-Occidentale'], country: 'BE' },
   BEVLI: { id: 'limburg', label: 'Limbourg', zones: ['BE-Limbourg'], country: 'BE' },
-  BEWHT: { id: 'hainaut', label: 'Hainaut', zones: ['BE-Hainaut-Est', 'BE-Hainaut-Ouest', 'BE-Hainaut'], country: 'BE' },
+  BEWHTO: { id: 'hainaut-ouest', label: 'Hainaut Ouest', zones: ['BE-Hainaut-Ouest'], country: 'BE' },
+  BEWHTE: { id: 'hainaut-est', label: 'Hainaut Est', zones: ['BE-Hainaut-Est'], country: 'BE' },
   BEWNA: { id: 'namur', label: 'Namur', zones: ['BE-Namur'], country: 'BE' },
   BEWLX: { id: 'luxembourg-be', label: 'Luxembourg (BE)', zones: ['BE-Luxembourg'], country: 'BE' },
   BEWLG: { id: 'liege', label: 'Liège', zones: ['BE-Liège'], country: 'BE' },
@@ -85,8 +89,43 @@ let raw = fs.readFileSync(SRC, 'utf8')
 raw = raw.replace(/,(\s*[}\]])/g, '$1')
 const data = JSON.parse(raw)
 
+// ---- Split Hainaut (BEWHT) into east/west at Mons longitude ----
+{
+  const hai = data.features.find((f) => f.properties?.id === 'BEWHT')
+  if (hai) {
+    const polys =
+      hai.geometry.type === 'Polygon'
+        ? [hai.geometry.coordinates]
+        : hai.geometry.coordinates
+    const westRect = [[[
+      [-10, 45], [HAINAUT_CUT_LON, 45],
+      [HAINAUT_CUT_LON, 55], [-10, 55], [-10, 45],
+    ]]]
+    const eastRect = [[[
+      [HAINAUT_CUT_LON, 45], [20, 45],
+      [20, 55], [HAINAUT_CUT_LON, 55], [HAINAUT_CUT_LON, 45],
+    ]]]
+    const west = polygonClipping.intersection(polys, westRect)
+    const east = polygonClipping.intersection(polys, eastRect)
+    data.features = data.features.filter((f) => f.properties?.id !== 'BEWHT')
+    const push = (id, name, mp) => {
+      if (mp.length === 0) return
+      data.features.push({
+        type: 'Feature',
+        properties: { id, name, source: 'split-from-BEWHT' },
+        geometry: {
+          type: mp.length === 1 ? 'Polygon' : 'MultiPolygon',
+          coordinates: mp.length === 1 ? mp[0] : mp,
+        },
+      })
+    }
+    push('BEWHTO', 'Hainaut Ouest', west)
+    push('BEWHTE', 'Hainaut Est', east)
+  }
+}
+
 // ---- Derive BE-Bruxelles from the hole in the BE provinces union ----
-const BE_IDS = ['BEVAN', 'BEVOV', 'BEVWV', 'BEVLI', 'BEWHT', 'BEWNA', 'BEWLX', 'BEWLG']
+const BE_IDS = ['BEVAN', 'BEVOV', 'BEVWV', 'BEVLI', 'BEWHTO', 'BEWHTE', 'BEWNA', 'BEWLX', 'BEWLG']
 const bePolygons = data.features
   .filter((f) => BE_IDS.includes(f.properties?.id))
   .map((f) =>
