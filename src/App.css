@@ -3788,7 +3788,7 @@
 }
 
 .plani__shipping-details {
-  margin-top: 12px;
+  margin-top: 6px;
   padding: 12px 14px;
   background: rgba(28, 28, 30, 0.04);
   border: 1px solid rgba(28, 28, 30, 0.08);
@@ -3798,18 +3798,8 @@
   color: var(--text);
 }
 
-.plani__shipping-details-head {
-  font-size: 13.5px;
-  margin-bottom: 6px;
-}
-
-.plani__shipping-price {
-  color: var(--text-soft);
-  font-weight: 500;
-}
-
 .plani__shipping-details-body {
-  margin: 0;
+  margin: 10px 0 0;
   color: var(--text);
 }
 

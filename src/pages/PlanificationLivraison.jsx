@@ -80,44 +80,33 @@ function ToolsIcon() {
 const SHIPPING_DETAILS = {
   standard: {
     label: 'Standard',
-    price: '99 €',
     icons: [<TruckIcon key="t" />],
     body: (
       <>
         Votre article est livré <strong>au pied du camion</strong>, devant
         chez vous.
-        <br />
-        👉 Idéal si vous êtes équipé pour le transporter jusqu'à chez vous.
       </>
     ),
     needsTerms: false,
   },
   confort: {
     label: 'Confort',
-    price: '159 €',
     icons: [<TruckIcon key="t" />, <PorterIcon key="p" />],
     body: (
       <>
         Nos livreurs <strong>déposent l'article dans la pièce de votre
         choix</strong>, au rez-de-chaussée ou à l'étage.
-        <br />
-        👉 Pratique si vous ne souhaitez pas porter ou manœuvrer les colis
-        vous-même.
       </>
     ),
     needsTerms: true,
   },
   premium: {
     label: 'Premium',
-    price: '179 €',
     icons: [<TruckIcon key="t" />, <PorterIcon key="p" />, <ToolsIcon key="w" />],
     body: (
       <>
         Nos livreurs livrent dans la pièce de votre choix,{' '}
         <strong>déballent et installent</strong> votre article.
-        <br />
-        👉 Parfait si vous voulez une expérience clé en main, sans rien avoir
-        à faire.
       </>
     ),
     needsTerms: true,
@@ -397,7 +386,7 @@ export default function PlanificationLivraison() {
                   return (
                     <div>
                       <div className="plani__recap-label">Type de livraison</div>
-                      <div className="plani__recap-value">
+                      <div className="plani__shipping-details">
                         <span
                           className={
                             'reception-shipping__chip is-' +
@@ -418,35 +407,29 @@ export default function PlanificationLivraison() {
                             </span>
                           )}
                         </span>
-                      </div>
-                      {details && (
-                        <div className="plani__shipping-details">
-                          <div className="plani__shipping-details-head">
-                            <strong>Livraison {details.label}</strong>{' '}
-                            <span className="plani__shipping-price">
-                              — {details.price}
-                            </span>
-                          </div>
-                          <p className="plani__shipping-details-body">
-                            {details.body}
-                          </p>
-                          {details.needsTerms && (
-                            <p className="plani__shipping-details-warn">
-                              <strong>Important</strong> · si vous habitez en
-                              étage sans ascenseur conforme aux dimensions
-                              minimales, consultez les{' '}
-                              <a
-                                href={SHIPPING_TERMS_URL}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                              >
-                                conditions de livraison en logement
-                              </a>
-                              .
+                        {details && (
+                          <>
+                            <p className="plani__shipping-details-body">
+                              {details.body}
                             </p>
-                          )}
-                        </div>
-                      )}
+                            {details.needsTerms && (
+                              <p className="plani__shipping-details-warn">
+                                <strong>Important</strong> · si vous habitez en
+                                étage sans ascenseur conforme aux dimensions
+                                minimales, consultez les{' '}
+                                <a
+                                  href={SHIPPING_TERMS_URL}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                >
+                                  conditions de livraison en logement
+                                </a>
+                                .
+                              </p>
+                            )}
+                          </>
+                        )}
+                      </div>
                     </div>
                   )
                 })()}
