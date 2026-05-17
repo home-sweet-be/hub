@@ -52,6 +52,7 @@ function pinsFeatureCollection(pins) {
         city: p.city || '',
         product: p.product || '',
         covered: p.covered ? 1 : 0,
+        tier: p.tier || 'standard',
       },
       geometry: { type: 'Point', coordinates: [p.lon, p.lat] },
     })),
@@ -146,8 +147,20 @@ export default function BelgiumHeatmap({
             '#34c759',
             '#ea4335',
           ],
-          'circle-stroke-color': '#fff',
-          'circle-stroke-width': 1.6,
+          'circle-stroke-color': [
+            'match',
+            ['get', 'tier'],
+            'premium', '#af52de',
+            'confort', '#ff9f0a',
+            '#fff',
+          ],
+          'circle-stroke-width': [
+            'match',
+            ['get', 'tier'],
+            'premium', 2.4,
+            'confort', 2.4,
+            1.6,
+          ],
         },
       })
 

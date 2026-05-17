@@ -19,6 +19,13 @@ function zoneLabel(z) {
   return z.replace(/^[A-Z]{2}-/, '').replace(/-/g, ' ')
 }
 
+function shippingTier(title) {
+  if (!title) return 'standard'
+  if (/premium/i.test(title)) return 'premium'
+  if (/confort/i.test(title)) return 'confort'
+  return 'standard'
+}
+
 function startOfToday() {
   const d = new Date()
   d.setHours(0, 0, 0, 0)
@@ -240,6 +247,7 @@ export default function LivraisonsPlanifier() {
           city: o.shippingAddress?.city || '',
           product,
           covered,
+          tier: shippingTier(o.shippingLine?.title),
         }
       })
       .filter(Boolean)
