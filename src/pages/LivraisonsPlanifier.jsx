@@ -522,6 +522,10 @@ export default function LivraisonsPlanifier() {
           load()
           refreshPriorities()
         }}
+        onChanged={() => {
+          load()
+          refreshPriorities()
+        }}
       />
     </div>
   )

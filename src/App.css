@@ -3604,6 +3604,41 @@
   color: var(--text);
 }
 
+.slot-bookings__remove {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  margin-left: 4px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255, 59, 48, 0.1);
+  color: #c43b30;
+  cursor: pointer;
+  font-size: 11px;
+  line-height: 1;
+  transition: background 0.15s ease, transform 0.08s ease;
+}
+
+.slot-bookings__remove:hover:not(:disabled) {
+  background: #ff3b30;
+  color: #fff;
+}
+
+.slot-bookings__remove:active:not(:disabled) {
+  transform: scale(0.92);
+}
+
+.slot-bookings__remove:disabled {
+  opacity: 0.5;
+  cursor: progress;
+}
+
+.slot-bookings__card.is-removing {
+  opacity: 0.55;
+}
+
 .slot-bookings__contact {
   display: flex;
   flex-wrap: wrap;

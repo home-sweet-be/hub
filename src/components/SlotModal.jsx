@@ -310,7 +310,7 @@ function activeLineItems(o) {
   )
 }
 
-function BookingsList({ bookings, loading }) {
+function BookingsList({ bookings, loading, onRemove, removingId }) {
   if (loading) {
     return <div className="slot-bookings__loading">Chargement…</div>
   }
@@ -323,8 +323,14 @@ function BookingsList({ bookings, loading }) {
           const first = o?.customer?.firstName || ''
           const last = o?.customer?.lastName || ''
           const items = o ? activeLineItems(o) : []
+          const isRemoving = removingId === b.id
           return (
-            <div key={b.id} className="slot-bookings__card">
+            <div
+              key={b.id}
+              className={
+                'slot-bookings__card' + (isRemoving ? ' is-removing' : '')
+              }
+            >
               <div className="slot-bookings__head">
                 <span className="slot-bookings__name">
                   {first || last ? `${first} ${last}`.trim() : '—'}
@@ -338,6 +344,18 @@ function BookingsList({ bookings, loading }) {
                 >
                   {b.shopify_order_name}
                 </a>
+                {onRemove && (
+                  <button
+                    type="button"
+                    className="slot-bookings__remove"
+                    onClick={() => onRemove(b)}
+                    disabled={isRemoving}
+                    title="Retirer cette réservation du créneau"
+                    aria-label="Retirer"
+                  >
+                    ✕
+                  </button>
+                )}
               </div>
               <div className="slot-bookings__contact">
                 {o?.email && (
@@ -380,7 +398,7 @@ function BookingsList({ bookings, loading }) {
 /* ------------------------------------------------------------------ */
 /*  Main modal                                                         */
 /* ------------------------------------------------------------------ */
-export default function SlotModal({ open, editing, onClose, onSaved }) {
+export default function SlotModal({ open, editing, onClose, onSaved, onChanged }) {
   const [day, setDay] = useState('')
   const [startMin, setStartMin] = useState(10 * 60)
   const [endMin, setEndMin] = useState(18 * 60)
@@ -391,6 +409,7 @@ export default function SlotModal({ open, editing, onClose, onSaved }) {
   // Bookings on this slot (only meaningful when editing an existing slot)
   const [bookings, setBookings] = useState([])
   const [bookingsLoading, setBookingsLoading] = useState(false)
+  const [removingBookingId, setRemovingBookingId] = useState(null)
 
   useEffect(() => {
     if (!open) return
@@ -495,6 +514,29 @@ export default function SlotModal({ open, editing, onClose, onSaved }) {
   const setRange = (s, e) => {
     setStartMin(s)
     setEndMin(e)
+  }
+
+  const removeBooking = async (b) => {
+    const who =
+      b?.order?.customer?.firstName && b?.order?.customer?.lastName
+        ? `${b.order.customer.firstName} ${b.order.customer.lastName}`
+        : `la commande ${b.shopify_order_name}`
+    if (!confirm(`Retirer ${who} du créneau ?`)) return
+    setRemovingBookingId(b.id)
+    setError(null)
+    try {
+      const { error: delErr } = await supabase
+        .from('delivery_bookings')
+        .delete()
+        .eq('id', b.id)
+      if (delErr) throw delErr
+      setBookings((prev) => prev.filter((x) => x.id !== b.id))
+      onChanged?.()
+    } catch (e) {
+      setError(e.message || String(e))
+    } finally {
+      setRemovingBookingId(null)
+    }
   }
 
   const validate = () => {
@@ -612,6 +654,8 @@ export default function SlotModal({ open, editing, onClose, onSaved }) {
                   <BookingsList
                     bookings={bookings}
                     loading={bookingsLoading}
+                    onRemove={removeBooking}
+                    removingId={removingBookingId}
                   />
                 </>
               ) : (
