@@ -189,9 +189,9 @@ function OrdersTable({
             <th aria-label="action" />
             <th aria-label="image" />
             <th>Produit</th>
+            <th>Livraison</th>
             <th>N°</th>
             <th>Zone</th>
-            <th>Livraison</th>
             <th>Ville</th>
             <th>Client</th>
             <th>Attente</th>
@@ -317,6 +317,42 @@ function OrdersTable({
                     )}
                   </td>
                   {isFirst && (
+                    <td rowSpan={span} className="reception-shipping">
+                      {(() => {
+                        const chip = classifyShipping(o.shippingLine?.title)
+                        if (!chip)
+                          return (
+                            <span className="reception-table__muted">—</span>
+                          )
+                        return (
+                          <span
+                            className={
+                              'reception-shipping__chip is-' +
+                              chip.label.toLowerCase()
+                            }
+                            title={o.shippingLine?.title || ''}
+                          >
+                            <span className="reception-shipping__label">
+                              {chip.label}
+                            </span>
+                            {chip.icons.length > 0 && (
+                              <span className="reception-shipping__icons">
+                                {chip.icons.map((icon, k) => (
+                                  <span
+                                    key={k}
+                                    className="reception-shipping__icon"
+                                  >
+                                    {icon}
+                                  </span>
+                                ))}
+                              </span>
+                            )}
+                          </span>
+                        )
+                      })()}
+                    </td>
+                  )}
+                  {isFirst && (
                     <td className="reception-num" rowSpan={span}>
                       {o.adminUrl ? (
                         <a
@@ -368,42 +404,6 @@ function OrdersTable({
                           'Non défini'
                         )}
                       </button>
-                    </td>
-                  )}
-                  {isFirst && (
-                    <td rowSpan={span} className="reception-shipping">
-                      {(() => {
-                        const chip = classifyShipping(o.shippingLine?.title)
-                        if (!chip)
-                          return (
-                            <span className="reception-table__muted">—</span>
-                          )
-                        return (
-                          <span
-                            className={
-                              'reception-shipping__chip is-' +
-                              chip.label.toLowerCase()
-                            }
-                            title={o.shippingLine?.title || ''}
-                          >
-                            <span className="reception-shipping__label">
-                              {chip.label}
-                            </span>
-                            {chip.icons.length > 0 && (
-                              <span className="reception-shipping__icons">
-                                {chip.icons.map((icon, k) => (
-                                  <span
-                                    key={k}
-                                    className="reception-shipping__icon"
-                                  >
-                                    {icon}
-                                  </span>
-                                ))}
-                              </span>
-                            )}
-                          </span>
-                        )
-                      })()}
                     </td>
                   )}
                   {isFirst && (
