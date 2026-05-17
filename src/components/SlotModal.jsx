@@ -570,7 +570,24 @@ export default function SlotModal({ open, editing, onClose, onSaved }) {
         onClick={(e) => e.stopPropagation()}
       >
         <header className="zone-modal__header">
-          <h3>{editing?.slot ? 'Modifier le créneau' : 'Nouveau créneau'}</h3>
+          <div>
+            <h3>{editing?.slot ? 'Modifier le créneau' : 'Nouveau créneau'}</h3>
+            {editing?.slot && day && bookings.length > 0 && (
+              <p className="slot-modal__date-locked">
+                🔒 {(() => {
+                  const d = parseYmd(day)
+                  return d
+                    ? d.toLocaleDateString('fr-BE', {
+                        weekday: 'long',
+                        day: '2-digit',
+                        month: 'long',
+                        year: 'numeric',
+                      })
+                    : day
+                })()} · date verrouillée (réservations en cours)
+              </p>
+            )}
+          </div>
           <button
             type="button"
             className="zone-modal__close"
@@ -584,12 +601,29 @@ export default function SlotModal({ open, editing, onClose, onSaved }) {
         <div className="zone-modal__body slot-modal__body">
           <div className="slot-modal__grid">
             <section className="slot-modal__section slot-modal__col--date">
-              <div className="slot-modal__section-title">Date</div>
-              <CalendarPicker
-                value={day}
-                onChange={setDay}
-                disabled={pending}
-              />
+              {bookings.length > 0 ? (
+                <>
+                  <div className="slot-modal__section-title">
+                    Réservations
+                    <span className="slot-modal__section-count">
+                      {bookings.length}
+                    </span>
+                  </div>
+                  <BookingsList
+                    bookings={bookings}
+                    loading={bookingsLoading}
+                  />
+                </>
+              ) : (
+                <>
+                  <div className="slot-modal__section-title">Date</div>
+                  <CalendarPicker
+                    value={day}
+                    onChange={setDay}
+                    disabled={pending}
+                  />
+                </>
+              )}
             </section>
 
             <section className="slot-modal__section slot-modal__col--zones">
@@ -647,22 +681,6 @@ export default function SlotModal({ open, editing, onClose, onSaved }) {
             </div>
           </div>
 
-          {editing?.slot && (bookings.length > 0 || bookingsLoading) && (
-            <section className="slot-modal__section slot-modal__bookings-section">
-              <div className="slot-modal__section-title">
-                Réservations
-                {bookings.length > 0 && (
-                  <span className="slot-modal__section-count">
-                    {bookings.length}
-                  </span>
-                )}
-              </div>
-              <BookingsList
-                bookings={bookings}
-                loading={bookingsLoading}
-              />
-            </section>
-          )}
         </div>
 
         {error && <div className="zone-modal__error">{error}</div>}

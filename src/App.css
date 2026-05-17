@@ -3543,9 +3543,27 @@
 }
 
 .slot-bookings__list {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-  gap: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 420px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.slot-bookings__list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.slot-bookings__list::-webkit-scrollbar-thumb {
+  background: rgba(28, 28, 30, 0.15);
+  border-radius: 3px;
+}
+
+.slot-modal__date-locked {
+  margin: 4px 0 0;
+  font-size: 11.5px;
+  color: var(--text-soft);
 }
 
 .slot-bookings__card {
