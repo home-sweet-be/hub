@@ -66,6 +66,13 @@ export default function LivraisonsPlanifier() {
   const [error, setError] = useState(null)
   const [editing, setEditing] = useState(null)
   const [waitingOrders, setWaitingOrders] = useState(null)
+  const [upcomingSlots, setUpcomingSlots] = useState(null)
+  const [upcomingBookings, setUpcomingBookings] = useState({})
+  const [priorityVersion, setPriorityVersion] = useState(0)
+
+  const refreshPriorities = useCallback(() => {
+    setPriorityVersion((v) => v + 1)
+  }, [])
 
   const weekEnd = useMemo(() => addDays(weekStart, 7), [weekStart])
 
@@ -105,12 +112,18 @@ export default function LivraisonsPlanifier() {
     load()
   }, [load])
 
-  // Load waiting-list orders (once, page-level) to compute zone priorities
+  // Load waiting-list orders + all upcoming slots to compute coverage
   useEffect(() => {
     let cancelled = false
+    const nowIso = new Date().toISOString()
     const cutoff = new Date(Date.now() - 150 * 86400000)
       .toISOString()
       .slice(0, 10)
+
+    setWaitingOrders(null)
+    setUpcomingSlots(null)
+    setUpcomingBookings({})
+
     fetch(
       '/api/shopify/receptions?q=' +
         encodeURIComponent(
@@ -125,10 +138,38 @@ export default function LivraisonsPlanifier() {
       .catch(() => {
         if (!cancelled) setWaitingOrders([])
       })
+
+    ;(async () => {
+      const { data: slotData } = await supabase
+        .from('delivery_slots')
+        .select('*')
+        .gte('starts_at', nowIso)
+        .order('starts_at', { ascending: true })
+      if (cancelled) return
+      const list = slotData || []
+      setUpcomingSlots(list)
+      if (list.length > 0) {
+        const ids = list.map((s) => s.id)
+        const { data: bks } = await supabase
+          .from('delivery_bookings')
+          .select('slot_id, status')
+          .in('slot_id', ids)
+          .eq('status', 'confirmed')
+        if (cancelled) return
+        const map = {}
+        ;(bks || []).forEach((b) => {
+          map[b.slot_id] = (map[b.slot_id] || 0) + 1
+        })
+        setUpcomingBookings(map)
+      } else {
+        setUpcomingBookings({})
+      }
+    })()
+
     return () => {
       cancelled = true
     }
-  }, [])
+  }, [priorityVersion])
 
   const zonePriorities = useMemo(() => {
     if (!waitingOrders) return null
@@ -142,11 +183,28 @@ export default function LivraisonsPlanifier() {
       }
       counts.set(zone, (counts.get(zone) || 0) + 1)
     }
-    const arr = [...counts.entries()]
-      .map(([zone, count]) => ({ zone, count }))
+
+    const coverageFor = (zone) => {
+      if (!upcomingSlots) return null
+      return upcomingSlots
+        .filter((s) => (s.zones || []).includes(zone))
+        .reduce(
+          (sum, s) =>
+            sum + Math.max(0, s.capacity - (upcomingBookings[s.id] || 0)),
+          0
+        )
+    }
+
+    const rows = [...counts.entries()]
+      .map(([zone, count]) => ({
+        zone,
+        count,
+        coverage: coverageFor(zone),
+      }))
       .sort((a, b) => b.count - a.count)
-    return { rows: arr, unknown, total: waitingOrders.length }
-  }, [waitingOrders])
+
+    return { rows, unknown, total: waitingOrders.length }
+  }, [waitingOrders, upcomingSlots, upcomingBookings])
 
   const days = useMemo(() => {
     const arr = []
@@ -315,16 +373,25 @@ export default function LivraisonsPlanifier() {
           <ol className="zone-priorities__list">
             {zonePriorities.rows.map((z, i) => {
               const max = zonePriorities.rows[0].count
-              const pct = (z.count / max) * 100
+              const demandPct = (z.count / max) * 100
+              const cov = z.coverage
+              const status =
+                cov === null
+                  ? 'loading'
+                  : cov >= z.count
+                  ? 'covered'
+                  : cov > 0
+                  ? 'partial'
+                  : 'none'
+              const coveredFraction =
+                cov === null || z.count === 0
+                  ? 0
+                  : Math.min(cov, z.count) / z.count
+              const missing = cov === null ? null : Math.max(0, z.count - cov)
               return (
                 <li
                   key={z.zone}
-                  className={
-                    'zone-priorities__row' +
-                    (i === 0 ? ' is-top' : '') +
-                    (i === 1 ? ' is-second' : '') +
-                    (i === 2 ? ' is-third' : '')
-                  }
+                  className={'zone-priorities__row is-' + status}
                 >
                   <span className="zone-priorities__rank">{i + 1}</span>
                   <span className="zone-priorities__zone">
@@ -333,13 +400,35 @@ export default function LivraisonsPlanifier() {
                     )}
                     <span>{zoneLabel(z.zone)}</span>
                   </span>
-                  <div className="zone-priorities__bar">
+                  <div
+                    className="zone-priorities__bar"
+                    title={
+                      cov === null
+                        ? ''
+                        : `${z.count} en attente · ${cov} place${cov > 1 ? 's' : ''} planifiée${cov > 1 ? 's' : ''}`
+                    }
+                  >
                     <div
-                      className="zone-priorities__bar-fill"
-                      style={{ width: `${pct}%` }}
-                    />
+                      className="zone-priorities__bar-demand"
+                      style={{ width: `${demandPct}%` }}
+                    >
+                      <div
+                        className="zone-priorities__bar-covered"
+                        style={{ width: `${coveredFraction * 100}%` }}
+                      />
+                    </div>
                   </div>
                   <span className="zone-priorities__count">{z.count}</span>
+                  <span
+                    className={
+                      'zone-priorities__pill zone-priorities__pill--' + status
+                    }
+                  >
+                    {status === 'loading' && '…'}
+                    {status === 'covered' && '✓ couvert'}
+                    {status === 'partial' && `−${missing} à planifier`}
+                    {status === 'none' && 'à planifier'}
+                  </span>
                 </li>
               )
             })}
@@ -362,6 +451,7 @@ export default function LivraisonsPlanifier() {
         onSaved={() => {
           setEditing(null)
           load()
+          refreshPriorities()
         }}
       />
     </div>

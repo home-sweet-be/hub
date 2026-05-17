@@ -2675,29 +2675,29 @@
 
 .zone-priorities__row {
   display: grid;
-  grid-template-columns: 28px minmax(140px, 200px) 1fr 40px;
+  grid-template-columns: 28px minmax(140px, 200px) 1fr 32px auto;
   gap: 12px;
   align-items: center;
   padding: 8px 12px;
   background: rgba(255, 255, 255, 0.6);
   border-radius: 10px;
   border: 1px solid transparent;
-  transition: background 0.15s ease;
+  transition: background 0.18s ease, border-color 0.18s ease;
 }
 
-.zone-priorities__row.is-top {
-  background: rgba(52, 199, 89, 0.1);
-  border-color: rgba(52, 199, 89, 0.28);
+.zone-priorities__row.is-covered {
+  background: rgba(52, 199, 89, 0.08);
+  border-color: rgba(52, 199, 89, 0.22);
 }
 
-.zone-priorities__row.is-second {
-  background: rgba(10, 132, 255, 0.06);
-  border-color: rgba(10, 132, 255, 0.2);
+.zone-priorities__row.is-partial {
+  background: rgba(255, 159, 10, 0.07);
+  border-color: rgba(255, 159, 10, 0.24);
 }
 
-.zone-priorities__row.is-third {
-  background: rgba(175, 82, 222, 0.06);
-  border-color: rgba(175, 82, 222, 0.18);
+.zone-priorities__row.is-none {
+  background: rgba(255, 59, 48, 0.06);
+  border-color: rgba(255, 59, 48, 0.18);
 }
 
 .zone-priorities__rank {
@@ -2712,22 +2712,6 @@
   background: rgba(28, 28, 30, 0.07);
   border-radius: 50%;
   font-variant-numeric: tabular-nums;
-}
-
-.zone-priorities__row.is-top .zone-priorities__rank {
-  background: #34c759;
-  color: #fff;
-  box-shadow: 0 2px 6px rgba(52, 199, 89, 0.35);
-}
-
-.zone-priorities__row.is-second .zone-priorities__rank {
-  background: #0a84ff;
-  color: #fff;
-}
-
-.zone-priorities__row.is-third .zone-priorities__rank {
-  background: #af52de;
-  color: #fff;
 }
 
 .zone-priorities__zone {
@@ -2748,30 +2732,35 @@
 }
 
 .zone-priorities__bar {
-  height: 8px;
+  height: 10px;
   background: rgba(28, 28, 30, 0.06);
   border-radius: 999px;
   overflow: hidden;
   position: relative;
 }
 
-.zone-priorities__bar-fill {
+.zone-priorities__bar-demand {
   height: 100%;
-  background: linear-gradient(90deg, #c7c7cc 0%, #8e8e93 100%);
+  background: linear-gradient(90deg, #ffb340 0%, #ff9f0a 100%);
   border-radius: 999px;
   transition: width 0.4s cubic-bezier(0.2, 0.9, 0.3, 1.1);
+  position: relative;
 }
 
-.zone-priorities__row.is-top .zone-priorities__bar-fill {
+.zone-priorities__row.is-none .zone-priorities__bar-demand {
+  background: linear-gradient(90deg, #ff6b5e 0%, #ff3b30 100%);
+}
+
+.zone-priorities__row.is-loading .zone-priorities__bar-demand {
+  background: linear-gradient(90deg, #c7c7cc 0%, #aeaeb2 100%);
+}
+
+.zone-priorities__bar-covered {
+  position: absolute;
+  inset: 0;
   background: linear-gradient(90deg, #34c759 0%, #2bb350 100%);
-}
-
-.zone-priorities__row.is-second .zone-priorities__bar-fill {
-  background: linear-gradient(90deg, #0a84ff 0%, #0064d1 100%);
-}
-
-.zone-priorities__row.is-third .zone-priorities__bar-fill {
-  background: linear-gradient(90deg, #af52de 0%, #8c3fb5 100%);
+  border-radius: 999px;
+  transition: width 0.4s cubic-bezier(0.2, 0.9, 0.3, 1.1);
 }
 
 .zone-priorities__count {
@@ -2780,6 +2769,39 @@
   text-align: right;
   font-variant-numeric: tabular-nums;
   color: var(--text);
+}
+
+.zone-priorities__pill {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 4px 9px;
+  border-radius: 999px;
+  white-space: nowrap;
+  letter-spacing: -0.005em;
+}
+
+.zone-priorities__pill--covered {
+  background: rgba(52, 199, 89, 0.16);
+  color: #1d6b35;
+  border: 1px solid rgba(52, 199, 89, 0.28);
+}
+
+.zone-priorities__pill--partial {
+  background: rgba(255, 159, 10, 0.16);
+  color: #8a5a00;
+  border: 1px solid rgba(255, 159, 10, 0.28);
+}
+
+.zone-priorities__pill--none {
+  background: rgba(255, 59, 48, 0.14);
+  color: #a3271f;
+  border: 1px solid rgba(255, 59, 48, 0.24);
+}
+
+.zone-priorities__pill--loading {
+  background: rgba(28, 28, 30, 0.06);
+  color: var(--text-muted);
+  border: 1px solid rgba(28, 28, 30, 0.1);
 }
 
 .zone-priorities__note {
@@ -2792,12 +2814,17 @@
 
 @media (max-width: 700px) {
   .zone-priorities__row {
-    grid-template-columns: 24px 1fr 36px;
+    grid-template-columns: 24px 1fr 32px;
     gap: 10px;
   }
   .zone-priorities__bar {
     grid-column: 1 / -1;
     margin-top: 4px;
+  }
+  .zone-priorities__pill {
+    grid-column: 1 / -1;
+    justify-self: start;
+    margin-top: 2px;
   }
 }
 
