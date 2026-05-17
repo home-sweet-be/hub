@@ -114,12 +114,13 @@ function OrdersTable({
             <th>Client</th>
             <th>Attente</th>
             <th>Date</th>
+            <th>Livraison</th>
           </tr>
         </thead>
         <tbody>
           {sorted.length === 0 && (
             <tr>
-              <td colSpan={9} className="reception-table__empty">
+              <td colSpan={10} className="reception-table__empty">
                 {emptyLabel}
               </td>
             </tr>
@@ -341,6 +342,17 @@ function OrdersTable({
                   {isFirst && (
                     <td className="reception-date" rowSpan={span}>
                       {formatDate(o.createdAt)}
+                    </td>
+                  )}
+                  {isFirst && (
+                    <td rowSpan={span} className="reception-shipping">
+                      {o.shippingLine?.title ? (
+                        <span className="reception-shipping__chip">
+                          {o.shippingLine.title}
+                        </span>
+                      ) : (
+                        <span className="reception-table__muted">—</span>
+                      )}
                     </td>
                   )}
                 </tr>

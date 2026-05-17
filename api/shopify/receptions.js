@@ -30,6 +30,14 @@ const QUERY = `
             lastName
             tags
           }
+          shippingLines(first: 1) {
+            edges {
+              node {
+                title
+                code
+              }
+            }
+          }
           lineItems(first: 20) {
             edges {
               node {
@@ -132,6 +140,7 @@ export default async function handler(req, res) {
           adminUrl: numericId
             ? `https://${domain}/admin/orders/${numericId}`
             : null,
+          shippingLine: o.shippingLines?.edges?.[0]?.node || null,
           lineItems: (o.lineItems?.edges || []).map((le) => le.node),
         }
       })
