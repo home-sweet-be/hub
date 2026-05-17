@@ -40,12 +40,6 @@ function activeLineItems(order) {
   return order.lineItems.filter((li) => effectiveQuantity(li) > 0)
 }
 
-function formatPrice(amount, currency = 'EUR') {
-  const n = Number(amount)
-  if (Number.isNaN(n)) return amount
-  return new Intl.NumberFormat('fr-BE', { style: 'currency', currency }).format(n)
-}
-
 function isSamples(li) {
   return li?.title ? /[ée]chantillon/i.test(li.title) : false
 }
@@ -111,6 +105,7 @@ function OrdersTable({
       <table className="reception-table">
         <thead>
           <tr>
+            <th aria-label="action" />
             <th aria-label="image" />
             <th>Produit</th>
             <th>N°</th>
@@ -119,15 +114,12 @@ function OrdersTable({
             <th>Client</th>
             <th>Attente</th>
             <th>Date</th>
-            <th className="num">Total</th>
-            <th>Paiement</th>
-            <th aria-label="action" />
           </tr>
         </thead>
         <tbody>
           {sorted.length === 0 && (
             <tr>
-              <td colSpan={11} className="reception-table__empty">
+              <td colSpan={9} className="reception-table__empty">
                 {emptyLabel}
               </td>
             </tr>
@@ -180,6 +172,22 @@ function OrdersTable({
 
               return (
                 <tr key={`${o.id}-${idx}`} className={rowCls}>
+                  {isFirst && action && (
+                    <td rowSpan={span} className="reservations-action-cell">
+                      <button
+                        type="button"
+                        className={
+                          'reservations-action ' + (action.className || '')
+                        }
+                        onClick={() => action.onClick(o)}
+                        disabled={actionPending}
+                        title={action.title}
+                        aria-label={action.title}
+                      >
+                        {actionPending ? '…' : action.icon}
+                      </button>
+                    </td>
+                  )}
                   <td className="reception-img-cell">
                     {hasImage ? (
                       <img
@@ -333,36 +341,6 @@ function OrdersTable({
                   {isFirst && (
                     <td className="reception-date" rowSpan={span}>
                       {formatDate(o.createdAt)}
-                    </td>
-                  )}
-                  {isFirst && (
-                    <td className="num" rowSpan={span}>
-                      {formatPrice(o.total, o.currency)}
-                    </td>
-                  )}
-                  {isFirst && (
-                    <td rowSpan={span}>
-                      <span
-                        className={`badge badge--${(o.financialStatus || '').toLowerCase()}`}
-                      >
-                        {(o.financialStatus || '—').toUpperCase()}
-                      </span>
-                    </td>
-                  )}
-                  {isFirst && action && (
-                    <td rowSpan={span} className="reservations-action-cell">
-                      <button
-                        type="button"
-                        className={
-                          'reservations-action ' + (action.className || '')
-                        }
-                        onClick={() => action.onClick(o)}
-                        disabled={actionPending}
-                        title={action.title}
-                        aria-label={action.title}
-                      >
-                        {actionPending ? '…' : action.icon}
-                      </button>
                     </td>
                   )}
                 </tr>
