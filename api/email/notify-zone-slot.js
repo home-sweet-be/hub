@@ -2,7 +2,7 @@ import { Resend } from 'resend'
 import { createClient } from '@supabase/supabase-js'
 
 const SHOPIFY_API_VERSION = process.env.SHOPIFY_API_VERSION || '2025-04'
-const FROM = process.env.EMAIL_FROM || 'Home Sweet <livraison@home-sweet.be>'
+const FROM = process.env.EMAIL_FROM || 'Home Sweet <livraison@send.home-sweet.be>'
 const BOOKING_URL =
   process.env.PLANI_PUBLIC_URL || 'https://home-sweet.be/pages/planifier-ma-livraison'
 
