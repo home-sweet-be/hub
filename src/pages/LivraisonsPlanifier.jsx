@@ -1,8 +1,22 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { supabase } from '../lib/supabase'
 import SlotModal from '../components/SlotModal'
+import { ZoneFlag, zoneCode } from '../components/ZoneFlag'
 
 const DAY_LABELS_BY_DOW = ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam']
+const ZONE_TAG_PATTERN = /^(BE|FR|LU|NL|DE|LIV)(-|$)/i
+
+function extractZone(order) {
+  const find = (tags) => (tags || []).find((t) => ZONE_TAG_PATTERN.test(t))
+  return find(order?.tags) || find(order?.customer?.tags) || null
+}
+
+function zoneLabel(z) {
+  if (!z) return 'Non défini'
+  if (z === 'LU') return 'Luxembourg'
+  if (/^LIV/i.test(z)) return 'Externe'
+  return z.replace(/^[A-Z]{2}-/, '').replace(/-/g, ' ')
+}
 
 function startOfToday() {
   const d = new Date()
@@ -51,6 +65,7 @@ export default function LivraisonsPlanifier() {
   const [bookings, setBookings] = useState({})
   const [error, setError] = useState(null)
   const [editing, setEditing] = useState(null)
+  const [waitingOrders, setWaitingOrders] = useState(null)
 
   const weekEnd = useMemo(() => addDays(weekStart, 7), [weekStart])
 
@@ -89,6 +104,49 @@ export default function LivraisonsPlanifier() {
   useEffect(() => {
     load()
   }, [load])
+
+  // Load waiting-list orders (once, page-level) to compute zone priorities
+  useEffect(() => {
+    let cancelled = false
+    const cutoff = new Date(Date.now() - 150 * 86400000)
+      .toISOString()
+      .slice(0, 10)
+    fetch(
+      '/api/shopify/receptions?q=' +
+        encodeURIComponent(
+          `created_at:>=${cutoff} AND tag:WaitingList AND NOT tag:removed AND status:open AND NOT financial_status:refunded AND NOT financial_status:partially_refunded`
+        ) +
+        '&first=100'
+    )
+      .then((r) => (r.ok ? r.json() : Promise.reject(new Error(`HTTP ${r.status}`))))
+      .then((data) => {
+        if (!cancelled) setWaitingOrders(data.orders || [])
+      })
+      .catch(() => {
+        if (!cancelled) setWaitingOrders([])
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [])
+
+  const zonePriorities = useMemo(() => {
+    if (!waitingOrders) return null
+    const counts = new Map()
+    let unknown = 0
+    for (const o of waitingOrders) {
+      const zone = extractZone(o)
+      if (!zone) {
+        unknown += 1
+        continue
+      }
+      counts.set(zone, (counts.get(zone) || 0) + 1)
+    }
+    const arr = [...counts.entries()]
+      .map(([zone, count]) => ({ zone, count }))
+      .sort((a, b) => b.count - a.count)
+    return { rows: arr, unknown, total: waitingOrders.length }
+  }, [waitingOrders])
 
   const days = useMemo(() => {
     const arr = []
@@ -222,6 +280,80 @@ export default function LivraisonsPlanifier() {
           )
         })}
       </div>
+
+      <section className="zone-priorities">
+        <header className="zone-priorities__head">
+          <div>
+            <h3 className="zone-priorities__title">
+              Priorités de planification
+            </h3>
+            <p className="zone-priorities__subtitle">
+              Zones de la file d'attente classées par volume — pense à ouvrir
+              des créneaux ici en priorité.
+            </p>
+          </div>
+          {zonePriorities && (
+            <span className="zone-priorities__total">
+              {zonePriorities.total} en attente
+            </span>
+          )}
+        </header>
+
+        {zonePriorities === null && (
+          <div className="zone-priorities__skeleton" />
+        )}
+
+        {zonePriorities && zonePriorities.rows.length === 0 && (
+          <div className="zone-priorities__empty">
+            {zonePriorities.unknown > 0
+              ? `${zonePriorities.unknown} commande(s) en attente sans zone définie.`
+              : 'Aucune commande en file d\'attente. Tout est sous contrôle.'}
+          </div>
+        )}
+
+        {zonePriorities && zonePriorities.rows.length > 0 && (
+          <ol className="zone-priorities__list">
+            {zonePriorities.rows.map((z, i) => {
+              const max = zonePriorities.rows[0].count
+              const pct = (z.count / max) * 100
+              return (
+                <li
+                  key={z.zone}
+                  className={
+                    'zone-priorities__row' +
+                    (i === 0 ? ' is-top' : '') +
+                    (i === 1 ? ' is-second' : '') +
+                    (i === 2 ? ' is-third' : '')
+                  }
+                >
+                  <span className="zone-priorities__rank">{i + 1}</span>
+                  <span className="zone-priorities__zone">
+                    {!/^LIV/i.test(z.zone) && (
+                      <ZoneFlag code={zoneCode(z.zone)} />
+                    )}
+                    <span>{zoneLabel(z.zone)}</span>
+                  </span>
+                  <div className="zone-priorities__bar">
+                    <div
+                      className="zone-priorities__bar-fill"
+                      style={{ width: `${pct}%` }}
+                    />
+                  </div>
+                  <span className="zone-priorities__count">{z.count}</span>
+                </li>
+              )
+            })}
+          </ol>
+        )}
+
+        {zonePriorities &&
+          zonePriorities.unknown > 0 &&
+          zonePriorities.rows.length > 0 && (
+            <p className="zone-priorities__note">
+              + {zonePriorities.unknown} commande(s) sans zone définie
+            </p>
+          )}
+      </section>
 
       <SlotModal
         open={!!editing}
