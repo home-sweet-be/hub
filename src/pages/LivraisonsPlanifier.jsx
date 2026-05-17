@@ -376,6 +376,11 @@ export default function LivraisonsPlanifier() {
                 (zonePriorities?.rows || []).map((r) => [r.zone, r.count])
               )
             }
+            zoneCoverage={
+              new Map(
+                (zonePriorities?.rows || []).map((r) => [r.zone, r.coverage ?? 0])
+              )
+            }
             max={zonePriorities?.rows?.[0]?.count || 0}
             pins={waitingPins}
           />

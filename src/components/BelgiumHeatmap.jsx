@@ -11,7 +11,7 @@ function escapeHtml(s) {
   )
 }
 
-function zonesFeatureCollection(zoneCounts) {
+function zonesFeatureCollection(zoneCounts, zoneCoverage, max) {
   return {
     type: 'FeatureCollection',
     features: BE_PROVINCES.map((p) => {
@@ -19,6 +19,12 @@ function zonesFeatureCollection(zoneCounts) {
         (sum, z) => sum + (zoneCounts.get(z) || 0),
         0
       )
+      const coverage = p.zones.reduce(
+        (sum, z) => sum + (zoneCoverage?.get(z) || 0),
+        0
+      )
+      const covered = count > 0 && coverage >= count ? 1 : 0
+      const intensity = max > 0 ? Math.min(1, count / max) : 0
       return {
         type: 'Feature',
         properties: {
@@ -26,6 +32,9 @@ function zonesFeatureCollection(zoneCounts) {
           label: p.label,
           country: p.country,
           count,
+          coverage,
+          covered,
+          intensity,
         },
         geometry: p.geometry,
       }
@@ -48,7 +57,12 @@ function pinsFeatureCollection(pins) {
   }
 }
 
-export default function BelgiumHeatmap({ zoneCounts, max, pins = [] }) {
+export default function BelgiumHeatmap({
+  zoneCounts,
+  zoneCoverage,
+  max,
+  pins = [],
+}) {
   const containerRef = useRef(null)
   const mapRef = useRef(null)
   const popupRef = useRef(null)
@@ -85,17 +99,24 @@ export default function BelgiumHeatmap({ zoneCounts, max, pins = [] }) {
           'fill-color': [
             'case',
             ['==', ['get', 'count'], 0],
-            'rgba(255,255,255,0.04)',
+            '#a8aab0',
+            ['==', ['get', 'covered'], 1],
+            '#34c759',
             [
               'interpolate',
               ['linear'],
-              ['get', 'count'],
-              0.0001, '#ffd866',
-              1, '#ffb340',
-              999999, '#ff3b30',
+              ['get', 'intensity'],
+              0, '#ffd866',
+              0.5, '#ff9f0a',
+              1, '#ff3b30',
             ],
           ],
-          'fill-opacity': 0.65,
+          'fill-opacity': [
+            'case',
+            ['==', ['get', 'count'], 0],
+            0.18,
+            0.7,
+          ],
         },
       })
       map.addLayer({
@@ -103,7 +124,14 @@ export default function BelgiumHeatmap({ zoneCounts, max, pins = [] }) {
         type: 'line',
         source: 'zones',
         paint: {
-          'line-color': 'rgba(28,28,30,0.55)',
+          'line-color': [
+            'case',
+            ['==', ['get', 'count'], 0],
+            'rgba(28,28,30,0.3)',
+            ['==', ['get', 'covered'], 1],
+            'rgba(30,90,40,0.6)',
+            'rgba(28,28,30,0.55)',
+          ],
           'line-width': 1.1,
         },
       })
@@ -163,12 +191,12 @@ export default function BelgiumHeatmap({ zoneCounts, max, pins = [] }) {
     }
   }, [])
 
-  // Push zone data when counts change
+  // Push zone data when counts/coverage change
   useEffect(() => {
     if (!ready) return
     const src = mapRef.current.getSource('zones')
-    if (src) src.setData(zonesFeatureCollection(zoneCounts))
-  }, [ready, zoneCounts, max])
+    if (src) src.setData(zonesFeatureCollection(zoneCounts, zoneCoverage, max))
+  }, [ready, zoneCounts, zoneCoverage, max])
 
   // Push pins
   const pinsData = useMemo(() => pinsFeatureCollection(pins), [pins])
