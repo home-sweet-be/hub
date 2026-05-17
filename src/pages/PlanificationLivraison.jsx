@@ -156,14 +156,19 @@ export default function PlanificationLivraison() {
 
   const weekEnd = useMemo(() => addDays(weekStart, 7), [weekStart])
 
-  // Iframe auto-resize: notify parent of height changes
+  // Iframe auto-resize: notify parent of content height changes.
+  // Measure only the .plani container (not documentElement) so we don't pick up
+  // the iframe's own viewport size, which would create a feedback loop with the
+  // parent expanding the iframe each cycle.
   useEffect(() => {
     if (window === window.parent) return // not iframed
+    let lastH = 0
     const post = () => {
-      const h = Math.max(
-        document.documentElement.scrollHeight,
-        document.body.scrollHeight
-      )
+      const el = document.querySelector('.plani')
+      if (!el) return
+      const h = Math.ceil(el.getBoundingClientRect().height)
+      if (Math.abs(h - lastH) < 2) return
+      lastH = h
       try {
         window.parent.postMessage(
           { type: 'homesweet:plani-height', height: h },
@@ -175,7 +180,8 @@ export default function PlanificationLivraison() {
     }
     post()
     const ro = new ResizeObserver(post)
-    ro.observe(document.body)
+    const target = document.querySelector('.plani')
+    if (target) ro.observe(target)
     window.addEventListener('load', post)
     return () => {
       ro.disconnect()
