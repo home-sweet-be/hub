@@ -141,6 +141,33 @@ export default function PlanificationLivraison() {
 
   const weekEnd = useMemo(() => addDays(weekStart, 7), [weekStart])
 
+  // Iframe auto-resize: notify parent of height changes
+  useEffect(() => {
+    if (window === window.parent) return // not iframed
+    const post = () => {
+      const h = Math.max(
+        document.documentElement.scrollHeight,
+        document.body.scrollHeight
+      )
+      try {
+        window.parent.postMessage(
+          { type: 'homesweet:plani-height', height: h },
+          '*'
+        )
+      } catch {
+        // ignore
+      }
+    }
+    post()
+    const ro = new ResizeObserver(post)
+    ro.observe(document.body)
+    window.addEventListener('load', post)
+    return () => {
+      ro.disconnect()
+      window.removeEventListener('load', post)
+    }
+  }, [])
+
   // ---- Step 1: verify order ----
   const submitAuth = async (e) => {
     e?.preventDefault?.()
