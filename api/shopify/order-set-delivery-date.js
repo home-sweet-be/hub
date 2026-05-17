@@ -85,6 +85,10 @@ export default async function handler(req, res) {
 
   const orderId = toGid(body.orderId)
   const deliveryDate = (body.deliveryDate || '').trim()
+  const monteChargeRequired =
+    typeof body.monteChargeRequired === 'boolean'
+      ? body.monteChargeRequired
+      : null
   if (!orderId) {
     return res
       .status(400)
@@ -109,11 +113,17 @@ export default async function handler(req, res) {
     return res.status(404).json({ error: 'Order not found' })
   }
 
-  // 2. Merge: replace 'Delivery Date' if present, otherwise append.
+  // 2. Merge: replace 'Delivery Date' (and 'Monte-charge' if provided)
+  //    while preserving every other existing attribute (e.g. EasyRoutes).
+  const KEYS_TO_REPLACE = new Set(['Delivery Date'])
+  if (monteChargeRequired !== null) KEYS_TO_REPLACE.add('Monte-charge')
   const next = existing
-    .filter((a) => a.key !== 'Delivery Date')
+    .filter((a) => !KEYS_TO_REPLACE.has(a.key))
     .map((a) => ({ key: a.key, value: a.value }))
   next.push({ key: 'Delivery Date', value: deliveryDate })
+  if (monteChargeRequired !== null) {
+    next.push({ key: 'Monte-charge', value: monteChargeRequired ? 'Oui' : 'Non' })
+  }
 
   // 3. Push back.
   const upd = await shopifyGraphql(domain, token, ORDER_UPDATE, {

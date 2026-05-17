@@ -5109,6 +5109,105 @@ body:has(.plani),
   }
 }
 
+/* ---------------- Plani delivery quiz ---------------- */
+.plani__card--quiz {
+  max-width: 760px;
+  padding: 32px;
+}
+
+.plani-quiz {
+  display: flex;
+  gap: 32px;
+  align-items: center;
+}
+
+.plani-quiz__image {
+  width: 240px;
+  max-width: 100%;
+  height: auto;
+  border-radius: 16px;
+  border: 2px dashed rgba(28, 28, 30, 0.08);
+  flex-shrink: 0;
+}
+
+.plani-quiz__body {
+  flex: 1;
+  min-width: 0;
+}
+
+.plani-quiz__question {
+  margin: 0 0 8px;
+  font-size: 18px;
+  font-weight: 600;
+  color: #1c1a17;
+  line-height: 1.35;
+}
+
+.plani-quiz__note {
+  margin: 0 0 20px;
+  font-size: 13px;
+  color: #6b6b6b;
+  line-height: 1.5;
+}
+
+.plani-quiz__actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 20px;
+}
+
+.plani-quiz__btn {
+  appearance: none;
+  border: 1px solid #ddd;
+  background: #f6f6f6;
+  color: #1c1a17;
+  padding: 12px 22px;
+  border-radius: 50px;
+  font-weight: 500;
+  font-size: 14px;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-block;
+  text-align: center;
+  transition: background 0.15s, border-color 0.15s, transform 0.05s;
+}
+
+.plani-quiz__btn:hover {
+  background: #ffffff;
+  border-color: #1c1a17;
+}
+
+.plani-quiz__btn:active {
+  transform: scale(0.98);
+}
+
+.plani-quiz__btn--primary {
+  background: #1c1a17;
+  color: #ffffff;
+  border-color: #1c1a17;
+}
+
+.plani-quiz__btn--primary:hover {
+  background: #2a2722;
+  border-color: #2a2722;
+  color: #ffffff;
+}
+
+@media (max-width: 640px) {
+  .plani-quiz {
+    flex-direction: column;
+    gap: 20px;
+    text-align: center;
+  }
+  .plani-quiz__image {
+    width: 180px;
+  }
+  .plani-quiz__actions {
+    justify-content: center;
+  }
+}
+
 /* ---------------- Confirm modal ---------------- */
 .confirm-modal__backdrop {
   position: fixed;
