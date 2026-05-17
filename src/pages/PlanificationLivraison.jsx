@@ -208,7 +208,6 @@ export default function PlanificationLivraison() {
         shopify_order_name: order.name,
         customer_email: order.email,
         customer_name: order.customerName,
-        address: order.address,
         zone: order.zone,
         status: 'confirmed',
       })
