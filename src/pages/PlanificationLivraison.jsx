@@ -93,18 +93,18 @@ export default function PlanificationLivraison() {
       if (!data?.ok) {
         const map = {
           not_found:
-            "Aucune commande trouvée avec ce numéro et cet e-mail. Vérifie l'orthographe ou contacte-nous.",
+            "Aucune commande trouvée avec ce numéro et cet e-mail. Vérifiez l'orthographe ou contactez-nous.",
           not_ready:
-            "Cette commande n'est pas encore prête à être livrée. Tu recevras un nouvel e-mail dès qu'elle le sera.",
+            "Cette commande n'est pas encore prête à être livrée. Vous recevrez un nouvel e-mail dès qu'elle le sera.",
           no_zone:
-            "Impossible de déterminer la zone de livraison pour cette commande. Contacte-nous à contact@homesweet.be.",
+            "Impossible de déterminer la zone de livraison pour cette commande. Contactez-nous à contact@homesweet.be.",
           missing_fields: 'Merci de remplir les deux champs.',
         }
         // eslint-disable-next-line no-console
         console.warn('verify-order not ok:', data)
         setAuthError(
           map[data?.code] ||
-            `Une erreur est survenue${data?.code ? ` (${data.code})` : ''}. Réessaie ou contacte-nous.`
+            `Une erreur est survenue${data?.code ? ` (${data.code})` : ''}. Réessayez ou contactez-nous.`
         )
         return
       }
@@ -230,10 +230,10 @@ export default function PlanificationLivraison() {
       <main className="plani__main">
         {step === 'auth' && (
           <section className="plani__card">
-            <h1 className="plani__title">Planifie ta livraison</h1>
+            <h1 className="plani__title">Planifiez votre livraison</h1>
             <p className="plani__lead">
-              Ta commande est prête ! Renseigne ton numéro et ton e-mail pour
-              choisir un créneau de livraison.
+              Votre commande est prête ! Renseignez votre numéro et votre
+              e-mail pour choisir un créneau de livraison.
             </p>
             <form className="plani__form" onSubmit={submitAuth}>
               <label className="plani__field">
@@ -270,7 +270,7 @@ export default function PlanificationLivraison() {
               </button>
             </form>
             <p className="plani__help">
-              Besoin d'aide ? Écris-nous à{' '}
+              Besoin d'aide ? Écrivez-nous à{' '}
               <a href="mailto:contact@homesweet.be">contact@homesweet.be</a>.
             </p>
           </section>
@@ -294,7 +294,7 @@ export default function PlanificationLivraison() {
             </div>
 
             <div className="plani__step-header">
-              <h2 className="plani__step-title">Choisis un créneau</h2>
+              <h2 className="plani__step-title">Choisissez un créneau</h2>
               {!loadingSlots && (
                 <span className="plani__available-count">
                   {totalAvailable}{' '}
@@ -403,15 +403,15 @@ export default function PlanificationLivraison() {
                   <span aria-hidden="true">📝</span>
                   <span>
                     Les <strong>horaires sont indicatifs</strong> —
-                    rends-toi disponible durant tout le créneau pour ne pas
-                    manquer ta livraison.
+                    rendez-vous disponible durant tout le créneau pour ne
+                    pas manquer votre livraison.
                   </span>
                 </div>
                 <div className="plani__note-row">
                   <span aria-hidden="true">📧</span>
                   <span>
-                    Tu recevras en temps réel un e-mail pour suivre la
-                    position de ton livreur.
+                    Vous recevrez en temps réel un e-mail pour suivre la
+                    position de votre livreur.
                   </span>
                 </div>
               </aside>
@@ -435,7 +435,7 @@ export default function PlanificationLivraison() {
                       </>
                     ) : (
                       <span className="plani__selected-empty">
-                        Sélectionne un créneau pour continuer
+                        Sélectionnez un créneau pour continuer
                       </span>
                     )}
                   </div>
@@ -492,8 +492,8 @@ export default function PlanificationLivraison() {
               </div>
             </div>
             <p className="plani__help">
-              Un e-mail de confirmation va t'être envoyé. Pour toute question,
-              écris-nous à{' '}
+              Un e-mail de confirmation va vous être envoyé. Pour toute
+              question, écrivez-nous à{' '}
               <a href="mailto:contact@homesweet.be">contact@homesweet.be</a>.
             </p>
           </section>
