@@ -367,6 +367,28 @@ export default function PlanificationLivraison() {
         status: 'confirmed',
       })
       if (error) throw error
+
+      // Push the date to Shopify as a "Delivery Date" custom attribute
+      // (shown in admin under "Additional details"). Best-effort: a failure
+      // here shouldn't block the booking — the slot is already reserved in
+      // Supabase.
+      try {
+        const deliveryDate = selectedSlot.starts_at.slice(0, 10) // YYYY-MM-DD
+        const r = await fetch('/api/shopify/order-set-delivery-date', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ orderId: order.id, deliveryDate }),
+        })
+        if (!r.ok) {
+          const detail = await r.text().catch(() => '')
+          // eslint-disable-next-line no-console
+          console.warn('order-set-delivery-date:', r.status, detail)
+        }
+      } catch (err) {
+        // eslint-disable-next-line no-console
+        console.warn('order-set-delivery-date network:', err)
+      }
+
       setStep('done')
     } catch (e) {
       setBookingError(e.message || String(e))
