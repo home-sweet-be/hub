@@ -25,6 +25,11 @@ const QUERY = `
             city
             zip
             country
+            latitude
+            longitude
+          }
+          shippingLines(first: 1) {
+            edges { node { title } }
           }
         }
       }
@@ -168,6 +173,10 @@ export default async function handler(req, res) {
               .filter(Boolean)
               .join(', ')
           : '',
+        lat: matched.shippingAddress?.latitude || null,
+        lon: matched.shippingAddress?.longitude || null,
+        shippingLine:
+          matched.shippingLines?.edges?.[0]?.node?.title || null,
       },
     })
   } catch (err) {

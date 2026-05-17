@@ -3598,7 +3598,7 @@
 }
 
 .plani__card--wide {
-  max-width: 980px;
+  max-width: 1180px;
 }
 
 .plani__card--done {
@@ -3767,6 +3767,46 @@
   grid-template-columns: 1fr;
   gap: 16px;
   margin-bottom: 0;
+}
+
+.plani__recap-map {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin-top: 10px;
+  border-radius: 10px;
+  border: 1px solid rgba(28, 28, 30, 0.1);
+  background: rgba(28, 28, 30, 0.04);
+  object-fit: cover;
+  aspect-ratio: 520 / 280;
+}
+
+.plani__shipping-pill {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  border: 1px solid rgba(28, 28, 30, 0.12);
+  background: rgba(28, 28, 30, 0.05);
+  color: var(--text);
+}
+
+.plani__shipping-pill.is-standard {
+  background: rgba(28, 28, 30, 0.05);
+  border-color: rgba(28, 28, 30, 0.12);
+}
+
+.plani__shipping-pill.is-confort {
+  background: rgba(255, 159, 10, 0.12);
+  border-color: rgba(255, 159, 10, 0.32);
+  color: #8a5a00;
+}
+
+.plani__shipping-pill.is-premium {
+  background: rgba(175, 82, 222, 0.12);
+  border-color: rgba(175, 82, 222, 0.32);
+  color: #6f2ea0;
 }
 
 @media (max-width: 900px) {

@@ -44,6 +44,24 @@ function zoneLabel(z) {
   return z.replace(/^[A-Z]{2}-/, '').replace(/^LIV-/, '').replace(/-/g, ' ')
 }
 
+const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_TOKEN
+
+function shippingTierKey(title) {
+  if (!title) return null
+  if (/premium/i.test(title)) return 'premium'
+  if (/confort/i.test(title)) return 'confort'
+  if (/standard/i.test(title)) return 'standard'
+  return 'other'
+}
+
+function shortShippingLabel(title) {
+  if (!title) return ''
+  if (/premium/i.test(title)) return 'Premium'
+  if (/confort/i.test(title)) return 'Confort'
+  if (/standard/i.test(title)) return 'Standard'
+  return title
+}
+
 export default function PlanificationLivraison() {
   const [step, setStep] = useState('auth') // auth | pick | done
   const [orderName, setOrderName] = useState('')
@@ -288,7 +306,30 @@ export default function PlanificationLivraison() {
                 <div>
                   <div className="plani__recap-label">Adresse de livraison</div>
                   <div className="plani__recap-value">{order.address}</div>
+                  {MAPBOX_TOKEN && order.lat && order.lon && (
+                    <img
+                      className="plani__recap-map"
+                      src={`https://api.mapbox.com/styles/v1/mapbox/streets-v12/static/pin-l+ea4335(${order.lon},${order.lat})/${order.lon},${order.lat},14/520x280@2x?access_token=${MAPBOX_TOKEN}&logo=false&attribution=false`}
+                      alt={`Carte de l'adresse de livraison`}
+                      loading="lazy"
+                    />
+                  )}
                 </div>
+                {order.shippingLine && (
+                  <div>
+                    <div className="plani__recap-label">Type de livraison</div>
+                    <div className="plani__recap-value">
+                      <span
+                        className={
+                          'plani__shipping-pill is-' +
+                          (shippingTierKey(order.shippingLine) || 'other')
+                        }
+                      >
+                        {shortShippingLabel(order.shippingLine)}
+                      </span>
+                    </div>
+                  </div>
+                )}
                 <div>
                   <div className="plani__recap-label">Zone</div>
                   <div className="plani__recap-value">{zoneLabel(order.zone)}</div>
