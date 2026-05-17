@@ -3,12 +3,12 @@ import LivraisonsPlanifier from './LivraisonsPlanifier'
 import LivraisonsReservations from './LivraisonsReservations'
 
 const STEPS = [
+  { id: 'file-attente', label: "File d'attente", color: '#34c759' },
   { id: 'planifier', label: 'Planifier', color: '#0a84ff' },
-  { id: 'reservations', label: 'Réservations', color: '#34c759' },
 ]
 
 export default function Livraisons() {
-  const [activeTab, setActiveTab] = useState('planifier')
+  const [activeTab, setActiveTab] = useState('file-attente')
 
   return (
     <div className="logistique">
@@ -71,8 +71,8 @@ export default function Livraisons() {
       </div>
 
       <div className="logistique__panel">
+        {activeTab === 'file-attente' && <LivraisonsReservations />}
         {activeTab === 'planifier' && <LivraisonsPlanifier />}
-        {activeTab === 'reservations' && <LivraisonsReservations />}
       </div>
     </div>
   )

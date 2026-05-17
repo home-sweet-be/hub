@@ -394,7 +394,7 @@ export default function LivraisonsReservations() {
     return fetch(
       '/api/shopify/receptions?q=' +
         encodeURIComponent(
-          `created_at:>=${cutoff} AND (tag:PretPourLaLivraison OR tag:${WAITLIST_TAG}) AND NOT tag:removed AND status:open AND NOT financial_status:refunded AND NOT financial_status:partially_refunded`
+          `created_at:>=${cutoff} AND tag:${WAITLIST_TAG} AND NOT tag:removed AND status:open AND NOT financial_status:refunded AND NOT financial_status:partially_refunded`
         ) +
         '&first=100'
     )
@@ -410,19 +410,7 @@ export default function LivraisonsReservations() {
     load()
   }, [load])
 
-  const isWaiting = (o) => (o.tags || []).includes(WAITLIST_TAG)
-
-  const ready = useMemo(() => {
-    if (!orders) return null
-    return orders.filter((o) => !isWaiting(o))
-  }, [orders])
-
-  const waiting = useMemo(() => {
-    if (!orders) return null
-    return orders.filter(isWaiting)
-  }, [orders])
-
-  const toggleWaitlist = async (o, add) => {
+  const removeFromWaitlist = async (o) => {
     setPendingId(o.id)
     try {
       const r = await fetch('/api/shopify/orders/tags', {
@@ -430,8 +418,7 @@ export default function LivraisonsReservations() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           orderIds: [o.id],
-          add: add ? [WAITLIST_TAG] : [],
-          remove: add ? [] : [WAITLIST_TAG],
+          remove: [WAITLIST_TAG],
         }),
       })
       if (!r.ok) throw new Error(`HTTP ${r.status}`)
@@ -447,40 +434,16 @@ export default function LivraisonsReservations() {
     <div className="page reception reception--list-only reservations">
       <div className="reception__body">
         <section className="reception__right">
-          <div className="reception__pane-label reception__pane-label--right">
-            Prêtes pour la livraison
-          </div>
           <OrdersTable
-            orders={ready}
+            orders={orders}
             loading={orders === null && !error}
             error={error}
-            emptyLabel="Aucune commande prête."
-            action={{
-              icon: '+',
-              title: "Ajouter à la file d'attente",
-              className: 'reservations-action--add',
-              onClick: (o) => toggleWaitlist(o, true),
-              pendingForId: pendingId,
-            }}
-            onZoneEdit={setZoneEditing}
-            onAddressView={setAddressViewing}
-          />
-        </section>
-
-        <section className="reception__right reservations__section">
-          <div className="reception__pane-label reception__pane-label--right">
-            File d'attente
-          </div>
-          <OrdersTable
-            orders={waiting}
-            loading={orders === null && !error}
-            error={null}
             emptyLabel="Aucune commande en file d'attente."
             action={{
               icon: '−',
               title: "Retirer de la file d'attente",
               className: 'reservations-action--remove',
-              onClick: (o) => toggleWaitlist(o, false),
+              onClick: removeFromWaitlist,
               pendingForId: pendingId,
             }}
             onZoneEdit={setZoneEditing}
