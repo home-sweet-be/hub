@@ -179,7 +179,22 @@ export default function LivraisonsPlanifier() {
         const lat = o.shippingAddress?.latitude
         const lon = o.shippingAddress?.longitude
         if (typeof lat !== 'number' || typeof lon !== 'number') return null
-        return { lat, lon, key: o.id, label: o.name }
+        const active = (o.lineItems || []).filter(
+          (li) => (li.currentQuantity ?? li.quantity ?? 0) > 0
+        )
+        const firstTitle = active[0]?.title || ''
+        const product =
+          active.length > 1
+            ? `${firstTitle} +${active.length - 1}`
+            : firstTitle
+        return {
+          lat,
+          lon,
+          key: o.id,
+          orderName: o.name,
+          city: o.shippingAddress?.city || '',
+          product,
+        }
       })
       .filter(Boolean)
   }, [waitingOrders])
