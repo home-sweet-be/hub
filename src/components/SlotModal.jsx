@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom'
 import { supabase } from '../lib/supabase'
 import { ZONES_BY_COUNTRY } from './ZoneModal'
 import ZoneMapPicker from './ZoneMapPicker'
+import ConfirmModal from './ConfirmModal'
 
 function zoneLabel(z) {
   if (z === 'LU') return 'Luxembourg'
@@ -410,6 +411,8 @@ export default function SlotModal({ open, editing, onClose, onSaved, onChanged }
   const [bookings, setBookings] = useState([])
   const [bookingsLoading, setBookingsLoading] = useState(false)
   const [removingBookingId, setRemovingBookingId] = useState(null)
+  // Confirmation modal state: { kind: 'remove-booking', booking, who } | { kind: 'delete-slot' } | null
+  const [confirming, setConfirming] = useState(null)
 
   useEffect(() => {
     if (!open) return
@@ -516,12 +519,17 @@ export default function SlotModal({ open, editing, onClose, onSaved, onChanged }
     setEndMin(e)
   }
 
-  const removeBooking = async (b) => {
+  const removeBooking = (b) => {
     const who =
       b?.order?.customer?.firstName && b?.order?.customer?.lastName
         ? `${b.order.customer.firstName} ${b.order.customer.lastName}`
         : `la commande ${b.shopify_order_name}`
-    if (!confirm(`Retirer ${who} du créneau ?`)) return
+    setConfirming({ kind: 'remove-booking', booking: b, who })
+  }
+
+  const doRemoveBooking = async () => {
+    const b = confirming?.booking
+    if (!b) return
     setRemovingBookingId(b.id)
     setError(null)
     try {
@@ -531,9 +539,11 @@ export default function SlotModal({ open, editing, onClose, onSaved, onChanged }
         .eq('id', b.id)
       if (delErr) throw delErr
       setBookings((prev) => prev.filter((x) => x.id !== b.id))
+      setConfirming(null)
       onChanged?.()
     } catch (e) {
       setError(e.message || String(e))
+      setConfirming(null)
     } finally {
       setRemovingBookingId(null)
     }
@@ -580,9 +590,13 @@ export default function SlotModal({ open, editing, onClose, onSaved, onChanged }
     }
   }
 
-  const remove = async () => {
+  const remove = () => {
     if (!editing?.slot) return
-    if (!confirm('Supprimer ce créneau ?')) return
+    setConfirming({ kind: 'delete-slot' })
+  }
+
+  const doDeleteSlot = async () => {
+    if (!editing?.slot) return
     setPending(true)
     setError(null)
     try {
@@ -591,15 +605,40 @@ export default function SlotModal({ open, editing, onClose, onSaved, onChanged }
         .delete()
         .eq('id', editing.slot.id)
       if (error) throw error
+      setConfirming(null)
       onSaved?.()
     } catch (e) {
       setError(e.message || String(e))
+      setConfirming(null)
     } finally {
       setPending(false)
     }
   }
 
+  const confirmKind = confirming?.kind
+  const confirmProps =
+    confirmKind === 'remove-booking'
+      ? {
+          title: 'Retirer du créneau',
+          message: `Retirer ${confirming.who} de ce créneau ? La place sera libérée pour un autre client.`,
+          confirmLabel: 'Retirer',
+          variant: 'danger',
+          pending: removingBookingId === confirming.booking?.id,
+          onConfirm: doRemoveBooking,
+        }
+      : confirmKind === 'delete-slot'
+        ? {
+            title: 'Supprimer le créneau',
+            message: 'Supprimer définitivement ce créneau ? Cette action est irréversible.',
+            confirmLabel: 'Supprimer',
+            variant: 'danger',
+            pending,
+            onConfirm: doDeleteSlot,
+          }
+        : null
+
   return createPortal(
+    <>
     <div
       className="zone-modal__backdrop"
       onClick={() => !pending && onClose?.()}
@@ -756,7 +795,15 @@ export default function SlotModal({ open, editing, onClose, onSaved, onChanged }
           </button>
         </footer>
       </div>
-    </div>,
+    </div>
+    {confirmProps && (
+      <ConfirmModal
+        open
+        {...confirmProps}
+        onClose={() => setConfirming(null)}
+      />
+    )}
+    </>,
     document.body
   )
 }

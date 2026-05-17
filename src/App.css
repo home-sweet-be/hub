@@ -5109,3 +5109,118 @@ body:has(.plani),
   }
 }
 
+/* ---------------- Confirm modal ---------------- */
+.confirm-modal__backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(28, 28, 30, 0.38);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1100;
+  padding: 24px;
+  animation: confirm-modal-fade 0.15s ease-out;
+}
+
+@keyframes confirm-modal-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.confirm-modal__card {
+  width: 100%;
+  max-width: 420px;
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow:
+    0 24px 60px -20px rgba(28, 28, 30, 0.45),
+    0 1px 0 rgba(255, 255, 255, 0.6) inset;
+  animation: confirm-modal-pop 0.2s cubic-bezier(0.2, 0.9, 0.3, 1.1);
+  overflow: hidden;
+}
+
+@keyframes confirm-modal-pop {
+  from { transform: scale(0.96); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+.confirm-modal__header {
+  padding: 22px 24px 4px;
+}
+
+.confirm-modal__header h3 {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: #1d1d1f;
+}
+
+.confirm-modal__body {
+  padding: 8px 24px 4px;
+  color: #4a4a4f;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.confirm-modal__body p {
+  margin: 0;
+}
+
+.confirm-modal__footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 20px 20px 20px;
+}
+
+.confirm-modal__btn {
+  appearance: none;
+  border: 0;
+  border-radius: 10px;
+  padding: 9px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, transform 0.05s;
+  min-width: 92px;
+}
+
+.confirm-modal__btn:active {
+  transform: scale(0.98);
+}
+
+.confirm-modal__btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.confirm-modal__btn--secondary {
+  background: #f1f1f3;
+  color: #1d1d1f;
+}
+
+.confirm-modal__btn--secondary:hover:not(:disabled) {
+  background: #e6e6e8;
+}
+
+.confirm-modal__btn--primary {
+  background: #0a84ff;
+  color: #ffffff;
+}
+
+.confirm-modal__btn--primary:hover:not(:disabled) {
+  background: #0066cc;
+}
+
+.confirm-modal__btn--danger {
+  background: #ff3b30;
+  color: #ffffff;
+}
+
+.confirm-modal__btn--danger:hover:not(:disabled) {
+  background: #d70015;
+}
+
