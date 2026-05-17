@@ -89,21 +89,32 @@ function buildCsv(orders) {
     'Articles',
     'Paiement',
     'Adresse',
+    'Complément',
+    'Code postal',
+    'Ville',
+    'Pays',
   ]
-  const rows = orders.map((o) => [
-    formatDate(o.createdAt),
-    o.name,
-    Number(o.total || 0)
-      .toFixed(2)
-      .replace('.', ','),
-    o.currency || 'EUR',
-    customerName(o.customer),
-    activeLineItems(o)
-      .map((li) => `${effectiveQuantity(li)}× ${li.title}`)
-      .join(' | '),
-    o.financialStatus || '',
-    shortAddress(o.shippingAddress),
-  ])
+  const rows = orders.map((o) => {
+    const a = o.shippingAddress || {}
+    return [
+      formatDate(o.createdAt),
+      o.name,
+      Number(o.total || 0)
+        .toFixed(2)
+        .replace('.', ','),
+      o.currency || 'EUR',
+      customerName(o.customer),
+      activeLineItems(o)
+        .map((li) => `${effectiveQuantity(li)}× ${li.title}`)
+        .join(' | '),
+      o.financialStatus || '',
+      a.address1 || '',
+      a.address2 || '',
+      a.zip || '',
+      a.city || '',
+      a.country || '',
+    ]
+  })
   return [headers, ...rows]
     .map((r) => r.map(csvEscape).join(';'))
     .join('\r\n')
@@ -246,7 +257,8 @@ export default function Compta() {
             role="tab"
             aria-selected={paymentFilter === f.id}
             className={
-              'compta__subtab' +
+              'compta__subtab compta__subtab--' +
+              f.id +
               (paymentFilter === f.id ? ' is-active' : '')
             }
             onClick={() => setPaymentFilter(f.id)}
