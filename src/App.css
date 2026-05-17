@@ -3879,6 +3879,141 @@
   font-size: 14px;
 }
 
+/* Calculateur de marge --- controls */
+.marge__controls {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 10px;
+  margin-bottom: 14px;
+  padding: 14px;
+  background: rgba(28, 28, 30, 0.03);
+  border: 1px solid rgba(28, 28, 30, 0.08);
+  border-radius: 12px;
+}
+
+.marge__field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 11px;
+  color: var(--text-soft);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.marge__field input {
+  height: 36px;
+  padding: 0 12px;
+  border: 1px solid rgba(28, 28, 30, 0.12);
+  border-radius: 8px;
+  background: #fff;
+  font-family: inherit;
+  font-size: 13.5px;
+  font-weight: 500;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.marge__field input:focus {
+  border-color: #1d1d1f;
+  box-shadow: 0 0 0 3px rgba(28, 28, 30, 0.1);
+}
+
+.marge__field--readonly .marge__val {
+  height: 36px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13.5px;
+}
+
+.marge__val strong {
+  color: var(--text);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.marge__val-hint {
+  font-size: 10.5px;
+  color: var(--text-muted);
+  font-style: italic;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+.marge__field--search {
+  grid-column: span 1;
+}
+
+@media (min-width: 900px) {
+  .marge__field--search {
+    grid-column: span 2;
+  }
+}
+
+/* Marge table cells */
+.marge-table__cell {
+  font-variant-numeric: tabular-nums;
+}
+
+.marge-table__cell > div {
+  font-weight: 600;
+  margin-bottom: 2px;
+}
+
+.marge-badge {
+  display: inline-block;
+  padding: 1px 7px;
+  border-radius: 999px;
+  font-size: 10.5px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.marge-badge.is-good {
+  background: rgba(52, 199, 89, 0.16);
+  color: #1d6b35;
+}
+
+.marge-badge.is-mid {
+  background: rgba(10, 132, 255, 0.14);
+  color: #0a5fb8;
+}
+
+.marge-badge.is-low {
+  background: rgba(255, 159, 10, 0.16);
+  color: #8a5a00;
+}
+
+.marge-badge.is-bad {
+  background: rgba(255, 59, 48, 0.14);
+  color: #a3271f;
+}
+
+.marge-table__edit {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  background: rgba(28, 28, 30, 0.06);
+  color: var(--text-soft);
+  text-decoration: none;
+  font-size: 14px;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.marge-table__edit:hover {
+  background: #1d1d1f;
+  color: #fff;
+}
+
 /* ============================================================
    COMPTA — month tabs + orders table
    ============================================================ */
