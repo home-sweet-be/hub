@@ -58,7 +58,10 @@ const QUERY = `
                   id
                   sku
                   inventoryQuantity
-                  inventoryItem { id }
+                  inventoryItem {
+                    id
+                    unitCost { amount currencyCode }
+                  }
                 }
               }
             }

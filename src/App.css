@@ -4013,6 +4013,29 @@
   color: #fff;
 }
 
+.marge__tabs {
+  margin: 0 0 12px;
+}
+
+.marge-table__order-link {
+  color: #1d1d1f;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.marge-table__order-link:hover {
+  text-decoration: underline;
+}
+
+.marge-table__articles {
+  max-width: 280px;
+  font-size: 12px;
+  line-height: 1.35;
+  color: var(--text-soft);
+  white-space: normal;
+  word-break: break-word;
+}
+
 /* ============================================================
    COMPTA — month tabs + orders table
    ============================================================ */
