@@ -224,11 +224,12 @@ for (const f of data.features) {
   simplified.push({ meta, rings: simplifyGeometry(f.geometry) })
 }
 
-// Bounds computed from zone features only (context countries don't count —
-// SVG viewBox clips them naturally)
+// Bounds: zoom on BE+LU. FR regions still render where they overlap, but
+// they don't push the viewBox out (otherwise the map dezooms a lot for the
+// huge French regions vs the small Belgium provinces).
 let lonMin = Infinity, lonMax = -Infinity, latMin = Infinity, latMax = -Infinity
 for (const { meta, rings } of simplified) {
-  if (meta.country === 'CTX') continue
+  if (meta.country !== 'BE' && meta.country !== 'LU') continue
   for (const ring of rings) {
     for (const [lon, lat] of ring) {
       if (lon < lonMin) lonMin = lon
