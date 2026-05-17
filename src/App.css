@@ -2594,9 +2594,10 @@
 
 /* Prêtes pour la livraison: bulk select + waitlist sticky bottom bar */
 .pretes-bulk-toolbar {
+  --sidebar-offset: 106px; /* half of 212px sidebar to visually center on main area */
   position: fixed;
   bottom: 24px;
-  left: 50%;
+  left: calc(50% + var(--sidebar-offset));
   transform: translateX(-50%);
   z-index: 50;
   display: flex;
@@ -2612,6 +2613,12 @@
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   animation: pretes-toolbar-in 0.22s cubic-bezier(0.2, 0.9, 0.3, 1.1);
+}
+
+@media (max-width: 900px) {
+  .pretes-bulk-toolbar {
+    --sidebar-offset: 0px;
+  }
 }
 
 @keyframes pretes-toolbar-in {
@@ -2649,7 +2656,7 @@
   width: 16px;
   height: 16px;
   cursor: pointer;
-  accent-color: #ff9f0a;
+  accent-color: #34c759;
   margin: 0;
 }
 

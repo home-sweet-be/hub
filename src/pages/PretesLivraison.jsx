@@ -187,7 +187,7 @@ export default function PretesLivraison() {
                 </span>
                 <button
                   type="button"
-                  className="btn btn--orange"
+                  className="btn btn--green"
                   onClick={sendToWaitlist}
                   disabled={pending}
                 >
