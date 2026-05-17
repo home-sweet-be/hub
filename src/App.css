@@ -2609,7 +2609,7 @@
 
 .zone-priorities__layout {
   display: grid;
-  grid-template-columns: minmax(300px, 360px) minmax(0, 1fr);
+  grid-template-columns: minmax(400px, 460px) minmax(0, 1fr);
   gap: 24px;
   align-items: stretch;
 }
