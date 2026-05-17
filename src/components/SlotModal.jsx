@@ -317,9 +317,6 @@ function BookingsList({ bookings, loading }) {
   if (!bookings.length) return null
   return (
     <div className="slot-bookings">
-      <div className="slot-bookings__title">
-        {bookings.length} réservation{bookings.length > 1 ? 's' : ''}
-      </div>
       <div className="slot-bookings__list">
         {bookings.map((b) => {
           const o = b.order
@@ -646,13 +643,26 @@ export default function SlotModal({ open, editing, onClose, onSaved }) {
                   disabled={pending}
                   booked={bookings.length}
                 />
-                <BookingsList
-                  bookings={bookings}
-                  loading={bookingsLoading}
-                />
               </section>
             </div>
           </div>
+
+          {editing?.slot && (bookings.length > 0 || bookingsLoading) && (
+            <section className="slot-modal__section slot-modal__bookings-section">
+              <div className="slot-modal__section-title">
+                Réservations
+                {bookings.length > 0 && (
+                  <span className="slot-modal__section-count">
+                    {bookings.length}
+                  </span>
+                )}
+              </div>
+              <BookingsList
+                bookings={bookings}
+                loading={bookingsLoading}
+              />
+            </section>
+          )}
         </div>
 
         {error && <div className="zone-modal__error">{error}</div>}

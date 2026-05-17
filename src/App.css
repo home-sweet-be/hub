@@ -3515,32 +3515,37 @@
   opacity: 1;
 }
 
-.slot-bookings {
-  margin-top: 18px;
-  padding-top: 14px;
+.slot-modal__bookings-section {
+  margin-top: 22px;
+  padding-top: 18px;
   border-top: 1px solid rgba(28, 28, 30, 0.08);
 }
 
-.slot-bookings__title {
-  font-size: 12px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  color: var(--text-soft);
-  margin-bottom: 10px;
+.slot-modal__section-count {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 1px 8px;
+  border-radius: 999px;
+  background: rgba(28, 28, 30, 0.08);
+  color: var(--text);
+  font-size: 10.5px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  vertical-align: middle;
+  text-transform: none;
+  letter-spacing: 0;
 }
 
 .slot-bookings__loading {
-  margin-top: 18px;
   font-size: 12.5px;
   color: var(--text-muted);
   font-style: italic;
 }
 
 .slot-bookings__list {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 10px;
 }
 
 .slot-bookings__card {
@@ -3549,6 +3554,7 @@
   border: 1px solid rgba(28, 28, 30, 0.08);
   border-radius: 10px;
   font-size: 12.5px;
+  min-width: 0;
 }
 
 .slot-bookings__head {
