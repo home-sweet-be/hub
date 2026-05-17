@@ -379,6 +379,7 @@ export default function PlanificationLivraison() {
         slot_id: selectedSlot.id,
         shopify_order_name: order.name.replace(/^#/, ''),
         status: 'confirmed',
+        monte_charge_required: monteChargeRequired,
       })
       if (error) throw error
 
