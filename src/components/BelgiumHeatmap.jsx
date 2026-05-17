@@ -102,20 +102,13 @@ export default function BelgiumHeatmap({
             '#a8aab0',
             ['==', ['get', 'covered'], 1],
             '#34c759',
-            [
-              'interpolate',
-              ['linear'],
-              ['get', 'intensity'],
-              0, '#ffd866',
-              0.5, '#ff9f0a',
-              1, '#ff3b30',
-            ],
+            '#ea4335',
           ],
           'fill-opacity': [
             'case',
             ['==', ['get', 'count'], 0],
             0.18,
-            0.7,
+            0.56,
           ],
         },
       })
