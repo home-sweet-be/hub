@@ -240,45 +240,27 @@ for (const { meta, rings } of simplified) {
   }
 }
 
-// Web Mercator projection — matches Mapbox so the background map aligns.
-// Both x and y in radians-equivalent so the aspect ratio works.
-function mercator(lon, lat) {
-  const x = (lon * Math.PI) / 180
-  const y = Math.log(Math.tan(Math.PI / 4 + (lat * Math.PI) / 360))
-  return [x, y]
+// Output GeoJSON-style geometry in lon/lat — Mapbox GL handles projection.
+function roundRing(ring) {
+  return ring.map(([lon, lat]) => [
+    Math.round(lon * 10000) / 10000,
+    Math.round(lat * 10000) / 10000,
+  ])
 }
 
-const [xMinMerc] = mercator(lonMin, 0)
-const [xMaxMerc] = mercator(lonMax, 0)
-const [, yMinMerc] = mercator(0, latMin)
-const [, yMaxMerc] = mercator(0, latMax)
-const projWidth = xMaxMerc - xMinMerc
-const projHeight = yMaxMerc - yMinMerc
-const VIEW_H = Math.round(VIEW_W * (projHeight / projWidth))
-const scaleX = VIEW_W / projWidth
-const scaleY = VIEW_H / projHeight
-
-function project(lon, lat) {
-  const [x, y] = mercator(lon, lat)
-  return [
-    Math.round((x - xMinMerc) * scaleX * 10) / 10,
-    Math.round((yMaxMerc - y) * scaleY * 10) / 10,
-  ]
-}
-
-function ringToPath(ring) {
-  let d = ''
-  ring.forEach(([lon, lat], i) => {
-    const [x, y] = project(lon, lat)
-    d += (i === 0 ? 'M' : 'L') + x + ',' + y
-  })
-  return d + 'Z'
-}
-
-const provinces = simplified.map(({ meta, rings }) => ({
-  ...meta,
-  d: rings.map(ringToPath).join(' '),
-}))
+const provinces = simplified.map(({ meta, rings }) => {
+  const rounded = rings.map(roundRing)
+  return {
+    ...meta,
+    geometry:
+      rounded.length === 1
+        ? { type: 'Polygon', coordinates: [rounded[0]] }
+        : {
+            type: 'MultiPolygon',
+            coordinates: rounded.map((r) => [r]),
+          },
+  }
+})
 
 // Render order: context countries → FR regions → LU → BE provinces → Brussels last
 const COUNTRY_ORDER = { CTX: 0, FR: 1, LU: 2, BE: 3 }
@@ -292,16 +274,20 @@ provinces.sort((a, b) => {
 
 const out = `// AUTO-GENERATED from public/geoexample.json by scripts/build-be-map.mjs
 // Regenerate: node scripts/build-be-map.mjs
-export const BE_VIEW_BOX = '0 0 ${VIEW_W} ${VIEW_H}'
-export const BE_VIEW_W = ${VIEW_W}
-export const BE_VIEW_H = ${VIEW_H}
-// [lonMin, latMin, lonMax, latMax] — bbox of zones in lon/lat, for Mapbox URL
+//
+// [lonMin, latMin, lonMax, latMax] — bbox of BE+LU zones (used as
+// initial map fit-bounds in BelgiumHeatmap)
 export const BE_BBOX = [${lonMin}, ${latMin}, ${lonMax}, ${latMax}]
-export const BE_PROVINCES = ${JSON.stringify(provinces, null, 2)}
+// Each zone: id, label, country, zones (Shopify tags), geometry (GeoJSON)
+export const BE_PROVINCES = ${JSON.stringify(provinces)}
 `
 
 fs.writeFileSync(OUT, out)
-const totalPts = provinces.reduce((s, p) => s + (p.d.match(/[ML]/g) || []).length, 0)
+const totalPts = provinces.reduce((s, p) => {
+  const coords = p.geometry.coordinates
+  const flat = p.geometry.type === 'Polygon' ? coords : coords.flat()
+  return s + flat.reduce((ss, r) => ss + r.length, 0)
+}, 0)
 console.log(
-  `Wrote ${OUT} — ${provinces.length} zones, ${totalPts} pts, ${fs.statSync(OUT).size} B, viewBox 0 0 ${VIEW_W} ${VIEW_H}`
+  `Wrote ${OUT} — ${provinces.length} zones, ${totalPts} pts, ${fs.statSync(OUT).size} B`
 )

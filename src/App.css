@@ -2628,91 +2628,44 @@
   display: flex;
 }
 
-.bemap-wrap {
-  position: relative;
+.bemap-gl {
   flex: 1;
   width: 100%;
   height: 100%;
   min-height: 0;
   border-radius: 8px;
   overflow: hidden;
-  cursor: grab;
-  touch-action: none;
 }
 
-.bemap-wrap.is-dragging,
-.bemap-wrap:active {
-  cursor: grabbing;
+.bemap-gl .mapboxgl-ctrl-logo,
+.bemap-gl .mapboxgl-ctrl-attrib {
+  display: none !important;
 }
 
-.bemap-pan-zoom {
-  position: absolute;
-  inset: 0;
-  transform-origin: 0 0;
-  will-change: transform;
-  user-select: none;
-}
-
-.bemap {
-  width: 100%;
-  height: 100%;
-  min-height: 0;
-  display: block;
-}
-
-.bemap__reset {
-  position: absolute;
-  bottom: 8px;
-  right: 8px;
-  width: 30px;
-  height: 30px;
-  border-radius: 8px;
-  border: 1px solid rgba(28, 28, 30, 0.12);
-  background: rgba(255, 255, 255, 0.92);
-  backdrop-filter: blur(8px);
-  font-size: 16px;
-  color: var(--text);
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 2px 8px rgba(28, 28, 30, 0.12);
-  transition: background 0.15s ease, transform 0.08s ease;
-  z-index: 4;
-}
-
-.bemap__reset:hover {
-  background: #fff;
-}
-
-.bemap__reset:active {
-  transform: scale(0.94);
-}
-
-.bemap-tooltip {
-  position: absolute;
-  background: rgba(28, 28, 30, 0.94);
+.bemap-popup .mapboxgl-popup-content {
+  background: rgba(28, 28, 30, 0.95);
   color: #fff;
   padding: 8px 11px;
   border-radius: 8px;
   font-size: 12px;
   line-height: 1.35;
-  pointer-events: none;
-  transform: translate(-50%, -100%);
-  white-space: nowrap;
-  z-index: 5;
   box-shadow: 0 6px 18px -4px rgba(28, 28, 30, 0.3);
   max-width: 240px;
 }
 
-.bemap-tooltip__num {
+.bemap-popup .mapboxgl-popup-tip {
+  border-top-color: rgba(28, 28, 30, 0.95) !important;
+  border-bottom-color: rgba(28, 28, 30, 0.95) !important;
+}
+
+.bemap-popup__num {
   font-weight: 700;
   font-size: 12.5px;
   font-variant-numeric: tabular-nums;
   margin-bottom: 2px;
 }
 
-.bemap-tooltip__row {
+.bemap-popup__row {
   display: flex;
   align-items: center;
   gap: 4px;
@@ -2720,46 +2673,10 @@
   font-size: 11.5px;
 }
 
-.bemap-tooltip__row--product {
+.bemap-popup__row--product {
   color: rgba(255, 255, 255, 0.72);
   font-style: italic;
-  overflow: hidden;
-  text-overflow: ellipsis;
   display: block;
-  max-width: 220px;
-}
-
-.bemap__province.is-ctx {
-  pointer-events: none;
-}
-
-.bemap__pin {
-  filter: drop-shadow(0 2px 3px rgba(28, 28, 30, 0.35));
-  cursor: help;
-  transition: transform 0.12s ease;
-  transform-box: fill-box;
-  transform-origin: center bottom;
-}
-
-.bemap__pin:hover {
-  transform: scale(1.15);
-}
-
-.bemap__province {
-  transition: filter 0.15s ease, transform 0.15s ease;
-  transform-origin: center;
-}
-
-.bemap__province.is-hot {
-  cursor: help;
-}
-
-.bemap__province.is-hot:hover {
-  filter: brightness(1.08) saturate(1.15);
-}
-
-.bemap__province.is-brussels {
-  stroke-width: 1.2;
 }
 
 .zone-priorities__head {
