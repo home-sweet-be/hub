@@ -79,8 +79,21 @@ export default function PlanificationLivraison() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ orderName, email }),
       })
-      const data = await r.json()
-      if (!data.ok) {
+      let data = null
+      try {
+        data = await r.json()
+      } catch {
+        data = null
+      }
+      if (!r.ok) {
+        // eslint-disable-next-line no-console
+        console.error('verify-order error:', r.status, data)
+        const detail =
+          data?.error || data?.message || `HTTP ${r.status}`
+        setAuthError(`Erreur serveur — ${detail}`)
+        return
+      }
+      if (!data?.ok) {
         const map = {
           not_found:
             "Aucune commande trouvée avec ce numéro et cet e-mail. Vérifie l'orthographe ou contacte-nous.",
@@ -90,12 +103,19 @@ export default function PlanificationLivraison() {
             "Impossible de déterminer la zone de livraison pour cette commande. Contacte-nous à contact@homesweet.be.",
           missing_fields: 'Merci de remplir les deux champs.',
         }
-        setAuthError(map[data.code] || 'Une erreur est survenue. Réessaie ou contacte-nous.')
+        // eslint-disable-next-line no-console
+        console.warn('verify-order not ok:', data)
+        setAuthError(
+          map[data?.code] ||
+            `Une erreur est survenue${data?.code ? ` (${data.code})` : ''}. Réessaie ou contacte-nous.`
+        )
         return
       }
       setOrder(data.order)
       setStep('pick')
     } catch (err) {
+      // eslint-disable-next-line no-console
+      console.error('verify-order network:', err)
       setAuthError(err.message || 'Erreur réseau, réessaie.')
     } finally {
       setVerifying(false)
