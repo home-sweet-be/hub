@@ -2607,6 +2607,48 @@
   -webkit-backdrop-filter: blur(10px);
 }
 
+.zone-priorities__layout {
+  display: grid;
+  grid-template-columns: minmax(220px, 280px) minmax(0, 1fr);
+  gap: 24px;
+  align-items: start;
+}
+
+.zone-priorities__main {
+  min-width: 0;
+}
+
+.zone-priorities__map {
+  position: relative;
+  padding: 8px;
+  background: rgba(255, 255, 255, 0.55);
+  border: 1px solid rgba(28, 28, 30, 0.08);
+  border-radius: 12px;
+}
+
+.bemap {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.bemap__province {
+  transition: filter 0.15s ease, transform 0.15s ease;
+  transform-origin: center;
+}
+
+.bemap__province.is-hot {
+  cursor: help;
+}
+
+.bemap__province.is-hot:hover {
+  filter: brightness(1.08) saturate(1.15);
+}
+
+.bemap__province.is-brussels {
+  stroke-width: 1.2;
+}
+
 .zone-priorities__head {
   display: flex;
   align-items: flex-start;
@@ -2810,6 +2852,16 @@
   color: var(--text-muted);
   text-align: center;
   font-style: italic;
+}
+
+@media (max-width: 900px) {
+  .zone-priorities__layout {
+    grid-template-columns: 1fr;
+  }
+  .zone-priorities__map {
+    max-width: 320px;
+    margin: 0 auto;
+  }
 }
 
 @media (max-width: 700px) {

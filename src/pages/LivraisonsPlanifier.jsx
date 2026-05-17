@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { supabase } from '../lib/supabase'
 import SlotModal from '../components/SlotModal'
 import { ZoneFlag, zoneCode } from '../components/ZoneFlag'
+import BelgiumHeatmap from '../components/BelgiumHeatmap'
 
 const DAY_LABELS_BY_DOW = ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam']
 const ZONE_TAG_PATTERN = /^(BE|FR|LU|NL|DE|LIV)(-|$)/i
@@ -340,6 +341,18 @@ export default function LivraisonsPlanifier() {
       </div>
 
       <section className="zone-priorities">
+        <div className="zone-priorities__layout">
+        <aside className="zone-priorities__map">
+          <BelgiumHeatmap
+            zoneCounts={
+              new Map(
+                (zonePriorities?.rows || []).map((r) => [r.zone, r.count])
+              )
+            }
+            max={zonePriorities?.rows?.[0]?.count || 0}
+          />
+        </aside>
+        <div className="zone-priorities__main">
         <header className="zone-priorities__head">
           <div>
             <h3 className="zone-priorities__title">
@@ -442,6 +455,8 @@ export default function LivraisonsPlanifier() {
               + {zonePriorities.unknown} commande(s) sans zone définie
             </p>
           )}
+        </div>
+        </div>
       </section>
 
       <SlotModal
