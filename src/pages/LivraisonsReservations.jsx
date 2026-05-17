@@ -1,4 +1,5 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { ZoneFlag, zoneCode } from '../components/ZoneFlag'
 import ZoneModal from '../components/ZoneModal'
 import AddressModal from '../components/AddressModal'
@@ -166,7 +167,7 @@ function OrdersTable({
   loading,
   error,
   emptyLabel,
-  action, // { icon, title, className, onClick(order), pendingForId }
+  selection, // { selectedIds, headerRef, onToggleAll, onToggleOne, disabled }
   onZoneEdit,
   onAddressView,
 }) {
@@ -187,7 +188,18 @@ function OrdersTable({
       <table className="reception-table">
         <thead>
           <tr>
-            <th aria-label="action" />
+            <th className="pretes-check-cell">
+              {selection && (
+                <input
+                  ref={selection.headerRef}
+                  type="checkbox"
+                  checked={selection.allSelected}
+                  onChange={selection.onToggleAll}
+                  disabled={selection.disabled || sorted.length === 0}
+                  aria-label="Tout sélectionner"
+                />
+              )}
+            </th>
             <th aria-label="image" />
             <th>Produit</th>
             <th>Livraison</th>
@@ -232,8 +244,6 @@ function OrdersTable({
               return !!x && !x.image?.url && amt < 590
             }
 
-            const actionPending = action?.pendingForId === o.id
-
             return rows.map((row, idx) => {
               const isFirst = idx === 0
               const isLast = idx === span - 1
@@ -255,20 +265,15 @@ function OrdersTable({
 
               return (
                 <tr key={`${o.id}-${idx}`} className={rowCls}>
-                  {isFirst && action && (
-                    <td rowSpan={span} className="reservations-action-cell">
-                      <button
-                        type="button"
-                        className={
-                          'reservations-action ' + (action.className || '')
-                        }
-                        onClick={() => action.onClick(o)}
-                        disabled={actionPending}
-                        title={action.title}
-                        aria-label={action.title}
-                      >
-                        {actionPending ? '…' : action.icon}
-                      </button>
+                  {isFirst && selection && (
+                    <td className="pretes-check-cell" rowSpan={span}>
+                      <input
+                        type="checkbox"
+                        checked={selection.selectedIds.has(o.id)}
+                        onChange={() => selection.onToggleOne(o.id)}
+                        disabled={selection.disabled}
+                        aria-label={`Sélectionner ${o.name}`}
+                      />
                     </td>
                   )}
                   <td className="reception-img-cell">
@@ -480,12 +485,15 @@ export default function LivraisonsReservations() {
   const [error, setError] = useState(null)
   const [zoneEditing, setZoneEditing] = useState(null)
   const [addressViewing, setAddressViewing] = useState(null)
-  const [pendingId, setPendingId] = useState(null)
+  const [selectedIds, setSelectedIds] = useState(() => new Set())
+  const [pending, setPending] = useState(false)
+  const headerCheckRef = useRef(null)
   const { reloadKey } = useReload()
 
   const load = useCallback(() => {
     setOrders(null)
     setError(null)
+    setSelectedIds(new Set())
     const cutoff = new Date(Date.now() - 150 * 86400000)
       .toISOString()
       .slice(0, 10)
@@ -508,14 +516,45 @@ export default function LivraisonsReservations() {
     load()
   }, [load, reloadKey])
 
-  const removeFromWaitlist = async (o) => {
-    setPendingId(o.id)
+  const sortedIds = useMemo(
+    () =>
+      (orders || []).map((o) => o.id),
+    [orders]
+  )
+  const allSelected =
+    sortedIds.length > 0 && sortedIds.every((id) => selectedIds.has(id))
+  const someSelected = selectedIds.size > 0 && !allSelected
+
+  useEffect(() => {
+    if (headerCheckRef.current) {
+      headerCheckRef.current.indeterminate = someSelected
+    }
+  }, [someSelected])
+
+  const toggleOne = (id) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev)
+      if (next.has(id)) next.delete(id)
+      else next.add(id)
+      return next
+    })
+  }
+
+  const toggleAll = () => {
+    if (allSelected) setSelectedIds(new Set())
+    else setSelectedIds(new Set(sortedIds))
+  }
+
+  const removeFromWaitlist = async () => {
+    if (pending || selectedIds.size === 0) return
+    setPending(true)
+    setError(null)
     try {
       const r = await fetch('/api/shopify/orders/tags', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          orderIds: [o.id],
+          orderIds: [...selectedIds],
           remove: [WAITLIST_TAG],
         }),
       })
@@ -524,7 +563,7 @@ export default function LivraisonsReservations() {
     } catch (e) {
       setError(e.message || String(e))
     } finally {
-      setPendingId(null)
+      setPending(false)
     }
   }
 
@@ -532,17 +571,40 @@ export default function LivraisonsReservations() {
     <div className="page reception reception--list-only reservations">
       <div className="reception__body">
         <section className="reception__right">
+          {selectedIds.size > 0 &&
+            createPortal(
+              <div className="pretes-bulk-toolbar">
+                <span className="pretes-bulk-toolbar__count">
+                  {selectedIds.size} commande
+                  {selectedIds.size > 1 ? 's' : ''} sélectionnée
+                  {selectedIds.size > 1 ? 's' : ''}
+                </span>
+                <button
+                  type="button"
+                  className="btn btn--green"
+                  onClick={removeFromWaitlist}
+                  disabled={pending}
+                >
+                  {pending
+                    ? 'Retrait…'
+                    : `Retirer de la file d'attente`}
+                </button>
+              </div>,
+              document.body
+            )}
+
           <OrdersTable
             orders={orders}
             loading={orders === null && !error}
             error={error}
             emptyLabel="Aucune commande en file d'attente."
-            action={{
-              icon: '−',
-              title: "Retirer de la file d'attente",
-              className: 'reservations-action--remove',
-              onClick: removeFromWaitlist,
-              pendingForId: pendingId,
+            selection={{
+              selectedIds,
+              headerRef: headerCheckRef,
+              allSelected,
+              disabled: pending,
+              onToggleAll: toggleAll,
+              onToggleOne: toggleOne,
             }}
             onZoneEdit={setZoneEditing}
             onAddressView={setAddressViewing}
