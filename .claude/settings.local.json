@@ -28,7 +28,9 @@
       "Bash(node -e \"let d='';process.stdin.on\\('data',c=>d+=c\\).on\\('end',\\(\\)=>{const j=JSON.parse\\(d\\);const o=j.orders||[];console.log\\('total:',o.length\\);console.log\\('<=1€ remaining:',o.filter\\(or=>Number\\(or.total\\)<=1\\).length\\);const inter=o.filter\\(or=>or.tags.includes\\('SentToSupplier'\\)&&or.lineItems.some\\(li=>li.vendor==='INTERCOMMERCE'\\)\\);const eltap=o.filter\\(or=>or.tags.includes\\('SentToSupplier'\\)&&or.lineItems.some\\(li=>li.vendor==='ELTAP'\\)\\);const stock=o.filter\\(or=>or.tags.includes\\('ProduitEnStock'\\)\\);console.log\\('INTER:',inter.length,'ELTAP:',eltap.length,'STOCK:',stock.length\\);}\\)\")",
       "Bash(npm run *)",
       "Bash(start *)",
-      "Bash(git reset *)"
+      "Bash(git reset *)",
+      "WebFetch(domain:github.com)",
+      "Bash(node *)"
     ]
   }
 }
