@@ -131,11 +131,14 @@ if (bruxellesRings.length > 0) {
 
 // ---- Add low-opacity context countries (background, no zones) ----
 const CONTEXT_COUNTRIES = {
+  France: { id: 'ctx-fr', label: 'France' },
   Netherlands: { id: 'ctx-nl', label: 'Pays-Bas' },
   Germany: { id: 'ctx-de', label: 'Allemagne' },
   Switzerland: { id: 'ctx-ch', label: 'Suisse' },
   'United Kingdom': { id: 'ctx-gb', label: 'Royaume-Uni' },
   Austria: { id: 'ctx-at', label: 'Autriche' },
+  Italy: { id: 'ctx-it', label: 'Italie' },
+  Spain: { id: 'ctx-es', label: 'Espagne' },
 }
 const NE_PATH = 'ne-countries.json'
 if (fs.existsSync(NE_PATH)) {
