@@ -16,8 +16,15 @@ const OUT = 'src/components/belgiumProvincesPaths.js'
 const EPS_DEG = 0.0025
 const VIEW_W = 1000
 
-// Hainaut splits at Mons longitude → BE-Hainaut-Ouest / BE-Hainaut-Est
-const HAINAUT_CUT_LON = 3.9514 // Mons
+// Hainaut split: slanted line pivoting at Mons, tilted 5° clockwise (top→east)
+const HAINAUT_CUT_LON = 3.9514 // Mons longitude
+const HAINAUT_PIVOT_LAT = 50.4542 // Mons latitude
+const HAINAUT_TILT_DEG = 5 // visual tilt to the right
+const _cosLatBE = Math.cos((50.5 * Math.PI) / 180)
+const HAINAUT_SLOPE =
+  Math.tan((HAINAUT_TILT_DEG * Math.PI) / 180) / _cosLatBE
+const cutLonAt = (lat) =>
+  HAINAUT_CUT_LON + (lat - HAINAUT_PIVOT_LAT) * HAINAUT_SLOPE
 
 // id (from properties.id) → metadata + matching Shopify zone tags
 const ZONE_META = {
@@ -97,13 +104,15 @@ const data = JSON.parse(raw)
       hai.geometry.type === 'Polygon'
         ? [hai.geometry.coordinates]
         : hai.geometry.coordinates
+    const cutS = cutLonAt(45)
+    const cutN = cutLonAt(55)
     const westRect = [[[
-      [-10, 45], [HAINAUT_CUT_LON, 45],
-      [HAINAUT_CUT_LON, 55], [-10, 55], [-10, 45],
+      [-10, 45], [cutS, 45],
+      [cutN, 55], [-10, 55], [-10, 45],
     ]]]
     const eastRect = [[[
-      [HAINAUT_CUT_LON, 45], [20, 45],
-      [20, 55], [HAINAUT_CUT_LON, 55], [HAINAUT_CUT_LON, 45],
+      [cutS, 45], [20, 45],
+      [20, 55], [cutN, 55], [cutS, 45],
     ]]]
     const west = polygonClipping.intersection(polys, westRect)
     const east = polygonClipping.intersection(polys, eastRect)
