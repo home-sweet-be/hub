@@ -402,9 +402,10 @@ export default function PlanificationLivraison() {
                 <div className="plani__note-row">
                   <span aria-hidden="true">📝</span>
                   <span>
-                    Les <strong>horaires sont indicatifs</strong> —
-                    rendez-vous disponible durant tout le créneau pour ne
-                    pas manquer votre livraison.
+                    Les <strong>horaires sont larges</strong> pour couvrir
+                    les imprévus et le trafic — rendez-vous disponible
+                    durant tout le créneau pour ne pas manquer votre
+                    livraison.
                   </span>
                 </div>
                 <div className="plani__note-row">
