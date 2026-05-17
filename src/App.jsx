@@ -4,6 +4,8 @@ import logo from './assets/homesweet.png'
 import Commandes from './pages/Commandes'
 import Logistique from './pages/Logistique'
 import Livraisons from './pages/Livraisons'
+import LivraisonsPlanifier from './pages/LivraisonsPlanifier'
+import LivraisonsReservations from './pages/LivraisonsReservations'
 import Compta from './pages/Compta'
 import Factures from './pages/Factures'
 import Rapports from './pages/Rapports'
@@ -127,7 +129,11 @@ export default function App() {
           <Route path="logistique" element={<Logistique />} />
           <Route path="receptions" element={<Navigate to="/logistique" replace />} />
           <Route path="fournisseurs" element={<Navigate to="/logistique" replace />} />
-          <Route path="livraisons" element={<Livraisons />} />
+          <Route path="livraisons" element={<Livraisons />}>
+            <Route index element={<Navigate to="waitinglist" replace />} />
+            <Route path="waitinglist" element={<LivraisonsReservations />} />
+            <Route path="planifier" element={<LivraisonsPlanifier />} />
+          </Route>
           <Route path="compta" element={<Compta />} />
           <Route path="factures" element={<Factures />} />
           <Route path="rapports" element={<Rapports />} />
