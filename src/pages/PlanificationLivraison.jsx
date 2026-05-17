@@ -45,6 +45,84 @@ function zoneLabel(z) {
 }
 
 const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_TOKEN
+const SHIPPING_TERMS_URL = 'https://home-sweet.be/pages/livraison'
+
+function TruckIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M14 17V6a1 1 0 0 0-1-1H3a1 1 0 0 0-1 1v11a1 1 0 0 0 1 1h1" />
+      <path d="M14 17H9" />
+      <path d="M19 17h2a1 1 0 0 0 1-1v-3.6a1 1 0 0 0-.22-.62l-3.5-4.4A1 1 0 0 0 17.5 7H14" />
+      <circle cx="7" cy="18" r="1.8" />
+      <circle cx="17" cy="18" r="1.8" />
+    </svg>
+  )
+}
+function PorterIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <circle cx="8" cy="4" r="2" />
+      <path d="M8 6v6" />
+      <path d="M5 21l3-9 3 9" />
+      <rect x="12" y="7" width="9" height="7" rx="1" />
+      <path d="M12 10.5h9" />
+    </svg>
+  )
+}
+function ToolsIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M14.7 6.3a3.5 3.5 0 0 0 4 4l-1.8 1.8L20 15.2a2 2 0 1 1-2.8 2.8L14 14.8l-1.8 1.8a3.5 3.5 0 0 0-4-4z" />
+    </svg>
+  )
+}
+
+const SHIPPING_DETAILS = {
+  standard: {
+    label: 'Standard',
+    price: '99 €',
+    icons: [<TruckIcon key="t" />],
+    body: (
+      <>
+        Votre article est livré <strong>au pied du camion</strong>, devant
+        chez vous.
+        <br />
+        👉 Idéal si vous êtes équipé pour le transporter jusqu'à chez vous.
+      </>
+    ),
+    needsTerms: false,
+  },
+  confort: {
+    label: 'Confort',
+    price: '159 €',
+    icons: [<TruckIcon key="t" />, <PorterIcon key="p" />],
+    body: (
+      <>
+        Nos livreurs <strong>déposent l'article dans la pièce de votre
+        choix</strong>, au rez-de-chaussée ou à l'étage.
+        <br />
+        👉 Pratique si vous ne souhaitez pas porter ou manœuvrer les colis
+        vous-même.
+      </>
+    ),
+    needsTerms: true,
+  },
+  premium: {
+    label: 'Premium',
+    price: '179 €',
+    icons: [<TruckIcon key="t" />, <PorterIcon key="p" />, <ToolsIcon key="w" />],
+    body: (
+      <>
+        Nos livreurs livrent dans la pièce de votre choix,{' '}
+        <strong>déballent et installent</strong> votre article.
+        <br />
+        👉 Parfait si vous voulez une expérience clé en main, sans rien avoir
+        à faire.
+      </>
+    ),
+    needsTerms: true,
+  },
+}
 
 function shippingTierKey(title) {
   if (!title) return null
@@ -52,14 +130,6 @@ function shippingTierKey(title) {
   if (/confort/i.test(title)) return 'confort'
   if (/standard/i.test(title)) return 'standard'
   return 'other'
-}
-
-function shortShippingLabel(title) {
-  if (!title) return ''
-  if (/premium/i.test(title)) return 'Premium'
-  if (/confort/i.test(title)) return 'Confort'
-  if (/standard/i.test(title)) return 'Standard'
-  return title
 }
 
 export default function PlanificationLivraison() {
@@ -299,9 +369,15 @@ export default function PlanificationLivraison() {
             <div className="plani__pick-layout">
             <aside className="plani__pick-recap">
               <div className="plani__order-recap plani__order-recap--stack">
-                <div>
-                  <div className="plani__recap-label">Commande</div>
-                  <div className="plani__recap-value">{order.name}</div>
+                <div className="plani__recap-top">
+                  <div>
+                    <div className="plani__recap-label">Commande</div>
+                    <div className="plani__recap-value">{order.name}</div>
+                  </div>
+                  <div>
+                    <div className="plani__recap-label">Zone</div>
+                    <div className="plani__recap-value">{zoneLabel(order.zone)}</div>
+                  </div>
                 </div>
                 <div>
                   <div className="plani__recap-label">Adresse de livraison</div>
@@ -315,25 +391,65 @@ export default function PlanificationLivraison() {
                     />
                   )}
                 </div>
-                {order.shippingLine && (
-                  <div>
-                    <div className="plani__recap-label">Type de livraison</div>
-                    <div className="plani__recap-value">
-                      <span
-                        className={
-                          'plani__shipping-pill is-' +
-                          (shippingTierKey(order.shippingLine) || 'other')
-                        }
-                      >
-                        {shortShippingLabel(order.shippingLine)}
-                      </span>
+                {order.shippingLine && (() => {
+                  const tier = shippingTierKey(order.shippingLine)
+                  const details = SHIPPING_DETAILS[tier]
+                  return (
+                    <div>
+                      <div className="plani__recap-label">Type de livraison</div>
+                      <div className="plani__recap-value">
+                        <span
+                          className={
+                            'reception-shipping__chip is-' +
+                            (tier || 'standard')
+                          }
+                          title={order.shippingLine}
+                        >
+                          <span className="reception-shipping__label">
+                            {details?.label || order.shippingLine}
+                          </span>
+                          {details?.icons?.length > 0 && (
+                            <span className="reception-shipping__icons">
+                              {details.icons.map((icon, i) => (
+                                <span key={i} className="reception-shipping__icon">
+                                  {icon}
+                                </span>
+                              ))}
+                            </span>
+                          )}
+                        </span>
+                      </div>
+                      {details && (
+                        <div className="plani__shipping-details">
+                          <div className="plani__shipping-details-head">
+                            <strong>Livraison {details.label}</strong>{' '}
+                            <span className="plani__shipping-price">
+                              — {details.price}
+                            </span>
+                          </div>
+                          <p className="plani__shipping-details-body">
+                            {details.body}
+                          </p>
+                          {details.needsTerms && (
+                            <p className="plani__shipping-details-warn">
+                              <strong>Important</strong> · si vous habitez en
+                              étage sans ascenseur conforme aux dimensions
+                              minimales, consultez les{' '}
+                              <a
+                                href={SHIPPING_TERMS_URL}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                              >
+                                conditions de livraison en logement
+                              </a>
+                              .
+                            </p>
+                          )}
+                        </div>
+                      )}
                     </div>
-                  </div>
-                )}
-                <div>
-                  <div className="plani__recap-label">Zone</div>
-                  <div className="plani__recap-value">{zoneLabel(order.zone)}</div>
-                </div>
+                  )
+                })()}
               </div>
             </aside>
             <div className="plani__pick-main">
