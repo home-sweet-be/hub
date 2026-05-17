@@ -706,6 +706,14 @@ export default function PlanificationLivraison() {
                 ou contactez-nous par téléphone.
               </p>
             </div>
+            <a
+              className="plani__account-link"
+              href="https://home-sweet.be/account/"
+              target="_top"
+              rel="noopener"
+            >
+              Retour au compte client
+            </a>
           </section>
         )}
 
@@ -758,6 +766,14 @@ export default function PlanificationLivraison() {
               question, écrivez-nous à{' '}
               <a href="mailto:contact@home-sweet.be">contact@home-sweet.be</a>.
             </p>
+            <a
+              className="plani__account-link"
+              href="https://home-sweet.be/account/"
+              target="_top"
+              rel="noopener"
+            >
+              Retour au compte client
+            </a>
           </section>
         )}
       </main>

@@ -4996,6 +4996,25 @@ body:has(.plani),
   text-decoration: underline;
 }
 
+.plani__account-link {
+  display: block;
+  margin: 18px auto 0;
+  padding: 12px 22px;
+  width: fit-content;
+  background: #1d1d1f;
+  color: #fff;
+  border-radius: 999px;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 600;
+  transition: background 0.15s ease, transform 0.15s ease;
+}
+
+.plani__account-link:hover {
+  background: #000;
+  transform: translateY(-1px);
+}
+
 .plani__done-recap {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
