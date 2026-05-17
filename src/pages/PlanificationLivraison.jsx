@@ -402,22 +402,16 @@ export default function PlanificationLivraison() {
                 <div className="plani__note-row">
                   <span aria-hidden="true">📝</span>
                   <span>
-                    <strong>Note :</strong> l'heure indiquée correspond au{' '}
-                    <strong>début du créneau</strong>. Il s'agit de l'heure à
-                    partir de laquelle vous devez être disponible.
-                  </span>
-                </div>
-                <div className="plani__note-row">
-                  <span aria-hidden="true">⏰</span>
-                  <span>
-                    Ex : 12:00 pour le créneau (12:00 – 20:00)
+                    Les <strong>horaires sont indicatifs</strong> —
+                    rends-toi disponible durant tout le créneau pour ne pas
+                    manquer ta livraison.
                   </span>
                 </div>
                 <div className="plani__note-row">
                   <span aria-hidden="true">📧</span>
                   <span>
-                    Vous recevrez en temps réel un e-mail pour suivre la
-                    position de votre livreur.
+                    Tu recevras en temps réel un e-mail pour suivre la
+                    position de ton livreur.
                   </span>
                 </div>
               </aside>
