@@ -30,7 +30,8 @@
       "Bash(start *)",
       "Bash(git reset *)",
       "WebFetch(domain:github.com)",
-      "Bash(node *)"
+      "Bash(node *)",
+      "Bash(npm install *)"
     ]
   }
 }

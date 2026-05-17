@@ -1,9 +1,12 @@
 // One-shot: simplify the user's delivery-zone GeoJSON (public/geoexample.json)
 // and emit a small JS module of SVG paths for the heatmap.
 //
+// Also derives BE-Bruxelles as the hole inside the union of all BE provinces.
+//
 // Input: public/geoexample.json — JSONC-ish (trailing commas tolerated)
 // Output: src/components/belgiumProvincesPaths.js
 import fs from 'node:fs'
+import polygonClipping from 'polygon-clipping'
 
 const SRC = 'public/geoexample.json'
 const OUT = 'src/components/belgiumProvincesPaths.js'
@@ -79,6 +82,50 @@ let raw = fs.readFileSync(SRC, 'utf8')
 raw = raw.replace(/,(\s*[}\]])/g, '$1')
 const data = JSON.parse(raw)
 
+// ---- Derive BE-Bruxelles from the hole in the BE provinces union ----
+const BE_IDS = ['BEVAN', 'BEVOV', 'BEVWV', 'BEVLI', 'BEWHT', 'BEWNA', 'BEWLX', 'BEWLG']
+const bePolygons = data.features
+  .filter((f) => BE_IDS.includes(f.properties?.id))
+  .map((f) =>
+    f.geometry.type === 'Polygon'
+      ? [f.geometry.coordinates]
+      : f.geometry.coordinates
+  )
+const union = polygonClipping.union(...bePolygons)
+// Each polygon = [outerRing, hole1, hole2, ...]. Collect holes as Bruxelles.
+const bruxellesRings = []
+for (const poly of union) {
+  for (let h = 1; h < poly.length; h++) {
+    // GeoJSON rings: holes are clockwise (CW). polygon-clipping returns
+    // outer = CCW, holes = CW. We invert the hole so it draws as a normal
+    // (filled) outer polygon when treated standalone.
+    bruxellesRings.push([...poly[h]].reverse())
+  }
+}
+if (bruxellesRings.length > 0) {
+  data.features.push({
+    type: 'Feature',
+    properties: {
+      id: 'BEBRU',
+      name: 'Bruxelles & Brabant',
+      source: 'derived-from-hole',
+    },
+    geometry: {
+      type: bruxellesRings.length === 1 ? 'Polygon' : 'MultiPolygon',
+      coordinates:
+        bruxellesRings.length === 1
+          ? [bruxellesRings[0]]
+          : bruxellesRings.map((r) => [r]),
+    },
+  })
+  ZONE_META.BEBRU = {
+    id: 'brussels',
+    label: 'Bruxelles',
+    zones: ['BE-Bruxelles'],
+    country: 'BE',
+  }
+}
+
 // ---- Collect & simplify ----
 const simplified = []
 for (const f of data.features) {
@@ -131,9 +178,15 @@ const provinces = simplified.map(({ meta, rings }) => ({
   d: rings.map(ringToPath).join(' '),
 }))
 
-// Render order: France background → LU → BE on top
+// Render order: France background → LU → BE on top → Brussels last (sits in hole)
 const COUNTRY_ORDER = { FR: 0, LU: 1, BE: 2 }
-provinces.sort((a, b) => COUNTRY_ORDER[a.country] - COUNTRY_ORDER[b.country])
+provinces.sort((a, b) => {
+  const c = COUNTRY_ORDER[a.country] - COUNTRY_ORDER[b.country]
+  if (c !== 0) return c
+  if (a.id === 'brussels') return 1
+  if (b.id === 'brussels') return -1
+  return 0
+})
 
 const out = `// AUTO-GENERATED from public/geoexample.json by scripts/build-be-map.mjs
 // Regenerate: node scripts/build-be-map.mjs
