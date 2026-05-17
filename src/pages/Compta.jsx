@@ -73,6 +73,57 @@ function shortAddress(addr) {
   return line || '—'
 }
 
+function csvEscape(v) {
+  const s = String(v ?? '')
+  if (/[";\n\r]/.test(s)) return '"' + s.replace(/"/g, '""') + '"'
+  return s
+}
+
+function buildCsv(orders) {
+  const headers = [
+    'Date',
+    'Numéro',
+    'Montant',
+    'Devise',
+    'Client',
+    'Articles',
+    'Paiement',
+    'Adresse',
+  ]
+  const rows = orders.map((o) => [
+    formatDate(o.createdAt),
+    o.name,
+    Number(o.total || 0)
+      .toFixed(2)
+      .replace('.', ','),
+    o.currency || 'EUR',
+    customerName(o.customer),
+    activeLineItems(o)
+      .map((li) => `${effectiveQuantity(li)}× ${li.title}`)
+      .join(' | '),
+    o.financialStatus || '',
+    shortAddress(o.shippingAddress),
+  ])
+  return [headers, ...rows]
+    .map((r) => r.map(csvEscape).join(';'))
+    .join('\r\n')
+}
+
+function downloadCsv(filename, csv) {
+  // BOM so Excel opens UTF-8 cleanly
+  const blob = new Blob(['﻿' + csv], {
+    type: 'text/csv;charset=utf-8',
+  })
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement('a')
+  a.href = url
+  a.download = filename
+  document.body.appendChild(a)
+  a.click()
+  document.body.removeChild(a)
+  URL.revokeObjectURL(url)
+}
+
 const PAYMENT_FILTERS = [
   { id: 'all', label: 'Toutes les commandes' },
   { id: 'full', label: 'Paiement complet en ligne' },
@@ -214,13 +265,50 @@ export default function Compta() {
         <div className="compta__summary">
           {orders && (
             <>
-              <span>
-                <strong>{sorted.length}</strong> commande
-                {sorted.length > 1 ? 's' : ''}
-              </span>
-              <span>
-                Total <strong>{formatPrice(total)}</strong>
-              </span>
+              <div className="compta__summary-left">
+                <span>
+                  <strong>{sorted.length}</strong> commande
+                  {sorted.length > 1 ? 's' : ''}
+                </span>
+                <span>
+                  Total <strong>{formatPrice(total)}</strong>
+                </span>
+              </div>
+              {paymentFilter === 'full' && sorted.length > 0 && (
+                <button
+                  type="button"
+                  className="compta__export"
+                  onClick={() => {
+                    const m = months[activeIdx]
+                    const slug = m.label
+                      .toLowerCase()
+                      .normalize('NFD')
+                      .replace(/[̀-ͯ]/g, '')
+                      .replace(/\s+/g, '-')
+                    downloadCsv(
+                      `compta-paiement-complet-${slug}.csv`,
+                      buildCsv(sorted)
+                    )
+                  }}
+                >
+                  <svg
+                    viewBox="0 0 24 24"
+                    width="14"
+                    height="14"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    aria-hidden="true"
+                  >
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                    <polyline points="7 10 12 15 17 10" />
+                    <line x1="12" y1="15" x2="12" y2="3" />
+                  </svg>
+                  Exporter en CSV
+                </button>
+              )}
             </>
           )}
         </div>
