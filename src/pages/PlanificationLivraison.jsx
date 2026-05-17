@@ -204,11 +204,7 @@ export default function PlanificationLivraison() {
     try {
       const { error } = await supabase.from('delivery_bookings').insert({
         slot_id: selectedSlot.id,
-        shopify_order_id: order.id,
-        shopify_order_name: order.name,
-        customer_email: order.email,
-        customer_name: order.customerName,
-        zone: order.zone,
+        shopify_order_name: order.name.replace(/^#/, ''),
         status: 'confirmed',
       })
       if (error) throw error
