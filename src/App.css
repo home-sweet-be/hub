@@ -2984,14 +2984,45 @@
 }
 
 .reception-shipping__chip {
-  display: inline-block;
-  padding: 3px 9px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 4px 3px 10px;
   border-radius: 999px;
-  background: rgba(28, 28, 30, 0.06);
+  background: rgba(28, 28, 30, 0.05);
   border: 1px solid rgba(28, 28, 30, 0.12);
   font-size: 11.5px;
   color: var(--text);
   white-space: nowrap;
+  font-weight: 500;
+}
+
+.reception-shipping__chip.is-standard {
+  background: rgba(28, 28, 30, 0.05);
+  border-color: rgba(28, 28, 30, 0.12);
+}
+
+.reception-shipping__chip.is-confort {
+  background: rgba(10, 132, 255, 0.1);
+  border-color: rgba(10, 132, 255, 0.25);
+  color: #0a5fb8;
+}
+
+.reception-shipping__chip.is-premium {
+  background: rgba(175, 82, 222, 0.1);
+  border-color: rgba(175, 82, 222, 0.28);
+  color: #6f2ea0;
+}
+
+.reception-shipping__emojis {
+  display: inline-flex;
+  align-items: center;
+  gap: 1px;
+  padding: 1px 6px 1px 4px;
+  background: rgba(255, 255, 255, 0.6);
+  border-radius: 999px;
+  font-size: 12px;
+  line-height: 1;
 }
 
 /* Réservations sub-page: two stacked sections with action column */

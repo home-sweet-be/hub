@@ -40,6 +40,19 @@ function activeLineItems(order) {
   return order.lineItems.filter((li) => effectiveQuantity(li) > 0)
 }
 
+const SHIPPING_TIERS = [
+  { match: /premium/i, label: 'Premium', emojis: ['🚚', '🧑', '🛠️'] },
+  { match: /confort/i, label: 'Confort', emojis: ['🚚', '🧑'] },
+  { match: /standard/i, label: 'Standard', emojis: ['🚚'] },
+]
+
+function classifyShipping(title) {
+  if (!title) return null
+  const tier = SHIPPING_TIERS.find((t) => t.match.test(title))
+  if (tier) return tier
+  return { label: title, emojis: [] }
+}
+
 function isSamples(li) {
   return li?.title ? /[ée]chantillon/i.test(li.title) : false
 }
@@ -346,13 +359,33 @@ function OrdersTable({
                   )}
                   {isFirst && (
                     <td rowSpan={span} className="reception-shipping">
-                      {o.shippingLine?.title ? (
-                        <span className="reception-shipping__chip">
-                          {o.shippingLine.title}
-                        </span>
-                      ) : (
-                        <span className="reception-table__muted">—</span>
-                      )}
+                      {(() => {
+                        const chip = classifyShipping(o.shippingLine?.title)
+                        if (!chip)
+                          return (
+                            <span className="reception-table__muted">—</span>
+                          )
+                        return (
+                          <span
+                            className={
+                              'reception-shipping__chip is-' +
+                              chip.label.toLowerCase()
+                            }
+                            title={o.shippingLine?.title || ''}
+                          >
+                            <span className="reception-shipping__label">
+                              {chip.label}
+                            </span>
+                            {chip.emojis.length > 0 && (
+                              <span className="reception-shipping__emojis">
+                                {chip.emojis.map((e, k) => (
+                                  <span key={k}>{e}</span>
+                                ))}
+                              </span>
+                            )}
+                          </span>
+                        )
+                      })()}
                     </td>
                   )}
                 </tr>
