@@ -73,9 +73,26 @@ function shortAddress(addr) {
   return line || '—'
 }
 
+const PAYMENT_FILTERS = [
+  { id: 'all', label: 'Toutes les commandes' },
+  { id: 'full', label: 'Paiement complet en ligne' },
+  { id: 'depo', label: 'Acompte en ligne + solde cash' },
+]
+
+function hasDepoTag(o) {
+  return (o.tags || []).some((t) => /^depo$/i.test(t))
+}
+
+function matchPaymentFilter(o, filterId) {
+  if (filterId === 'full') return !hasDepoTag(o)
+  if (filterId === 'depo') return hasDepoTag(o)
+  return true
+}
+
 export default function Compta() {
   const months = useMemo(buildMonths, [])
   const [activeIdx, setActiveIdx] = useState(0)
+  const [paymentFilter, setPaymentFilter] = useState('all')
   const [ordersByMonth, setOrdersByMonth] = useState({}) // {idx: orders[]}
   const [loadingIdx, setLoadingIdx] = useState(null)
   const [error, setError] = useState(null)
@@ -120,14 +137,27 @@ export default function Compta() {
   const orders = ordersByMonth[activeIdx]
   const isLoading = loadingIdx === activeIdx && !orders
 
-  const sorted = useMemo(() => {
+  const sortedAll = useMemo(() => {
     if (!orders) return []
     return [...orders].sort((a, b) => (a.createdAt < b.createdAt ? 1 : -1))
   }, [orders])
 
+  const counts = useMemo(
+    () => ({
+      all: sortedAll.length,
+      full: sortedAll.filter((o) => !hasDepoTag(o)).length,
+      depo: sortedAll.filter(hasDepoTag).length,
+    }),
+    [sortedAll]
+  )
+
+  const sorted = useMemo(
+    () => sortedAll.filter((o) => matchPaymentFilter(o, paymentFilter)),
+    [sortedAll, paymentFilter]
+  )
+
   const total = useMemo(
-    () =>
-      sorted.reduce((s, o) => s + (Number(o.total) || 0), 0),
+    () => sorted.reduce((s, o) => s + (Number(o.total) || 0), 0),
     [sorted]
   )
 
@@ -153,6 +183,27 @@ export default function Compta() {
             {i === 0 && (
               <span className="compta__tab-flag">Mois actuel</span>
             )}
+          </button>
+        ))}
+      </div>
+
+      <div className="compta__subtabs" role="tablist">
+        {PAYMENT_FILTERS.map((f) => (
+          <button
+            key={f.id}
+            type="button"
+            role="tab"
+            aria-selected={paymentFilter === f.id}
+            className={
+              'compta__subtab' +
+              (paymentFilter === f.id ? ' is-active' : '')
+            }
+            onClick={() => setPaymentFilter(f.id)}
+          >
+            <span>{f.label}</span>
+            <span className="compta__subtab-count">
+              {orders ? counts[f.id] : '…'}
+            </span>
           </button>
         ))}
       </div>
