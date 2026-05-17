@@ -4161,13 +4161,25 @@
 
 .plani__done-recap {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16px;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 18px;
+  align-items: center;
   text-align: left;
   margin: 24px 0;
   padding: 16px 18px;
-  background: #f5f7fb;
+  background: #f5f5f7;
   border-radius: 14px;
+}
+
+.plani__done-map {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 10px;
+  border: 1px solid rgba(28, 28, 30, 0.1);
+  background: rgba(28, 28, 30, 0.04);
+  aspect-ratio: 520 / 280;
+  object-fit: cover;
 }
 
 @media (max-width: 900px) {

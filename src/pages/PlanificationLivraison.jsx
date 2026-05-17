@@ -615,9 +615,9 @@ export default function PlanificationLivraison() {
                 />
               </svg>
             </div>
-            <h1 className="plani__title">Livraison planifiée !</h1>
+            <h1 className="plani__title">Livraison planifiée</h1>
             <p className="plani__lead">
-              On se voit le{' '}
+              Livraison prévue le{' '}
               <strong>
                 {fmtFullDate(new Date(selectedSlot.starts_at))}
               </strong>{' '}
@@ -629,10 +629,16 @@ export default function PlanificationLivraison() {
               .
             </p>
             <div className="plani__done-recap">
-              <div>
-                <div className="plani__recap-label">Commande</div>
-                <div className="plani__recap-value">{order.name}</div>
-              </div>
+              {MAPBOX_TOKEN && order.lat && order.lon ? (
+                <img
+                  className="plani__done-map"
+                  src={`https://api.mapbox.com/styles/v1/mapbox/streets-v12/static/pin-l+ea4335(${order.lon},${order.lat})/${order.lon},${order.lat},14/520x280@2x?access_token=${MAPBOX_TOKEN}&logo=false&attribution=false`}
+                  alt="Carte de l'adresse de livraison"
+                  loading="lazy"
+                />
+              ) : (
+                <div />
+              )}
               <div>
                 <div className="plani__recap-label">Adresse</div>
                 <div className="plani__recap-value">{order.address}</div>
