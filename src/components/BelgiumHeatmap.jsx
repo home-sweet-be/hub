@@ -3,7 +3,7 @@ import { BE_PROVINCES, BE_VIEW_BOX } from './belgiumProvincesPaths.js'
 function colorFor(count, max, country, hasZone) {
   // Background context countries: very faint
   if (country === 'CTX') {
-    return { fill: 'rgba(28,28,30,0.04)', stroke: 'rgba(28,28,30,0.12)' }
+    return { fill: 'rgba(28,28,30,0.02)', stroke: 'rgba(28,28,30,0.06)' }
   }
   // Untagged / no waiting orders → neutral by country
   if (count === 0) {
