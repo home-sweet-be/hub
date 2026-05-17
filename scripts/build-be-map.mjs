@@ -1,9 +1,12 @@
 // One-shot: simplify the user's delivery-zone GeoJSON (public/geoexample.json)
 // and emit a small JS module of SVG paths for the heatmap.
 //
-// Also derives BE-Bruxelles as the hole inside the union of all BE provinces.
+// Also derives BE-Bruxelles as the hole inside the union of all BE provinces,
+// and adds low-opacity context countries (NL, DE, CH, GB) clipped by viewBox.
 //
-// Input: public/geoexample.json — JSONC-ish (trailing commas tolerated)
+// Inputs:
+//   - public/geoexample.json  (user zones, JSONC-ish)
+//   - ne-countries.json       (Natural Earth 110m, only neighbors used)
 // Output: src/components/belgiumProvincesPaths.js
 import fs from 'node:fs'
 import polygonClipping from 'polygon-clipping'
@@ -126,6 +129,38 @@ if (bruxellesRings.length > 0) {
   }
 }
 
+// ---- Add low-opacity context countries (background, no zones) ----
+const CONTEXT_COUNTRIES = {
+  Netherlands: { id: 'ctx-nl', label: 'Pays-Bas' },
+  Germany: { id: 'ctx-de', label: 'Allemagne' },
+  Switzerland: { id: 'ctx-ch', label: 'Suisse' },
+  'United Kingdom': { id: 'ctx-gb', label: 'Royaume-Uni' },
+  Austria: { id: 'ctx-at', label: 'Autriche' },
+}
+const NE_PATH = 'ne-countries.json'
+if (fs.existsSync(NE_PATH)) {
+  const ne = JSON.parse(fs.readFileSync(NE_PATH, 'utf8'))
+  for (const f of ne.features) {
+    const name = f.properties.NAME || f.properties.name
+    const m = CONTEXT_COUNTRIES[name]
+    if (!m) continue
+    const id = `CTX_${m.id.replace('ctx-', '').toUpperCase()}`
+    data.features.push({
+      type: 'Feature',
+      properties: { id, name, source: 'natural-earth-110m' },
+      geometry: f.geometry,
+    })
+    ZONE_META[id] = {
+      id: m.id,
+      label: m.label,
+      zones: [],
+      country: 'CTX',
+    }
+  }
+} else {
+  console.warn(`(no ${NE_PATH} — skipping context countries)`)
+}
+
 // ---- Collect & simplify ----
 const simplified = []
 for (const f of data.features) {
@@ -138,8 +173,11 @@ for (const f of data.features) {
   simplified.push({ meta, rings: simplifyGeometry(f.geometry) })
 }
 
+// Bounds computed from zone features only (context countries don't count —
+// SVG viewBox clips them naturally)
 let lonMin = Infinity, lonMax = -Infinity, latMin = Infinity, latMax = -Infinity
-for (const { rings } of simplified) {
+for (const { meta, rings } of simplified) {
+  if (meta.country === 'CTX') continue
   for (const ring of rings) {
     for (const [lon, lat] of ring) {
       if (lon < lonMin) lonMin = lon
@@ -178,8 +216,8 @@ const provinces = simplified.map(({ meta, rings }) => ({
   d: rings.map(ringToPath).join(' '),
 }))
 
-// Render order: France background → LU → BE on top → Brussels last (sits in hole)
-const COUNTRY_ORDER = { FR: 0, LU: 1, BE: 2 }
+// Render order: context countries → FR regions → LU → BE provinces → Brussels last
+const COUNTRY_ORDER = { CTX: 0, FR: 1, LU: 2, BE: 3 }
 provinces.sort((a, b) => {
   const c = COUNTRY_ORDER[a.country] - COUNTRY_ORDER[b.country]
   if (c !== 0) return c

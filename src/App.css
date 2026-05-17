@@ -2630,6 +2630,11 @@
   width: 100%;
   height: auto;
   display: block;
+  overflow: hidden;
+}
+
+.bemap__province.is-ctx {
+  pointer-events: none;
 }
 
 .bemap__province {
