@@ -40,17 +40,85 @@ function activeLineItems(order) {
   return order.lineItems.filter((li) => effectiveQuantity(li) > 0)
 }
 
+function TruckIcon() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M14 17V6a1 1 0 0 0-1-1H3a1 1 0 0 0-1 1v11a1 1 0 0 0 1 1h1" />
+      <path d="M14 17H9" />
+      <path d="M19 17h2a1 1 0 0 0 1-1v-3.6a1 1 0 0 0-.22-.62l-3.5-4.4A1 1 0 0 0 17.5 7H14" />
+      <circle cx="7" cy="18" r="1.8" />
+      <circle cx="17" cy="18" r="1.8" />
+    </svg>
+  )
+}
+
+function PorterIcon() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <circle cx="8" cy="4" r="2" />
+      <path d="M8 6v6" />
+      <path d="M5 21l3-9 3 9" />
+      <rect x="12" y="7" width="9" height="7" rx="1" />
+      <path d="M12 10.5h9" />
+    </svg>
+  )
+}
+
+function ToolsIcon() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M14.7 6.3a3.5 3.5 0 0 0 4 4l-1.8 1.8L20 15.2a2 2 0 1 1-2.8 2.8L14 14.8l-1.8 1.8a3.5 3.5 0 0 0-4-4z" />
+    </svg>
+  )
+}
+
 const SHIPPING_TIERS = [
-  { match: /premium/i, label: 'Premium', emojis: ['🚚', '🏋️', '🛠️'] },
-  { match: /confort/i, label: 'Confort', emojis: ['🚚', '🏋️'] },
-  { match: /standard/i, label: 'Standard', emojis: ['🚚'] },
+  {
+    match: /premium/i,
+    label: 'Premium',
+    icons: [<TruckIcon key="t" />, <PorterIcon key="p" />, <ToolsIcon key="w" />],
+  },
+  {
+    match: /confort/i,
+    label: 'Confort',
+    icons: [<TruckIcon key="t" />, <PorterIcon key="p" />],
+  },
+  {
+    match: /standard/i,
+    label: 'Standard',
+    icons: [<TruckIcon key="t" />],
+  },
 ]
 
 function classifyShipping(title) {
   if (!title) return null
   const tier = SHIPPING_TIERS.find((t) => t.match.test(title))
   if (tier) return tier
-  return { label: title, emojis: [] }
+  return { label: title, icons: [] }
 }
 
 function isSamples(li) {
@@ -321,10 +389,15 @@ function OrdersTable({
                             <span className="reception-shipping__label">
                               {chip.label}
                             </span>
-                            {chip.emojis.length > 0 && (
-                              <span className="reception-shipping__emojis">
-                                {chip.emojis.map((e, k) => (
-                                  <span key={k}>{e}</span>
+                            {chip.icons.length > 0 && (
+                              <span className="reception-shipping__icons">
+                                {chip.icons.map((icon, k) => (
+                                  <span
+                                    key={k}
+                                    className="reception-shipping__icon"
+                                  >
+                                    {icon}
+                                  </span>
                                 ))}
                               </span>
                             )}

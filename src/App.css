@@ -3014,15 +3014,26 @@
   color: #6f2ea0;
 }
 
-.reception-shipping__emojis {
+.reception-shipping__icons {
   display: inline-flex;
   align-items: center;
-  gap: 1px;
-  padding: 1px 6px 1px 4px;
-  background: rgba(255, 255, 255, 0.6);
+  gap: 3px;
+  padding: 3px 8px;
+  background: rgba(255, 255, 255, 0.75);
   border-radius: 999px;
-  font-size: 12px;
-  line-height: 1;
+  line-height: 0;
+}
+
+.reception-shipping__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.reception-shipping__icon svg {
+  width: 13px;
+  height: 13px;
+  display: block;
 }
 
 /* Réservations sub-page: two stacked sections with action column */
