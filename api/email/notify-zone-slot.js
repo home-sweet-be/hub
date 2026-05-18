@@ -111,13 +111,28 @@ function renderEmail({ firstName, orderName, zoneName, slotDate, url }) {
           Bonne nouvelle : votre commande <strong>${orderName}</strong> est prête.
         </p>
         ${dateLine}
-        <p style="margin:0 0 24px;color:#4a4a4f;line-height:1.5;">
-          Cliquez ci-dessous pour choisir le créneau qui vous arrange.
+        <p style="margin:0 0 20px;color:#4a4a4f;line-height:1.5;">
+          Pour réserver votre créneau, cliquez sur le bouton ci-dessous, ou
+          rendez-vous dans votre compte client.
         </p>
-        <p style="margin:0 0 24px;">
-          <a href="${url}" style="display:inline-block;background:#1c1a17;color:#ffffff;text-decoration:none;padding:14px 28px;border-radius:10px;font-weight:500;font-size:14px;letter-spacing:0.04em;text-transform:uppercase;">
-            Choisir mon créneau
-          </a>
+        <table role="presentation" cellpadding="0" cellspacing="0" style="margin:0 0 24px;">
+          <tr>
+            <td style="padding-right:10px;">
+              <a href="${url}" style="display:inline-block;background:#1c1a17;color:#ffffff;text-decoration:none;padding:14px 28px;border-radius:10px;font-weight:500;font-size:14px;letter-spacing:0.04em;text-transform:uppercase;">
+                Choisir mon créneau
+              </a>
+            </td>
+            <td>
+              <a href="https://home-sweet.be/account" style="display:inline-block;background:#ffffff;color:#1c1a17;text-decoration:none;padding:13px 27px;border:1px solid #1c1a17;border-radius:10px;font-weight:500;font-size:14px;letter-spacing:0.04em;text-transform:uppercase;">
+                Mon compte
+              </a>
+            </td>
+          </tr>
+        </table>
+        <p style="margin:0 0 14px;color:#4a4a4f;font-size:13px;line-height:1.5;">
+          Une question ? Écrivez-nous à
+          <a href="mailto:contact@home-sweet.be" style="color:#1c1a17;">contact@home-sweet.be</a>,
+          nous sommes là pour vous aider.
         </p>
         <p style="margin:0;color:#8a8a8e;font-size:12px;line-height:1.5;">
           Si vous avez déjà réservé un créneau, vous pouvez ignorer cet email.<br/>
