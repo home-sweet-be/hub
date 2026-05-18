@@ -474,169 +474,209 @@ export default function PlanificationLivraison() {
           </section>
         )}
 
-        {step === 'quiz' && order && (
-          <section className="plani__card plani__card--quiz">
-            {quizStep === 'rdc' && (
-              <div className="plani-quiz">
-                <img
-                  className="plani-quiz__image"
-                  src="https://cdn.shopify.com/s/files/1/0919/0581/8947/files/rdc.jpg?v=1762362965"
-                  alt=""
-                />
-                <div className="plani-quiz__body">
-                  <p className="plani-quiz__question">
-                    Votre logement est-il au rez-de-chaussée ?
-                  </p>
-                  <div className="plani-quiz__actions">
-                    <button
-                      type="button"
-                      className="plani-quiz__btn plani-quiz__btn--primary"
-                      onClick={() => setStep('pick')}
-                    >
-                      Oui
-                    </button>
-                    <button
-                      type="button"
-                      className="plani-quiz__btn"
-                      onClick={() => setQuizStep('ascenseur')}
-                    >
-                      Non
-                    </button>
+        {step === 'quiz' && order && (() => {
+          const tier = shippingTierKey(order.shippingLine)
+          const tierLabel = tier === 'premium' ? 'Premium' : 'Confort'
+          const STEP_INDEX = {
+            rdc: 1,
+            ascenseur: 2,
+            dimensions: 3,
+            'ascenseur-taille': 4,
+          }
+          const idx = STEP_INDEX[quizStep] || null
+          const totalSteps = 4
+          return (
+            <section className="plani__card plani__card--quiz">
+              <header className="plani-quiz__header">
+                <span className="plani-quiz__tier">Livraison {tierLabel}</span>
+                <h2 className="plani-quiz__title">
+                  Quelques questions pour préparer votre livraison
+                </h2>
+                <p className="plani-quiz__intro">
+                  Vos réponses nous permettent de garantir une livraison sans accroc le jour J.
+                </p>
+                <div className="plani-quiz__progress">
+                  <div className="plani-quiz__progress-label">
+                    {idx ? `Étape ${idx} sur ${totalSteps}` : 'Récapitulatif'}
+                  </div>
+                  <div className="plani-quiz__progress-bar">
+                    <div
+                      className="plani-quiz__progress-fill"
+                      style={{ width: `${((idx ?? totalSteps) / totalSteps) * 100}%` }}
+                    />
                   </div>
                 </div>
-              </div>
-            )}
+              </header>
 
-            {quizStep === 'ascenseur' && (
-              <div className="plani-quiz">
-                <img
-                  className="plani-quiz__image"
-                  src="https://cdn.shopify.com/s/files/1/0919/0581/8947/files/ascenseur.jpg?v=1762362965"
-                  alt=""
-                />
-                <div className="plani-quiz__body">
-                  <p className="plani-quiz__question">
-                    Disposez-vous d'un ascenseur ?
-                  </p>
-                  <div className="plani-quiz__actions">
-                    <button
-                      type="button"
-                      className="plani-quiz__btn plani-quiz__btn--primary"
-                      onClick={() => setQuizStep('dimensions')}
-                    >
-                      Oui
-                    </button>
-                    <button
-                      type="button"
-                      className="plani-quiz__btn"
-                      onClick={() => {
-                        setMonteChargeRequired(true)
-                        setQuizStep('monte-charge')
-                      }}
-                    >
-                      Non
-                    </button>
+              {quizStep === 'rdc' && (
+                <div className="plani-quiz">
+                  <img
+                    className="plani-quiz__image"
+                    src="https://cdn.shopify.com/s/files/1/0919/0581/8947/files/rdc.jpg?v=1762362965"
+                    alt=""
+                  />
+                  <div className="plani-quiz__body">
+                    <p className="plani-quiz__question">
+                      Votre logement est-il au rez-de-chaussée ?
+                    </p>
+                    <div className="plani-quiz__actions">
+                      <button
+                        type="button"
+                        className="plani-quiz__btn plani-quiz__btn--primary"
+                        onClick={() => setStep('pick')}
+                      >
+                        Oui
+                      </button>
+                      <button
+                        type="button"
+                        className="plani-quiz__btn"
+                        onClick={() => setQuizStep('ascenseur')}
+                      >
+                        Non
+                      </button>
+                    </div>
                   </div>
                 </div>
-              </div>
-            )}
+              )}
 
-            {quizStep === 'dimensions' && (
-              <div className="plani-quiz">
-                <img
-                  className="plani-quiz__image"
-                  src="https://cdn.shopify.com/s/files/1/0919/0581/8947/files/gif_dimensions.gif?v=1762303981"
-                  alt=""
-                />
-                <div className="plani-quiz__body">
-                  <p className="plani-quiz__question">
-                    Avez-vous vérifié les dimensions des colis sur la fiche produit ?
-                  </p>
-                  <div className="plani-quiz__actions">
-                    <button
-                      type="button"
-                      className="plani-quiz__btn plani-quiz__btn--primary"
-                      onClick={() => setQuizStep('ascenseur-taille')}
-                    >
-                      Oui
-                    </button>
-                    <a
-                      href="https://home-sweet.be/collections/canapes"
-                      target="_blank"
-                      rel="noreferrer"
-                      className="plani-quiz__btn"
-                    >
-                      Non, je vais vérifier
-                    </a>
+              {quizStep === 'ascenseur' && (
+                <div className="plani-quiz">
+                  <img
+                    className="plani-quiz__image"
+                    src="https://cdn.shopify.com/s/files/1/0919/0581/8947/files/ascenseur.jpg?v=1762362965"
+                    alt=""
+                  />
+                  <div className="plani-quiz__body">
+                    <p className="plani-quiz__question">
+                      Disposez-vous d'un ascenseur ?
+                    </p>
+                    <div className="plani-quiz__actions">
+                      <button
+                        type="button"
+                        className="plani-quiz__btn plani-quiz__btn--primary"
+                        onClick={() => setQuizStep('dimensions')}
+                      >
+                        Oui
+                      </button>
+                      <button
+                        type="button"
+                        className="plani-quiz__btn"
+                        onClick={() => setQuizStep('monte-charge')}
+                      >
+                        Non
+                      </button>
+                    </div>
                   </div>
                 </div>
-              </div>
-            )}
+              )}
 
-            {quizStep === 'ascenseur-taille' && (
-              <div className="plani-quiz">
-                <img
-                  className="plani-quiz__image"
-                  src="https://cdn.shopify.com/s/files/1/0919/0581/8947/files/mesure_ascenceur.jpg?v=1762362965"
-                  alt=""
-                />
-                <div className="plani-quiz__body">
-                  <p className="plani-quiz__question">
-                    L'ascenseur est-il assez grand pour les colis ?
-                  </p>
-                  <div className="plani-quiz__actions">
-                    <button
-                      type="button"
-                      className="plani-quiz__btn plani-quiz__btn--primary"
-                      onClick={() => setStep('pick')}
-                    >
-                      Oui
-                    </button>
-                    <button
-                      type="button"
-                      className="plani-quiz__btn"
-                      onClick={() => {
-                        setMonteChargeRequired(true)
-                        setQuizStep('monte-charge')
-                      }}
-                    >
-                      Non
-                    </button>
+              {quizStep === 'dimensions' && (
+                <div className="plani-quiz">
+                  <img
+                    className="plani-quiz__image"
+                    src="https://cdn.shopify.com/s/files/1/0919/0581/8947/files/gif_dimensions.gif?v=1762303981"
+                    alt=""
+                  />
+                  <div className="plani-quiz__body">
+                    <p className="plani-quiz__question">
+                      Avez-vous vérifié les dimensions des colis sur la fiche produit ?
+                    </p>
+                    <div className="plani-quiz__actions">
+                      <button
+                        type="button"
+                        className="plani-quiz__btn plani-quiz__btn--primary"
+                        onClick={() => setQuizStep('ascenseur-taille')}
+                      >
+                        Oui
+                      </button>
+                      <a
+                        href="https://home-sweet.be/collections/canapes"
+                        target="_blank"
+                        rel="noreferrer"
+                        className="plani-quiz__btn"
+                      >
+                        Non, je vais vérifier
+                      </a>
+                    </div>
                   </div>
                 </div>
-              </div>
-            )}
+              )}
 
-            {quizStep === 'monte-charge' && (
-              <div className="plani-quiz">
-                <img
-                  className="plani-quiz__image"
-                  src="https://cdn.shopify.com/s/files/1/0919/0581/8947/files/monte_charges.jpg?v=1762305635"
-                  alt=""
-                />
-                <div className="plani-quiz__body">
-                  <p className="plani-quiz__question">
-                    Un monte-charges est nécessaire.
-                  </p>
-                  <p className="plani-quiz__note">
-                    Vous serez invité à réserver un monte-charges pour la
-                    livraison dans votre logement. Sans réservation, vous serez
-                    livré au pied du camion.
-                  </p>
-                  <div className="plani-quiz__actions">
-                    <button
-                      type="button"
-                      className="plani-quiz__btn plani-quiz__btn--primary"
-                      onClick={() => setStep('pick')}
-                    >
-                      Continuer
-                    </button>
+              {quizStep === 'ascenseur-taille' && (
+                <div className="plani-quiz">
+                  <img
+                    className="plani-quiz__image"
+                    src="https://cdn.shopify.com/s/files/1/0919/0581/8947/files/mesure_ascenceur.jpg?v=1762362965"
+                    alt=""
+                  />
+                  <div className="plani-quiz__body">
+                    <p className="plani-quiz__question">
+                      L'ascenseur est-il assez grand pour les colis ?
+                    </p>
+                    <div className="plani-quiz__actions">
+                      <button
+                        type="button"
+                        className="plani-quiz__btn plani-quiz__btn--primary"
+                        onClick={() => setStep('pick')}
+                      >
+                        Oui
+                      </button>
+                      <button
+                        type="button"
+                        className="plani-quiz__btn"
+                        onClick={() => setQuizStep('monte-charge')}
+                      >
+                        Non
+                      </button>
+                    </div>
                   </div>
                 </div>
-              </div>
-            )}
-          </section>
-        )}
+              )}
+
+              {quizStep === 'monte-charge' && (
+                <div className="plani-quiz">
+                  <img
+                    className="plani-quiz__image"
+                    src="https://cdn.shopify.com/s/files/1/0919/0581/8947/files/monte_charges.jpg?v=1762305635"
+                    alt=""
+                  />
+                  <div className="plani-quiz__body">
+                    <p className="plani-quiz__question">
+                      Réservation d'un monte-charges
+                    </p>
+                    <p className="plani-quiz__note">
+                      D'après vos réponses, un monte-charges est nécessaire pour
+                      acheminer vos colis dans votre logement. Souhaitez-vous le
+                      réserver ?
+                    </p>
+                    <div className="plani-quiz__actions plani-quiz__actions--stacked">
+                      <button
+                        type="button"
+                        className="plani-quiz__btn plani-quiz__btn--primary"
+                        onClick={() => {
+                          setMonteChargeRequired(true)
+                          setStep('pick')
+                        }}
+                      >
+                        Oui, je réserve un monte-charges
+                      </button>
+                      <button
+                        type="button"
+                        className="plani-quiz__btn"
+                        onClick={() => {
+                          setMonteChargeRequired(false)
+                          setStep('pick')
+                        }}
+                      >
+                        Non, livraison au pied du camion
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </section>
+          )
+        })()}
 
         {step === 'pick' && order && (
           <section className="plani__card plani__card--wide">
