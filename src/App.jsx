@@ -60,8 +60,13 @@ function Shell() {
   // double-scrollbar issue. We measure .hub-shell rather than documentElement
   // to avoid the feedback loop where the iframe's own viewport inflates the
   // measured height.
+  //
+  // We also tag <html> with .is-iframed so the CSS can drop min-height:100vh
+  // on .hub-shell — otherwise the shell stays stuck at the previous (taller)
+  // iframe viewport when navigating from a long page to a shorter one.
   useEffect(() => {
     if (window === window.parent) return
+    document.documentElement.classList.add('is-iframed')
     let lastH = 0
     const post = () => {
       const el = document.querySelector('.hub-shell')
@@ -86,6 +91,7 @@ function Shell() {
     return () => {
       ro.disconnect()
       window.removeEventListener('load', post)
+      document.documentElement.classList.remove('is-iframed')
     }
   }, [])
 

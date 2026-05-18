@@ -67,6 +67,13 @@
   gap: 16px;
 }
 
+/* When the hub is iframed, drop the 100vh floor — otherwise the shell
+   stays stuck at the previous (taller) iframe viewport when navigating
+   from a long page (Commandes) to a shorter one (Rapports, etc.). */
+.is-iframed .hub-shell {
+  min-height: 0;
+}
+
 /* =========================================================
    Header
    ========================================================= */
