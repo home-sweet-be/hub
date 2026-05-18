@@ -5489,3 +5489,340 @@ body:has(.plani),
   background: #d70015;
 }
 
+/* ---------------- Livraisons Semaine (3rd tab) ---------------- */
+.semaine {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  padding: 4px 4px 32px;
+}
+
+.semaine__summary {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 10px;
+  padding: 12px 18px;
+  background: rgba(255, 149, 0, 0.08);
+  border: 1px solid rgba(255, 149, 0, 0.2);
+  border-radius: 12px;
+  align-self: flex-start;
+}
+
+.semaine__summary-count {
+  font-size: 24px;
+  font-weight: 700;
+  color: #b35900;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+}
+
+.semaine__summary-label {
+  font-size: 14px;
+  color: #6b4a14;
+}
+
+.semaine__loading,
+.semaine__error,
+.semaine__empty {
+  padding: 32px;
+  background: rgba(28, 28, 30, 0.03);
+  border-radius: 14px;
+  text-align: center;
+  color: var(--text-soft);
+}
+
+.semaine__empty h3 {
+  margin: 0 0 8px;
+  font-size: 16px;
+  color: var(--text);
+}
+
+.semaine__empty p {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.semaine__day {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.semaine__day-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  padding: 0 4px;
+  border-bottom: 1px solid rgba(28, 28, 30, 0.08);
+  padding-bottom: 8px;
+}
+
+.semaine__day-title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text);
+  letter-spacing: -0.01em;
+  text-transform: capitalize;
+}
+
+.semaine__day-count {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-soft);
+  letter-spacing: 0.04em;
+}
+
+.semaine__cards {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.semaine__card {
+  display: grid;
+  grid-template-columns: 130px 1fr;
+  gap: 20px;
+  padding: 18px 20px;
+  background: #ffffff;
+  border: 1px solid rgba(28, 28, 30, 0.08);
+  border-left: 4px solid rgba(28, 28, 30, 0.2);
+  border-radius: 14px;
+  transition: box-shadow 0.15s, transform 0.05s;
+}
+
+.semaine__card:hover {
+  box-shadow: 0 6px 22px -10px rgba(0, 0, 0, 0.18);
+}
+
+.semaine__card--standard { border-left-color: #8a8a8e; }
+.semaine__card--confort { border-left-color: #0a84ff; }
+.semaine__card--premium { border-left-color: #5e5ce6; }
+.semaine__card--mc { border-left-color: #ff9500; }
+
+.semaine__time {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  font-variant-numeric: tabular-nums;
+}
+
+.semaine__time-start {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+
+.semaine__time-sep {
+  color: var(--text-soft);
+  font-size: 13px;
+}
+
+.semaine__time-end {
+  font-size: 14px;
+  color: var(--text-soft);
+  letter-spacing: -0.01em;
+}
+
+.semaine__body {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+}
+
+.semaine__top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.semaine__top-left {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.semaine__order {
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--text);
+  text-decoration: none;
+  padding: 3px 8px;
+  border-radius: 6px;
+  background: rgba(28, 28, 30, 0.06);
+  font-variant-numeric: tabular-nums;
+}
+
+a.semaine__order:hover {
+  background: rgba(28, 28, 30, 0.1);
+}
+
+.semaine__customer {
+  font-weight: 500;
+  font-size: 15px;
+  color: var(--text);
+}
+
+.semaine__top-right {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+}
+
+.semaine__tier {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  padding: 3px 9px;
+  border-radius: 6px;
+  text-transform: uppercase;
+}
+
+.semaine__tier--standard { background: rgba(138, 138, 142, 0.18); color: #4a4a4f; }
+.semaine__tier--confort { background: rgba(10, 132, 255, 0.14); color: #0050b3; }
+.semaine__tier--premium { background: rgba(94, 92, 230, 0.14); color: #3a36c4; }
+
+.semaine__badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  padding: 3px 9px;
+  border-radius: 6px;
+  white-space: nowrap;
+}
+
+.semaine__badge--mc {
+  background: rgba(255, 149, 0, 0.16);
+  color: #b35900;
+}
+
+.semaine__zone {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--text-soft);
+  padding: 3px 8px 3px 6px;
+  border-radius: 6px;
+  background: rgba(28, 28, 30, 0.04);
+}
+
+.semaine__zone img,
+.semaine__zone svg {
+  width: 14px;
+  height: 14px;
+}
+
+.semaine__address {
+  display: flex;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--text-soft);
+  line-height: 1.4;
+}
+
+.semaine__items {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background: rgba(28, 28, 30, 0.025);
+  border-radius: 10px;
+  padding: 10px 12px;
+}
+
+.semaine__item {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.semaine__item-img {
+  width: 44px;
+  height: 44px;
+  border-radius: 8px;
+  object-fit: cover;
+  flex-shrink: 0;
+  background: #f0f0f2;
+}
+
+.semaine__item-img--placeholder {
+  background: rgba(28, 28, 30, 0.08);
+}
+
+.semaine__item-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.semaine__item-title {
+  font-size: 13.5px;
+  color: var(--text);
+  line-height: 1.35;
+}
+
+.semaine__item-qty {
+  font-weight: 700;
+  color: var(--text);
+  margin-right: 2px;
+}
+
+.semaine__item-variant {
+  font-size: 12px;
+  color: var(--text-soft);
+  margin-top: 2px;
+}
+
+.semaine__contact {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.semaine__chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  color: var(--text-soft);
+  text-decoration: none;
+  padding: 4px 9px;
+  border-radius: 999px;
+  background: rgba(28, 28, 30, 0.05);
+}
+
+.semaine__chip:hover {
+  background: rgba(28, 28, 30, 0.1);
+  color: var(--text);
+}
+
+@media (max-width: 720px) {
+  .semaine__card {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  .semaine__time {
+    flex-direction: row;
+    align-items: baseline;
+    gap: 8px;
+  }
+  .semaine__time-start {
+    font-size: 18px;
+  }
+}
+

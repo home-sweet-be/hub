@@ -7,6 +7,7 @@ import Logistique from './pages/Logistique'
 import Livraisons from './pages/Livraisons'
 import LivraisonsPlanifier from './pages/LivraisonsPlanifier'
 import LivraisonsReservations from './pages/LivraisonsReservations'
+import LivraisonsSemaine from './pages/LivraisonsSemaine'
 import Compta from './pages/Compta'
 import Rapports from './pages/Rapports'
 import PlanificationLivraison from './pages/PlanificationLivraison'
@@ -206,6 +207,7 @@ export default function App() {
             <Route index element={<Navigate to="waitinglist" replace />} />
             <Route path="waitinglist" element={<LivraisonsReservations />} />
             <Route path="planifier" element={<LivraisonsPlanifier />} />
+            <Route path="semaine" element={<LivraisonsSemaine />} />
           </Route>
           <Route path="compta" element={<Compta />} />
           <Route path="factures" element={<Navigate to="/commandes" replace />} />

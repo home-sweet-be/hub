@@ -4,6 +4,7 @@ import { NavLink, Outlet } from 'react-router-dom'
 const STEPS = [
   { to: 'waitinglist', label: "File d'attente", color: '#34c759' },
   { to: 'planifier', label: 'Planifier', color: '#0a84ff' },
+  { to: 'semaine', label: 'Livraisons', color: '#ff9500' },
 ]
 
 export default function Livraisons() {
