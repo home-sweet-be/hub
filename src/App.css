@@ -5119,7 +5119,7 @@ body:has(.plani),
 /* ---------------- Plani toast (slot creation feedback) ---------------- */
 .plani-toast {
   position: fixed;
-  bottom: 24px;
+  top: 24px;
   right: 24px;
   max-width: 420px;
   padding: 14px 44px 14px 18px;
@@ -5134,7 +5134,7 @@ body:has(.plani),
 }
 
 @keyframes plani-toast-in {
-  from { transform: translateY(8px); opacity: 0; }
+  from { transform: translateY(-8px); opacity: 0; }
   to { transform: translateY(0); opacity: 1; }
 }
 
