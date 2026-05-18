@@ -580,6 +580,19 @@
     <!-- COLONNE PRINCIPALE -->
     <div>
 
+      <!-- Extract 'Delivery Date' from order custom attributes (injected by
+           the hub when the customer books a slot). Fall back to the legacy
+           metafield for older orders. -->
+      {%- assign delivery_date = '' -%}
+      {%- for attr in order.note_attributes -%}
+        {%- if attr.name == 'Delivery Date' and attr.value != blank -%}
+          {%- assign delivery_date = attr.value -%}
+        {%- endif -%}
+      {%- endfor -%}
+      {%- if delivery_date == blank and order.metafields.custom.date_de_livraison_client != blank -%}
+        {%- assign delivery_date = order.metafields.custom.date_de_livraison_client -%}
+      {%- endif -%}
+
       <!-- BLOC STATUT -->
 
       {%- if order.cancelled -%}
@@ -605,7 +618,7 @@
             <img src="https://cdn.shopify.com/s/files/1/0919/0581/8947/files/iconcamion.png?v=1753216842" alt="Prêt">
           </div>
 
-          {%- if order.metafields.custom.date_de_livraison_client != blank -%}
+          {%- if delivery_date != blank -%}
 
             <h3 class="hs-status-ready__title">Créneau de livraison confirmé</h3>
             <p class="hs-status-ready__sub">Votre commande sera livrée à la date suivante :</p>
@@ -613,7 +626,7 @@
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                 <rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
               </svg>
-              {{ order.metafields.custom.date_de_livraison_client }}
+              {{ delivery_date | date: "%A %d %B %Y" }}
             </div>
 
           {%- else -%}
@@ -646,7 +659,7 @@
         <div class="hs-status-progress"
              id="order-status"
              data-order-date="{{ order_date_iso }}"
-             data-date-livraison="{{ order.metafields.custom.date_de_livraison_client }}">
+             data-date-livraison="{{ delivery_date }}">
           <div class="hs-status-progress__bar-track">
             <div class="hs-status-progress__bar-fill" id="progress-bar-fill"></div>
           </div>
