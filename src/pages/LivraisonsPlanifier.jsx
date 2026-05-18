@@ -525,8 +525,25 @@ export default function LivraisonsPlanifier() {
           load()
           refreshPriorities()
           if (notify) {
-            setNotifyToast(notify)
-            setTimeout(() => setNotifyToast(null), 8000)
+            // When iframed, let the parent Shopify page render the toast so
+            // it can be pinned to the real browser viewport. Inside the
+            // iframe, position:fixed pins to the (tall) iframe rect — the
+            // toast would land below the fold.
+            if (window !== window.parent) {
+              try {
+                window.parent.postMessage(
+                  { type: 'homesweet:toast', payload: notify },
+                  '*'
+                )
+              } catch {
+                // fall back to in-iframe toast
+                setNotifyToast(notify)
+                setTimeout(() => setNotifyToast(null), 8000)
+              }
+            } else {
+              setNotifyToast(notify)
+              setTimeout(() => setNotifyToast(null), 8000)
+            }
           }
         }}
         onChanged={() => {
