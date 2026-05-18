@@ -55,6 +55,40 @@ function Shell() {
     }
   }, [drawerOpen])
 
+  // When iframed (e.g. embedded on a Shopify page), post the actual content
+  // height to the parent so the iframe can grow to fit and we avoid the
+  // double-scrollbar issue. We measure .hub-shell rather than documentElement
+  // to avoid the feedback loop where the iframe's own viewport inflates the
+  // measured height.
+  useEffect(() => {
+    if (window === window.parent) return
+    let lastH = 0
+    const post = () => {
+      const el = document.querySelector('.hub-shell')
+      if (!el) return
+      const h = Math.ceil(el.getBoundingClientRect().height)
+      if (Math.abs(h - lastH) < 2) return
+      lastH = h
+      try {
+        window.parent.postMessage(
+          { type: 'homesweet:hub-height', height: h },
+          '*'
+        )
+      } catch {
+        // ignore
+      }
+    }
+    post()
+    const target = document.querySelector('.hub-shell')
+    const ro = new ResizeObserver(post)
+    if (target) ro.observe(target)
+    window.addEventListener('load', post)
+    return () => {
+      ro.disconnect()
+      window.removeEventListener('load', post)
+    }
+  }, [])
+
   return (
     <ReloadContext.Provider value={{ reloadKey, reloading, triggerReload }}>
     <div className="hub-shell">
