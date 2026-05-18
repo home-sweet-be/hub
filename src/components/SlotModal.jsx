@@ -585,27 +585,35 @@ export default function SlotModal({ open, editing, onClose, onSaved, onChanged }
       if (res.error) throw res.error
 
       // On creation only, notify waiting-list customers in the matching zones.
-      // Best-effort: a failure here shouldn't roll back the slot.
+      // We await the response (best-effort) so we can surface the count to
+      // the user — failures here still don't roll back the slot.
+      let notifySummary = null
       if (isNew) {
         try {
-          fetch('/api/email/notify-zone-slot', {
+          const r = await fetch('/api/email/notify-zone-slot', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
               zones: [...zones],
               slotDate: day,
             }),
-          }).catch((err) => {
-            // eslint-disable-next-line no-console
-            console.warn('notify-zone-slot network:', err)
           })
+          const data = await r.json().catch(() => null)
+          // eslint-disable-next-line no-console
+          console.log('[notify-zone-slot]', r.status, data)
+          if (r.ok && data) {
+            notifySummary = data
+          } else {
+            notifySummary = { error: data?.error || `HTTP ${r.status}` }
+          }
         } catch (err) {
           // eslint-disable-next-line no-console
-          console.warn('notify-zone-slot:', err)
+          console.warn('notify-zone-slot network:', err)
+          notifySummary = { error: err.message || 'Erreur réseau' }
         }
       }
 
-      onSaved?.()
+      onSaved?.(notifySummary)
     } catch (e) {
       setError(e.message || String(e))
     } finally {

@@ -5109,6 +5109,64 @@ body:has(.plani),
   }
 }
 
+/* ---------------- Plani toast (slot creation feedback) ---------------- */
+.plani-toast {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  max-width: 420px;
+  padding: 14px 44px 14px 18px;
+  border-radius: 12px;
+  font-size: 14px;
+  line-height: 1.45;
+  background: #1c1a17;
+  color: #ffffff;
+  box-shadow: 0 18px 40px -12px rgba(0, 0, 0, 0.35);
+  z-index: 1200;
+  animation: plani-toast-in 0.25s cubic-bezier(0.2, 0.9, 0.3, 1.1);
+}
+
+@keyframes plani-toast-in {
+  from { transform: translateY(8px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.plani-toast--success {
+  background: #1c5d3a;
+}
+
+.plani-toast--error {
+  background: #b3261e;
+}
+
+.plani-toast--info {
+  background: #4a4a4f;
+}
+
+.plani-toast strong {
+  font-weight: 600;
+}
+
+.plani-toast__close {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: transparent;
+  border: 0;
+  color: inherit;
+  opacity: 0.7;
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 6px;
+}
+
+.plani-toast__close:hover {
+  opacity: 1;
+  background: rgba(255, 255, 255, 0.1);
+}
+
 /* ---------------- Plani delivery quiz ---------------- */
 .plani:has(.plani__card--quiz) {
   min-height: 100vh;

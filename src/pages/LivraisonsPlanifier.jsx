@@ -78,6 +78,9 @@ export default function LivraisonsPlanifier() {
   const [upcomingSlots, setUpcomingSlots] = useState(null)
   const [upcomingBookings, setUpcomingBookings] = useState({})
   const [priorityVersion, setPriorityVersion] = useState(0)
+  // Brief toast shown after a slot is created, reporting how many waiting-list
+  // customers were notified by email.
+  const [notifyToast, setNotifyToast] = useState(null)
 
   const refreshPriorities = useCallback(() => {
     setPriorityVersion((v) => v + 1)
@@ -517,16 +520,49 @@ export default function LivraisonsPlanifier() {
         open={!!editing}
         editing={editing}
         onClose={() => setEditing(null)}
-        onSaved={() => {
+        onSaved={(notify) => {
           setEditing(null)
           load()
           refreshPriorities()
+          if (notify) {
+            setNotifyToast(notify)
+            setTimeout(() => setNotifyToast(null), 8000)
+          }
         }}
         onChanged={() => {
           load()
           refreshPriorities()
         }}
       />
+
+      {notifyToast && (
+        <div
+          className={`plani-toast ${notifyToast.error ? 'plani-toast--error' : notifyToast.sent > 0 ? 'plani-toast--success' : 'plani-toast--info'}`}
+          role="status"
+        >
+          {notifyToast.error ? (
+            <>
+              <strong>Notification email échouée :</strong> {notifyToast.error}
+            </>
+          ) : notifyToast.sent > 0 ? (
+            <>
+              <strong>✓ {notifyToast.sent} email{notifyToast.sent > 1 ? 's' : ''} envoyé{notifyToast.sent > 1 ? 's' : ''}</strong>
+              {' '}aux clients en attente sur cette zone.
+              {notifyToast.failed > 0 && ` (${notifyToast.failed} échec${notifyToast.failed > 1 ? 's' : ''})`}
+            </>
+          ) : (
+            <>Aucun client en attente sur cette zone — aucun email envoyé.</>
+          )}
+          <button
+            className="plani-toast__close"
+            type="button"
+            onClick={() => setNotifyToast(null)}
+            aria-label="Fermer"
+          >
+            ×
+          </button>
+        </div>
+      )}
     </div>
   )
 }

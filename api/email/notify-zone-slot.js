@@ -161,6 +161,8 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: 'zones must be a non-empty array' })
   }
 
+  console.log('[notify-zone-slot] start', { zones, slotDate, from: FROM })
+
   const supabase = createClient(supaUrl, supaKey)
   const resend = new Resend(apiKey)
 
@@ -169,8 +171,10 @@ export default async function handler(req, res) {
   try {
     orders = await fetchWaitingOrders(domain, token)
   } catch (e) {
+    console.error('[notify-zone-slot] fetchWaitingOrders failed:', e.message)
     return res.status(500).json({ error: 'fetchWaitingOrders failed', message: e.message })
   }
+  console.log('[notify-zone-slot] waiting orders fetched:', orders.length)
 
   // 2. Fetch confirmed bookings to skip.
   const bookedRes = await supabase
@@ -198,6 +202,11 @@ export default async function handler(req, res) {
       zone,
     })
   }
+
+  console.log('[notify-zone-slot] targets after filter:', targets.length, {
+    booked: bookedNames.size,
+    zones: [...zoneSet],
+  })
 
   if (targets.length === 0) {
     return res.status(200).json({ sent: 0, skipped: orders.length, targets: [] })
@@ -231,21 +240,21 @@ export default async function handler(req, res) {
         html,
       })
       if (error) {
+        console.error('[notify-zone-slot] resend error for', t.email, error)
         results.push({ email: t.email, ok: false, error: error.message || String(error) })
       } else {
+        console.log('[notify-zone-slot] sent', t.email, 'id:', data?.id)
         results.push({ email: t.email, ok: true, id: data?.id })
       }
     } catch (e) {
+      console.error('[notify-zone-slot] resend threw for', t.email, e)
       results.push({ email: t.email, ok: false, error: e.message || String(e) })
     }
   }
 
   const sent = results.filter((r) => r.ok).length
   const failed = results.length - sent
-  return res.status(200).json({
-    sent,
-    failed,
-    skipped: orders.length - targets.length,
-    results,
-  })
+  const skipped = orders.length - targets.length
+  console.log('[notify-zone-slot] done', { sent, failed, skipped })
+  return res.status(200).json({ sent, failed, skipped, results })
 }
