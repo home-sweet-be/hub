@@ -345,6 +345,14 @@ function BookingsList({ bookings, loading, onRemove, removingId }) {
                 >
                   {b.shopify_order_name}
                 </a>
+                {b.monte_charge_required && (
+                  <span
+                    className="slot-bookings__badge slot-bookings__badge--mc"
+                    title="Monte-charges réservé"
+                  >
+                    🛗 Monte-charges
+                  </span>
+                )}
                 {onRemove && (
                   <button
                     type="button"
@@ -449,7 +457,7 @@ export default function SlotModal({ open, editing, onClose, onSaved, onChanged }
       try {
         const { data: bks, error } = await supabase
           .from('delivery_bookings')
-          .select('id, shopify_order_name, status, created_at')
+          .select('id, shopify_order_name, status, created_at, monte_charge_required')
           .eq('slot_id', editing.slot.id)
           .eq('status', 'confirmed')
         if (error) throw error

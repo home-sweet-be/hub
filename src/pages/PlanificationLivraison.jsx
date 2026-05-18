@@ -668,7 +668,7 @@ export default function PlanificationLivraison() {
                           setStep('pick')
                         }}
                       >
-                        Non, livraison au pied du camion
+                        Non, je prend le risque
                       </button>
                     </div>
                   </div>

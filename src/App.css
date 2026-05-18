@@ -3611,6 +3611,23 @@
   color: var(--text);
 }
 
+.slot-bookings__badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  padding: 2px 8px;
+  border-radius: 6px;
+  white-space: nowrap;
+}
+
+.slot-bookings__badge--mc {
+  background: rgba(255, 149, 0, 0.14);
+  color: #b35900;
+}
+
 .slot-bookings__remove {
   display: inline-flex;
   align-items: center;
@@ -5175,12 +5192,9 @@ body:has(.plani),
 }
 
 /* ---------------- Plani delivery quiz ---------------- */
-.plani:has(.plani__card--quiz) {
-  min-height: 100vh;
-}
-
 .plani:has(.plani__card--quiz) .plani__main {
-  align-items: center;
+  align-items: flex-start;
+  padding-top: 48px;
 }
 
 .plani__card--quiz {
