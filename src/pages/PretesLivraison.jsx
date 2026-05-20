@@ -97,7 +97,7 @@ export default function PretesLivraison() {
     return fetch(
       '/api/shopify/receptions?q=' +
         encodeURIComponent(
-          `created_at:>=${cutoff} AND tag:PretPourLaLivraison AND NOT tag:WaitingList AND NOT tag:removed AND status:open AND NOT financial_status:refunded AND NOT financial_status:partially_refunded`
+          `created_at:>=${cutoff} AND tag:PretPourLaLivraison AND NOT tag:WaitingList AND NOT tag:removed AND status:open AND NOT fulfillment_status:fulfilled AND NOT financial_status:refunded AND NOT financial_status:partially_refunded`
         ) +
         '&first=100'
     )
