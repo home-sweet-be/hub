@@ -5497,6 +5497,14 @@ body:has(.plani),
   padding: 4px 4px 32px;
 }
 
+.semaine__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
 .semaine__summary {
   display: inline-flex;
   align-items: baseline;
@@ -5506,6 +5514,26 @@ body:has(.plani),
   border: 1px solid rgba(255, 149, 0, 0.2);
   border-radius: 12px;
   align-self: flex-start;
+}
+
+.semaine__easyroutes {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 12px;
+  overflow: hidden;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  line-height: 0;
+}
+
+.semaine__easyroutes:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px -6px rgba(0, 0, 0, 0.25);
+}
+
+.semaine__easyroutes img {
+  display: block;
+  height: 48px;
+  width: auto;
 }
 
 .semaine__summary-count {

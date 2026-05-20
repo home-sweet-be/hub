@@ -189,11 +189,22 @@ export default function LivraisonsSemaine() {
 
   return (
     <div className="semaine">
-      <div className="semaine__summary">
-        <span className="semaine__summary-count">{totalCount}</span>
-        <span className="semaine__summary-label">
-          livraison{totalCount > 1 ? 's' : ''} sur les 7 prochains jours
-        </span>
+      <div className="semaine__header">
+        <div className="semaine__summary">
+          <span className="semaine__summary-count">{totalCount}</span>
+          <span className="semaine__summary-label">
+            livraison{totalCount > 1 ? 's' : ''} sur les 7 prochains jours
+          </span>
+        </div>
+        <a
+          href="https://admin.shopify.com/store/homesweetbe/apps/easyroutes"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="semaine__easyroutes"
+          title="Ouvrir EasyRoutes"
+        >
+          <img src="/btn%20easy%20routes.jpg" alt="EasyRoutes" />
+        </a>
       </div>
 
       {days.map((day) => (
