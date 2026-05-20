@@ -77,7 +77,7 @@ export default function LivraisonsPlanifier() {
   const [waitingOrders, setWaitingOrders] = useState(null)
   const [upcomingSlots, setUpcomingSlots] = useState(null)
   const [upcomingBookings, setUpcomingBookings] = useState({})
-  const [bookedOrderNames, setBookedOrderNames] = useState(() => new Set())
+  const [bookedOrders, setBookedOrders] = useState(() => new Map())
   const [priorityVersion, setPriorityVersion] = useState(0)
   // Brief toast shown after a slot is created, reporting how many waiting-list
   // customers were notified by email.
@@ -171,6 +171,7 @@ export default function LivraisonsPlanifier() {
       setUpcomingSlots(list)
       if (list.length > 0) {
         const ids = list.map((s) => s.id)
+        const slotStarts = new Map(list.map((s) => [s.id, s.starts_at]))
         const { data: bks } = await supabase
           .from('delivery_bookings')
           .select('slot_id, shopify_order_name, status')
@@ -178,18 +179,19 @@ export default function LivraisonsPlanifier() {
           .eq('status', 'confirmed')
         if (cancelled) return
         const map = {}
-        const names = new Set()
+        const bookedMap = new Map()
         ;(bks || []).forEach((b) => {
           map[b.slot_id] = (map[b.slot_id] || 0) + 1
           if (b.shopify_order_name) {
-            names.add(String(b.shopify_order_name).replace(/^#/, ''))
+            const key = String(b.shopify_order_name).replace(/^#/, '')
+            bookedMap.set(key, slotStarts.get(b.slot_id) || null)
           }
         })
         setUpcomingBookings(map)
-        setBookedOrderNames(names)
+        setBookedOrders(bookedMap)
       } else {
         setUpcomingBookings({})
-        setBookedOrderNames(new Set())
+        setBookedOrders(new Map())
       }
     })()
 
@@ -259,7 +261,12 @@ export default function LivraisonsPlanifier() {
         const zone = extractZone(o)
         const covered = zone ? coveredZones.has(zone) : false
         const orderKey = String(o.name || '').replace(/^#/, '')
-        const booked = bookedOrderNames.has(orderKey)
+        const booked = bookedOrders.has(orderKey)
+        const bookedAt = booked ? bookedOrders.get(orderKey) : null
+        const cust = o.customer
+        const customerName = cust
+          ? [cust.firstName, cust.lastName].filter(Boolean).join(' ').trim()
+          : ''
         return {
           lat,
           lon,
@@ -269,11 +276,13 @@ export default function LivraisonsPlanifier() {
           product,
           covered,
           booked,
+          bookedAt,
+          customerName,
           tier: shippingTier(o.shippingLine?.title),
         }
       })
       .filter(Boolean)
-  }, [waitingOrders, coveredZones, bookedOrderNames])
+  }, [waitingOrders, coveredZones, bookedOrders])
 
   const days = useMemo(() => {
     const arr = []

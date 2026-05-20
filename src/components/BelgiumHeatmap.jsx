@@ -51,6 +51,8 @@ function pinsFeatureCollection(pins) {
         orderName: p.orderName || '',
         city: p.city || '',
         product: p.product || '',
+        customerName: p.customerName || '',
+        bookedAt: p.bookedAt || '',
         covered: p.covered ? 1 : 0,
         booked: p.booked ? 1 : 0,
         tier: p.tier || 'standard',
@@ -58,6 +60,25 @@ function pinsFeatureCollection(pins) {
       geometry: { type: 'Point', coordinates: [p.lon, p.lat] },
     })),
   }
+}
+
+const TIER_LABEL = { premium: 'Premium', confort: 'Confort', standard: 'Standard' }
+const TIER_COLOR = { premium: '#af52de', confort: '#ff9f0a', standard: '#9ba0a8' }
+
+function formatBookedAt(iso) {
+  if (!iso) return ''
+  const d = new Date(iso)
+  if (Number.isNaN(d.getTime())) return ''
+  const date = d.toLocaleDateString('fr-BE', {
+    weekday: 'short',
+    day: '2-digit',
+    month: 'short',
+  })
+  const time = d.toLocaleTimeString('fr-BE', {
+    hour: '2-digit',
+    minute: '2-digit',
+  })
+  return `${date} · ${time}`
 }
 
 export default function BelgiumHeatmap({
@@ -171,10 +192,11 @@ export default function BelgiumHeatmap({
         filter: ['==', ['get', 'booked'], 1],
         layout: {
           'text-field': '✓',
-          'text-size': 11,
+          'text-size': 8,
           'text-font': ['Open Sans Bold', 'Arial Unicode MS Bold'],
           'text-allow-overlap': true,
           'text-ignore-placement': true,
+          'text-offset': [0, 0.05],
         },
         paint: {
           'text-color': '#fff',
@@ -192,10 +214,32 @@ export default function BelgiumHeatmap({
         map.getCanvas().style.cursor = 'pointer'
         const f = e.features?.[0]
         if (!f) return
-        const { orderName, city, product } = f.properties
+        const {
+          orderName,
+          city,
+          product,
+          customerName,
+          bookedAt,
+          booked,
+          tier,
+        } = f.properties
+        const isBooked = String(booked) === '1'
+        const tierKey = String(tier || 'standard')
+        const tierLabel = TIER_LABEL[tierKey] || 'Standard'
+        const tierColor = TIER_COLOR[tierKey] || TIER_COLOR.standard
+        const bookedLabel = formatBookedAt(bookedAt)
         const html = `
-          <div class="bemap-popup__num">${escapeHtml(orderName)}</div>
-          ${city ? `<div class="bemap-popup__row"><span>📍</span>${escapeHtml(city)}</div>` : ''}
+          <div class="bemap-popup__head">
+            <div class="bemap-popup__num">${escapeHtml(orderName)}</div>
+            <span class="bemap-popup__tier" style="background:${tierColor}">${escapeHtml(tierLabel)}</span>
+          </div>
+          ${
+            isBooked
+              ? `<div class="bemap-popup__status bemap-popup__status--booked"><span class="bemap-popup__check">✓</span> Réservée${bookedLabel ? ` · ${escapeHtml(bookedLabel)}` : ''}</div>`
+              : `<div class="bemap-popup__status bemap-popup__status--waiting">En attente de réservation</div>`
+          }
+          ${customerName ? `<div class="bemap-popup__row"><span class="bemap-popup__ico">👤</span>${escapeHtml(customerName)}</div>` : ''}
+          ${city ? `<div class="bemap-popup__row"><span class="bemap-popup__ico">📍</span>${escapeHtml(city)}</div>` : ''}
           ${product ? `<div class="bemap-popup__row bemap-popup__row--product">${escapeHtml(product)}</div>` : ''}
         `
         popupRef.current
