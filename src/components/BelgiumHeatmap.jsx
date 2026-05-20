@@ -52,6 +52,7 @@ function pinsFeatureCollection(pins) {
         city: p.city || '',
         product: p.product || '',
         covered: p.covered ? 1 : 0,
+        booked: p.booked ? 1 : 0,
         tier: p.tier || 'standard',
       },
       geometry: { type: 'Point', coordinates: [p.lon, p.lat] },
@@ -161,6 +162,22 @@ export default function BelgiumHeatmap({
             'confort', 2.4,
             1.6,
           ],
+        },
+      })
+      map.addLayer({
+        id: 'pins-booked-check',
+        type: 'symbol',
+        source: 'pins',
+        filter: ['==', ['get', 'booked'], 1],
+        layout: {
+          'text-field': '✓',
+          'text-size': 11,
+          'text-font': ['Open Sans Bold', 'Arial Unicode MS Bold'],
+          'text-allow-overlap': true,
+          'text-ignore-placement': true,
+        },
+        paint: {
+          'text-color': '#fff',
         },
       })
 

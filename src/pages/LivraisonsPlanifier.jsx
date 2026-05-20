@@ -77,6 +77,7 @@ export default function LivraisonsPlanifier() {
   const [waitingOrders, setWaitingOrders] = useState(null)
   const [upcomingSlots, setUpcomingSlots] = useState(null)
   const [upcomingBookings, setUpcomingBookings] = useState({})
+  const [bookedOrderNames, setBookedOrderNames] = useState(() => new Set())
   const [priorityVersion, setPriorityVersion] = useState(0)
   // Brief toast shown after a slot is created, reporting how many waiting-list
   // customers were notified by email.
@@ -172,17 +173,23 @@ export default function LivraisonsPlanifier() {
         const ids = list.map((s) => s.id)
         const { data: bks } = await supabase
           .from('delivery_bookings')
-          .select('slot_id, status')
+          .select('slot_id, shopify_order_name, status')
           .in('slot_id', ids)
           .eq('status', 'confirmed')
         if (cancelled) return
         const map = {}
+        const names = new Set()
         ;(bks || []).forEach((b) => {
           map[b.slot_id] = (map[b.slot_id] || 0) + 1
+          if (b.shopify_order_name) {
+            names.add(String(b.shopify_order_name).replace(/^#/, ''))
+          }
         })
         setUpcomingBookings(map)
+        setBookedOrderNames(names)
       } else {
         setUpcomingBookings({})
+        setBookedOrderNames(new Set())
       }
     })()
 
@@ -251,6 +258,8 @@ export default function LivraisonsPlanifier() {
             : firstTitle
         const zone = extractZone(o)
         const covered = zone ? coveredZones.has(zone) : false
+        const orderKey = String(o.name || '').replace(/^#/, '')
+        const booked = bookedOrderNames.has(orderKey)
         return {
           lat,
           lon,
@@ -259,11 +268,12 @@ export default function LivraisonsPlanifier() {
           city: o.shippingAddress?.city || '',
           product,
           covered,
+          booked,
           tier: shippingTier(o.shippingLine?.title),
         }
       })
       .filter(Boolean)
-  }, [waitingOrders, coveredZones])
+  }, [waitingOrders, coveredZones, bookedOrderNames])
 
   const days = useMemo(() => {
     const arr = []
