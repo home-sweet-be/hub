@@ -9,6 +9,7 @@ import LivraisonsPlanifier from './pages/LivraisonsPlanifier'
 import LivraisonsReservations from './pages/LivraisonsReservations'
 import LivraisonsSemaine from './pages/LivraisonsSemaine'
 import Compta from './pages/Compta'
+import Emails from './pages/Emails'
 import Rapports from './pages/Rapports'
 import PlanificationLivraison from './pages/PlanificationLivraison'
 import './App.css'
@@ -18,6 +19,7 @@ const MODULES = [
   { to: '/logistique', label: 'Logistique', icon: '📦' },
   { to: '/livraisons', label: 'Livraisons', icon: '🛋️' },
   { to: '/compta', label: 'Compta', icon: '💶' },
+  { to: '/emails', label: 'Emails', icon: '✉️' },
   { to: '/rapports', label: 'Rapports', icon: '📊' },
 ]
 
@@ -210,6 +212,7 @@ export default function App() {
             <Route path="semaine" element={<LivraisonsSemaine />} />
           </Route>
           <Route path="compta" element={<Compta />} />
+          <Route path="emails" element={<Emails />} />
           <Route path="factures" element={<Navigate to="/commandes" replace />} />
           <Route path="rapports" element={<Rapports />} />
           <Route path="*" element={<Navigate to="/commandes" replace />} />
