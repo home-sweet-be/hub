@@ -356,19 +356,24 @@ export default function Fournisseurs() {
       { wch: 10 }, // Wait (days)
     ]
 
-    // Header row: black fill, white bold text. Body cells: grey text.
+    // Header row: black fill, white bold text. Body: black text, except the
+    // Homesweet name column (less important for the supplier) in grey.
+    // All fonts sized 15 (Excel default 11 + 4).
+    const FONT_SZ = 15
+    const NAME_COL = 3 // 0:Order 1:Quantity 2:SKU 3:Homesweet name
     const headerStyle = {
       fill: { patternType: 'solid', fgColor: { rgb: '000000' } },
-      font: { color: { rgb: 'FFFFFF' }, bold: true },
+      font: { color: { rgb: 'FFFFFF' }, bold: true, sz: FONT_SZ },
       alignment: { vertical: 'center' },
     }
-    const bodyStyle = { font: { color: { rgb: '808080' } } }
+    const bodyStyle = { font: { color: { rgb: '000000' }, sz: FONT_SZ } }
+    const nameStyle = { font: { color: { rgb: '808080' }, sz: FONT_SZ } }
     const range = XLSX.utils.decode_range(ws['!ref'])
     for (let R = range.s.r; R <= range.e.r; R++) {
       for (let C = range.s.c; C <= range.e.c; C++) {
         const cell = ws[XLSX.utils.encode_cell({ r: R, c: C })]
         if (!cell) continue
-        cell.s = R === 0 ? headerStyle : bodyStyle
+        cell.s = R === 0 ? headerStyle : C === NAME_COL ? nameStyle : bodyStyle
       }
     }
     const wb = XLSX.utils.book_new()
