@@ -408,6 +408,29 @@ export default function PlanificationLivraison() {
         console.warn('order-set-delivery-date network:', err)
       }
 
+      // Notify the team of the new booking. Best-effort: never blocks the
+      // customer's confirmation.
+      try {
+        await fetch('/api/email/booking-notify', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            orderName: order.name,
+            customerName: order.customerName,
+            email: order.email,
+            zone: zoneLabel(order.zone),
+            address: order.address,
+            shippingLine: order.shippingLine,
+            slotStart: selectedSlot.starts_at,
+            slotEnd: selectedSlot.ends_at,
+            monteChargeRequired,
+          }),
+        })
+      } catch (err) {
+        // eslint-disable-next-line no-console
+        console.warn('booking-notify network:', err)
+      }
+
       setStep('done')
     } catch (e) {
       setBookingError(e.message || String(e))
