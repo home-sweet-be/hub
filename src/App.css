@@ -6222,21 +6222,6 @@ a.semaine__order:hover {
 /* ============================================================ */
 /*  Notifications page                                          */
 /* ============================================================ */
-.notif__subtitle {
-  margin: 0 0 16px;
-  font-size: 13px;
-  line-height: 1.5;
-  color: #6b6b70;
-  max-width: 720px;
-}
-
-.notif__subtitle code {
-  font-size: 12px;
-  background: rgba(28, 28, 30, 0.06);
-  padding: 1px 5px;
-  border-radius: 5px;
-}
-
 .notif__filters {
   display: flex;
   flex-wrap: wrap;

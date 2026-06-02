@@ -155,13 +155,6 @@ function Suivi() {
 
   return (
     <>
-      <p className="notif__subtitle">
-        Tous les clients en file d'attente (<code>WaitingList</code>) et l'état
-        réel de leur notification, croisé avec Resend. Les lignes{' '}
-        <strong>Non notifié</strong> ou <strong>Problème</strong> sont celles à
-        traiter.
-      </p>
-
       <nav className="notif__filters" aria-label="Filtres">
         {SUIVI_FILTERS.map((f) => (
           <button
