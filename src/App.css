@@ -6345,6 +6345,48 @@ a.semaine__order:hover {
   border: 1px dashed rgba(179, 38, 30, 0.4);
 }
 
+.notif-table__action {
+  text-align: center;
+  white-space: nowrap;
+}
+
+.notif-resend-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 30px;
+  padding: 0;
+  font-size: 15px;
+  line-height: 1;
+  border: 1px solid rgba(28, 28, 30, 0.14);
+  border-radius: 8px;
+  background: #fff;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, transform 0.08s;
+}
+
+.notif-resend-btn:hover:not(:disabled) {
+  background: rgba(28, 28, 30, 0.05);
+  border-color: rgba(28, 28, 30, 0.3);
+}
+
+.notif-resend-btn:active:not(:disabled) {
+  transform: scale(0.94);
+}
+
+.notif-resend-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.notif-resent {
+  font-size: 12px;
+  font-weight: 600;
+  color: #1c5d3a;
+  white-space: nowrap;
+}
+
 @media (max-width: 640px) {
   .notif__search,
   .notif__search input {

@@ -62,7 +62,34 @@ function Suivi() {
   const [filter, setFilter] = useState('all')
   const [zone, setZone] = useState('all')
   const [search, setSearch] = useState('')
+  // Per-row resend state: orderName -> 'sending' | 'ok' | { err: msg }
+  const [resend, setResend] = useState({})
   const { reloadKey } = useReload()
+
+  const resendOne = useCallback(async (r) => {
+    if (!r.email) {
+      setResend((s) => ({ ...s, [r.orderName]: { err: 'Pas d’email' } }))
+      return
+    }
+    setResend((s) => ({ ...s, [r.orderName]: 'sending' }))
+    try {
+      const res = await fetch('/api/notifications/resend', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          orderName: r.orderName,
+          email: r.email,
+          customerName: r.customerName,
+          zone: r.zone,
+        }),
+      })
+      const json = await res.json().catch(() => null)
+      if (!res.ok || !json?.ok) throw new Error(json?.error || `HTTP ${res.status}`)
+      setResend((s) => ({ ...s, [r.orderName]: 'ok' }))
+    } catch (e) {
+      setResend((s) => ({ ...s, [r.orderName]: { err: e.message || String(e) } }))
+    }
+  }, [])
 
   const load = useCallback(async () => {
     setLoading(true)
@@ -210,12 +237,13 @@ function Suivi() {
                   <th>Email</th>
                   <th>Zone</th>
                   <th>Notifié le</th>
+                  <th aria-label="Relancer" />
                 </tr>
               </thead>
               <tbody>
                 {rows.length === 0 && (
                   <tr>
-                    <td colSpan={6} className="reception-table__empty">
+                    <td colSpan={7} className="reception-table__empty">
                       {data.rows.length === 0
                         ? "Aucun client en file d'attente."
                         : 'Aucun client ne correspond aux filtres.'}
@@ -250,6 +278,33 @@ function Suivi() {
                       <td>{zoneLabel(r.zone)}</td>
                       <td className="notif-table__date">
                         {r.notified ? formatDateTime(r.sentAt) : '—'}
+                      </td>
+                      <td className="notif-table__action">
+                        {(() => {
+                          const st = resend[r.orderName]
+                          if (st === 'ok') {
+                            return <span className="notif-resent">✓ Renvoyé</span>
+                          }
+                          return (
+                            <button
+                              type="button"
+                              className="notif-resend-btn"
+                              disabled={st === 'sending' || !r.email}
+                              onClick={() => resendOne(r)}
+                              title={
+                                r.email
+                                  ? `Renvoyer la notification à ${r.email}`
+                                  : 'Aucun email pour ce client'
+                              }
+                            >
+                              {st === 'sending'
+                                ? '…'
+                                : st && st.err
+                                ? '⚠️'
+                                : '📨'}
+                            </button>
+                          )
+                        })()}
                       </td>
                     </tr>
                   )
