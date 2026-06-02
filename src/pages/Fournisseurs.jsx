@@ -318,7 +318,8 @@ export default function Fournisseurs() {
   const handleExport = async () => {
     if (filtered.length === 0) return
     // Lazy-load SheetJS so it isn't bundled into the initial app load.
-    const XLSX = await import('xlsx')
+    const mod = await import('xlsx')
+    const XLSX = mod.default || mod
     const rows = filtered.map((o) => ({
       'N°': o.name.replace(/^#/, ''),
       Client: customerName(o.customer),
@@ -340,8 +341,22 @@ export default function Fournisseurs() {
     ]
     const wb = XLSX.utils.book_new()
     XLSX.utils.book_append_sheet(wb, ws, activeDef.label.slice(0, 31))
+
+    // Build the .xlsx ourselves and download with the official Excel MIME type
+    // so the OS reliably opens it with Excel (writeFile can mistype the blob).
+    const buf = XLSX.write(wb, { bookType: 'xlsx', type: 'array' })
+    const blob = new Blob([buf], {
+      type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    })
     const today = new Date().toISOString().slice(0, 10)
-    XLSX.writeFile(wb, `commandes-${activeDef.id}-${today}.xlsx`)
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `commandes-${activeDef.id}-${today}.xlsx`
+    document.body.appendChild(a)
+    a.click()
+    a.remove()
+    URL.revokeObjectURL(url)
   }
 
   const handleMarkSent = async () => {
@@ -574,28 +589,29 @@ export default function Fournisseurs() {
               )}
 
               <div className="reception-cart__actions">
-                <button
-                  type="button"
-                  className="btn btn--export"
-                  disabled={filtered.length === 0}
-                  onClick={handleExport}
-                  title={`Exporter les ${filtered.length} commande(s) du tableau en Excel`}
-                >
-                  <svg
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    aria-hidden="true"
+                {filtered.length > 0 && (
+                  <button
+                    type="button"
+                    className="btn btn--export"
+                    onClick={handleExport}
+                    title={`Exporter les ${filtered.length} commande(s) du tableau en Excel`}
                   >
-                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                    <path d="M7 10l5 5 5-5" />
-                    <path d="M12 15V3" />
-                  </svg>
-                  Export
-                </button>
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      aria-hidden="true"
+                    >
+                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                      <path d="M7 10l5 5 5-5" />
+                      <path d="M12 15V3" />
+                    </svg>
+                    Export
+                  </button>
+                )}
 
                 <button
                   type="button"
