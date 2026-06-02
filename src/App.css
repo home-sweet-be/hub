@@ -948,6 +948,29 @@
     0 6px 14px -4px rgba(255, 69, 58, 0.55);
 }
 
+.reception-action--stock-remove {
+  background: linear-gradient(180deg, #0a84ff 0%, #0066cc 100%);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.35) inset,
+    0 4px 10px -4px rgba(10, 132, 255, 0.5);
+}
+
+.reception-action--stock-remove:hover:not(:disabled) {
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.45) inset,
+    0 6px 14px -4px rgba(10, 132, 255, 0.6);
+}
+
+.reception-action--stock-remove svg {
+  width: 16px;
+  height: 16px;
+}
+
+.reception-stock-remove-cell {
+  text-align: center;
+  white-space: nowrap;
+}
+
 .reception-table tbody tr.is-selected {
   opacity: 0.2;
 }

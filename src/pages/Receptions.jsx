@@ -139,6 +139,7 @@ export default function Receptions() {
   const [zoneEditing, setZoneEditing] = useState(null) // order being edited
   const [addressViewing, setAddressViewing] = useState(null) // order whose address is shown
   const [adjustItems, setAdjustItems] = useState(null) // null = closed, [] = open
+  const [removingId, setRemovingId] = useState(null) // order id whose stock tag is being removed
   const { reloadKey } = useReload()
 
   const load = useCallback(() => {
@@ -317,6 +318,53 @@ export default function Receptions() {
       throw e
     } finally {
       setPending(null)
+    }
+  }
+
+  // Move an order between the "en stock" and "à réceptionner / à envoyer"
+  // states by flipping its tags:
+  //  - mode 'remove' (EN STOCK tab): drop ProduitEnStock → the order falls
+  //    back into the Fournisseurs list ("à envoyer au fournisseur").
+  //  - mode 'add' (INTERCOMMERCE / ELTAP tabs): add ProduitEnStock and drop
+  //    SentToSupplier → the order moves into the EN STOCK tab.
+  const handleStockToggle = async (order, mode) => {
+    if (removingId) return
+    const isAdd = mode === 'add'
+    setRemovingId(order.id)
+    setFeedback(null)
+    try {
+      const r = await fetch('/api/shopify/orders/tags', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          orderIds: [order.id],
+          add: isAdd ? ['ProduitEnStock'] : [],
+          remove: isAdd ? ['SentToSupplier'] : ['ProduitEnStock'],
+        }),
+      })
+      const data = await r.json()
+      if (!r.ok || data.hasErrors) {
+        const messages = (data.orderResults || [])
+          .flatMap((x) => [...(x.addErrors || []), ...(x.removeErrors || [])])
+          .map((e) => e.message)
+        throw new Error(messages.join(' · ') || `HTTP ${r.status}`)
+      }
+      setFeedback({
+        type: 'ok',
+        message: isAdd
+          ? `Commande ${order.name} marquée « en stock ».`
+          : `Commande ${order.name} renvoyée vers « à envoyer au fournisseur ».`,
+      })
+      setSelectedIds((prev) => {
+        const next = new Set(prev)
+        next.delete(order.id)
+        return next
+      })
+      await load()
+    } catch (e) {
+      setFeedback({ type: 'err', message: e.message })
+    } finally {
+      setRemovingId(null)
     }
   }
 
@@ -623,12 +671,13 @@ export default function Receptions() {
                     <th>Client</th>
                     <th>Attente</th>
                     <th>Date</th>
+                    <th aria-label="action" />
                   </tr>
                 </thead>
                 <tbody>
                   {filtered.length === 0 && (
                     <tr>
-                      <td colSpan={9} className="reception-table__empty">
+                      <td colSpan={10} className="reception-table__empty">
                         Aucune commande dans cet onglet.
                       </td>
                     </tr>
@@ -884,6 +933,63 @@ export default function Receptions() {
                           {isFirst && (
                             <td className="reception-date" rowSpan={span}>
                               {formatDate(o.createdAt)}
+                            </td>
+                          )}
+                          {isFirst && (
+                            <td
+                              className="reception-stock-remove-cell"
+                              rowSpan={span}
+                            >
+                              {activeDef.id === 'stock' ? (
+                                <button
+                                  type="button"
+                                  className="reception-action reception-action--stock-remove"
+                                  onClick={() => handleStockToggle(o, 'remove')}
+                                  disabled={
+                                    removingId === o.id || pending !== null
+                                  }
+                                  title="Retirer du stock — renvoyer vers « à envoyer au fournisseur »"
+                                  aria-label="Retirer du stock"
+                                >
+                                  <svg
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    strokeWidth="2"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    aria-hidden="true"
+                                  >
+                                    <path d="M9 14 4 9l5-5" />
+                                    <path d="M4 9h11a5 5 0 0 1 5 5v0a5 5 0 0 1-5 5H9" />
+                                  </svg>
+                                </button>
+                              ) : (
+                                <button
+                                  type="button"
+                                  className="reception-action reception-action--stock-remove"
+                                  onClick={() => handleStockToggle(o, 'add')}
+                                  disabled={
+                                    removingId === o.id || pending !== null
+                                  }
+                                  title="Marquer en stock — déplacer vers l'onglet EN STOCK"
+                                  aria-label="Marquer en stock"
+                                >
+                                  <svg
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    strokeWidth="2"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    aria-hidden="true"
+                                  >
+                                    <path d="M21 8v13H3V8" />
+                                    <path d="M1 3h22v5H1z" />
+                                    <path d="M10 12h4" />
+                                  </svg>
+                                </button>
+                              )}
                             </td>
                           )}
                         </tr>
