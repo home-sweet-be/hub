@@ -317,8 +317,9 @@ export default function Fournisseurs() {
   // an Excel file — one row per order.
   const handleExport = async () => {
     if (selectedOrders.length === 0) return
-    // Lazy-load SheetJS so it isn't bundled into the initial app load.
-    const mod = await import('xlsx')
+    // Lazy-load SheetJS (styled fork) so it isn't bundled into the initial
+    // app load. xlsx-js-style supports cell fills/fonts that plain xlsx drops.
+    const mod = await import('xlsx-js-style')
     const XLSX = mod.default || mod
     // One row per line item (quantity + SKU are per product).
     const rows = []
@@ -346,14 +347,30 @@ export default function Fournisseurs() {
     ws['!cols'] = [
       { wch: 8 }, // Order
       { wch: 9 }, // Quantity
-      { wch: 16 }, // SKU
-      { wch: 40 }, // Homesweet name
+      { wch: 30 }, // SKU
+      { wch: 30 }, // Homesweet name
       { wch: 22 }, // Customer
       { wch: 14 }, // Zone
       { wch: 18 }, // City
       { wch: 12 }, // Date
       { wch: 10 }, // Wait (days)
     ]
+
+    // Header row: black fill, white bold text. Body cells: grey text.
+    const headerStyle = {
+      fill: { patternType: 'solid', fgColor: { rgb: '000000' } },
+      font: { color: { rgb: 'FFFFFF' }, bold: true },
+      alignment: { vertical: 'center' },
+    }
+    const bodyStyle = { font: { color: { rgb: '808080' } } }
+    const range = XLSX.utils.decode_range(ws['!ref'])
+    for (let R = range.s.r; R <= range.e.r; R++) {
+      for (let C = range.s.c; C <= range.e.c; C++) {
+        const cell = ws[XLSX.utils.encode_cell({ r: R, c: C })]
+        if (!cell) continue
+        cell.s = R === 0 ? headerStyle : bodyStyle
+      }
+    }
     const wb = XLSX.utils.book_new()
     XLSX.utils.book_append_sheet(wb, ws, activeDef.label.slice(0, 31))
 

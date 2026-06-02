@@ -17,7 +17,7 @@
     "react-dom": "^19.2.6",
     "react-router-dom": "^7.15.1",
     "resend": "^6.12.3",
-    "xlsx": "^0.18.5"
+    "xlsx-js-style": "^1.2.0"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
