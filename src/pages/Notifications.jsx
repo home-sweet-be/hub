@@ -73,7 +73,7 @@ function Suivi() {
     }
     setResend((s) => ({ ...s, [r.orderName]: 'sending' }))
     try {
-      const res = await fetch('/api/notifications/resend', {
+      const res = await fetch('/api/notifications', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -95,7 +95,7 @@ function Suivi() {
     setLoading(true)
     setError(null)
     try {
-      const r = await fetch('/api/notifications/overview')
+      const r = await fetch('/api/notifications')
       const json = await r.json().catch(() => null)
       if (!r.ok || !json) throw new Error(json?.error || `HTTP ${r.status}`)
       setData(json)
