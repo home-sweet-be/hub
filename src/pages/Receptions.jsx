@@ -151,7 +151,7 @@ export default function Receptions() {
     return fetch(
       '/api/shopify/receptions?q=' +
         encodeURIComponent(
-          `created_at:>=${cutoff} AND (tag:SentToSupplier OR tag:ProduitEnStock) AND NOT tag:WaitingList AND NOT tag:removed AND status:open AND NOT fulfillment_status:fulfilled AND NOT financial_status:refunded AND total_price:>1`
+          `created_at:>=${cutoff} AND (tag:SentToSupplier OR tag:ProduitEnStock) AND NOT tag:WaitingList AND NOT tag:PretPourLaLivraison AND NOT tag:removed AND status:open AND NOT fulfillment_status:fulfilled AND NOT financial_status:refunded AND total_price:>1`
         ) +
         '&first=250'
     )
