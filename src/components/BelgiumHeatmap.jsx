@@ -91,21 +91,33 @@ export default function BelgiumHeatmap({
   const mapRef = useRef(null)
   const popupRef = useRef(null)
   const [ready, setReady] = useState(false)
+  const [mapError, setMapError] = useState(false)
 
   // Init map once
   useEffect(() => {
     if (!containerRef.current || !mapboxgl.accessToken) return
-    const map = new mapboxgl.Map({
-      container: containerRef.current,
-      style: 'mapbox://styles/mapbox/light-v11',
-      bounds: [
-        [BE_BBOX[0], BE_BBOX[1]],
-        [BE_BBOX[2], BE_BBOX[3]],
-      ],
-      fitBoundsOptions: { padding: 16, animate: false },
-      attributionControl: false,
-      logoPosition: 'bottom-left',
-    })
+    let map
+    try {
+      map = new mapboxgl.Map({
+        container: containerRef.current,
+        style: 'mapbox://styles/mapbox/light-v11',
+        bounds: [
+          [BE_BBOX[0], BE_BBOX[1]],
+          [BE_BBOX[2], BE_BBOX[3]],
+        ],
+        fitBoundsOptions: { padding: 16, animate: false },
+        attributionControl: false,
+        logoPosition: 'bottom-left',
+      })
+    } catch (e) {
+      // WebGL may be unavailable (e.g. blocked in the embedding iframe).
+      // Throwing here would escape the effect and unmount the whole hub
+      // (grey screen). Degrade gracefully to a fallback instead.
+      // eslint-disable-next-line no-console
+      console.error('[heatmap] Mapbox init failed:', e)
+      setMapError(true)
+      return
+    }
     map.addControl(
       new mapboxgl.NavigationControl({ showCompass: false }),
       'top-right'
@@ -305,5 +317,15 @@ export default function BelgiumHeatmap({
     if (src) src.setData(pinsData)
   }, [ready, pinsData])
 
-  return <div ref={containerRef} className="bemap-gl" />
+  return (
+    <div ref={containerRef} className="bemap-gl">
+      {mapError && (
+        <div className="bemap-fallback">
+          🗺️ Carte indisponible sur cet appareil/navigateur.
+          <br />
+          Le reste de la page fonctionne normalement.
+        </div>
+      )}
+    </div>
+  )
 }

@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route, Navigate, NavLink, Outlet, useLocation } 
 import { useCallback, useEffect, useRef, useState } from 'react'
 import logo from './assets/homesweet.png'
 import { ReloadContext } from './lib/reload'
+import ErrorBoundary from './components/ErrorBoundary'
 import Commandes from './pages/Commandes'
 import Logistique from './pages/Logistique'
 import Livraisons from './pages/Livraisons'
@@ -235,7 +236,9 @@ function Shell() {
 
         <main className="hub-main">
           <div className="hub-main__inner glass glass--panel">
-            <Outlet />
+            <ErrorBoundary resetKey={location.pathname}>
+              <Outlet />
+            </ErrorBoundary>
           </div>
         </main>
       </div>

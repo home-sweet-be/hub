@@ -2782,6 +2782,63 @@
   display: none !important;
 }
 
+.bemap-fallback {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  padding: 16px;
+  text-align: center;
+  font-size: 13px;
+  line-height: 1.5;
+  color: #6b6b70;
+  background: rgba(28, 28, 30, 0.03);
+  border-radius: 8px;
+}
+
+.hub-error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  min-height: 280px;
+  padding: 32px 20px;
+  text-align: center;
+}
+
+.hub-error__title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #1d1d1f;
+}
+
+.hub-error__msg {
+  margin: 0;
+  max-width: 520px;
+  font-size: 13px;
+  color: #b3261e;
+  word-break: break-word;
+}
+
+.hub-error__btn {
+  padding: 10px 22px;
+  border-radius: 10px;
+  border: 1px solid #1c1a17;
+  background: #1c1a17;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.hub-error__btn:hover {
+  background: #000;
+}
+
 .bemap-popup .mapboxgl-popup-content {
   background: rgba(20, 20, 22, 0.96);
   color: #fff;
