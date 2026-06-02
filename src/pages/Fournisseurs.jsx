@@ -316,11 +316,11 @@ export default function Fournisseurs() {
   // Export the orders currently shown in the right-hand table (active tab) to
   // an Excel file — one row per order.
   const handleExport = async () => {
-    if (filtered.length === 0) return
+    if (selectedOrders.length === 0) return
     // Lazy-load SheetJS so it isn't bundled into the initial app load.
     const mod = await import('xlsx')
     const XLSX = mod.default || mod
-    const rows = filtered.map((o) => ({
+    const rows = selectedOrders.map((o) => ({
       'N°': o.name.replace(/^#/, ''),
       Client: customerName(o.customer),
       Produits: productsSummary(activeLineItems(o)),
@@ -589,12 +589,12 @@ export default function Fournisseurs() {
               )}
 
               <div className="reception-cart__actions">
-                {filtered.length > 0 && (
+                {selectedOrders.length > 0 && (
                   <button
                     type="button"
                     className="btn btn--export"
                     onClick={handleExport}
-                    title={`Exporter les ${filtered.length} commande(s) du tableau en Excel`}
+                    title={`Exporter les ${selectedOrders.length} commande(s) de la liste en Excel`}
                   >
                     <svg
                       viewBox="0 0 24 24"
