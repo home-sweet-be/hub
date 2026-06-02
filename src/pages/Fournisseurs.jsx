@@ -320,24 +320,39 @@ export default function Fournisseurs() {
     // Lazy-load SheetJS so it isn't bundled into the initial app load.
     const mod = await import('xlsx')
     const XLSX = mod.default || mod
-    const rows = selectedOrders.map((o) => ({
-      'N°': o.name.replace(/^#/, ''),
-      Client: customerName(o.customer),
-      Produits: productsSummary(activeLineItems(o)),
-      Zone: extractZone(o) || '',
-      Ville: o.shippingAddress?.city || '',
-      Date: formatDate(o.createdAt),
-      'Attente (j)': daysSince(o.createdAt),
-    }))
+    // One row per line item (quantity + SKU are per product).
+    const rows = []
+    for (const o of selectedOrders) {
+      const zone = extractZone(o) || ''
+      const client = customerName(o.customer)
+      const city = o.shippingAddress?.city || ''
+      const date = formatDate(o.createdAt)
+      const wait = daysSince(o.createdAt)
+      for (const li of activeLineItems(o)) {
+        rows.push({
+          Order: o.name.replace(/^#/, ''),
+          Quantity: effectiveQuantity(li),
+          SKU: li.sku || li.variant?.sku || '',
+          'Homesweet name': li.title || '',
+          Customer: client,
+          Zone: zone,
+          City: city,
+          Date: date,
+          'Wait (days)': wait,
+        })
+      }
+    }
     const ws = XLSX.utils.json_to_sheet(rows)
     ws['!cols'] = [
-      { wch: 8 },
-      { wch: 22 },
-      { wch: 50 },
-      { wch: 14 },
-      { wch: 18 },
-      { wch: 12 },
-      { wch: 10 },
+      { wch: 8 }, // Order
+      { wch: 9 }, // Quantity
+      { wch: 16 }, // SKU
+      { wch: 40 }, // Homesweet name
+      { wch: 22 }, // Customer
+      { wch: 14 }, // Zone
+      { wch: 18 }, // City
+      { wch: 12 }, // Date
+      { wch: 10 }, // Wait (days)
     ]
     const wb = XLSX.utils.book_new()
     XLSX.utils.book_append_sheet(wb, ws, activeDef.label.slice(0, 31))
