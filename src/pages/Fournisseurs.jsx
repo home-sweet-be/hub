@@ -313,6 +313,37 @@ export default function Fournisseurs() {
     }
   }
 
+  // Export the orders currently shown in the right-hand table (active tab) to
+  // an Excel file — one row per order.
+  const handleExport = async () => {
+    if (filtered.length === 0) return
+    // Lazy-load SheetJS so it isn't bundled into the initial app load.
+    const XLSX = await import('xlsx')
+    const rows = filtered.map((o) => ({
+      'N°': o.name.replace(/^#/, ''),
+      Client: customerName(o.customer),
+      Produits: productsSummary(activeLineItems(o)),
+      Zone: extractZone(o) || '',
+      Ville: o.shippingAddress?.city || '',
+      Date: formatDate(o.createdAt),
+      'Attente (j)': daysSince(o.createdAt),
+    }))
+    const ws = XLSX.utils.json_to_sheet(rows)
+    ws['!cols'] = [
+      { wch: 8 },
+      { wch: 22 },
+      { wch: 50 },
+      { wch: 14 },
+      { wch: 18 },
+      { wch: 12 },
+      { wch: 10 },
+    ]
+    const wb = XLSX.utils.book_new()
+    XLSX.utils.book_append_sheet(wb, ws, activeDef.label.slice(0, 31))
+    const today = new Date().toISOString().slice(0, 10)
+    XLSX.writeFile(wb, `commandes-${activeDef.id}-${today}.xlsx`)
+  }
+
   const handleMarkSent = async () => {
     if (selectedOrders.length === 0) return
     setPending('markSent')
@@ -542,18 +573,43 @@ export default function Fournisseurs() {
                 </div>
               )}
 
-              <button
-                type="button"
-                className="btn btn--orange"
-                disabled={selectedOrders.length === 0 || pending !== null}
-                onClick={handleMarkSent}
-              >
-                {pending === 'markSent'
-                  ? 'Mise à jour…'
-                  : selectedOrders.length === 1
-                  ? 'Marquer comme envoyée au fournisseur'
-                  : 'Marquer comme envoyées au fournisseur'}
-              </button>
+              <div className="reception-cart__actions">
+                <button
+                  type="button"
+                  className="btn btn--export"
+                  disabled={filtered.length === 0}
+                  onClick={handleExport}
+                  title={`Exporter les ${filtered.length} commande(s) du tableau en Excel`}
+                >
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    aria-hidden="true"
+                  >
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                    <path d="M7 10l5 5 5-5" />
+                    <path d="M12 15V3" />
+                  </svg>
+                  Export
+                </button>
+
+                <button
+                  type="button"
+                  className="btn btn--orange"
+                  disabled={selectedOrders.length === 0 || pending !== null}
+                  onClick={handleMarkSent}
+                >
+                  {pending === 'markSent'
+                    ? 'Mise à jour…'
+                    : selectedOrders.length === 1
+                    ? 'Marquer comme envoyée au fournisseur'
+                    : 'Marquer comme envoyées au fournisseur'}
+                </button>
+              </div>
             </div>
           </div>
         </aside>
