@@ -252,21 +252,12 @@ function Suivi() {
                 )}
                 {rows.map((r) => {
                   const meta = SUIVI_META[r.family]
-                  const urgent = r.family === 'missing' && r.zoneHasSlot
                   return (
                     <tr key={r.orderName + r.email}>
                       <td>
                         <span className={'notif-status ' + meta.cls}>
                           {meta.label}
                         </span>
-                        {urgent && (
-                          <span
-                            className="notif-slot-flag"
-                            title="Un créneau est disponible dans sa zone — à notifier en priorité"
-                          >
-                            créneau dispo
-                          </span>
-                        )}
                       </td>
                       <td className="notif-table__order">
                         {String(r.orderName).replace(/^#/, '')}

@@ -205,14 +205,25 @@ async function handleOverview(req, res) {
     let match = mostRecent(byOrder.get(nameNorm))
     if (!match && email) match = mostRecent(byTo.get(email.toLowerCase()))
 
+    const notified = !!match
+    const zoneHasSlot = zone ? zonesWithSlot.has(zone) : false
+
+    // The "ready — pick a slot" email is triggered when a slot opens in the
+    // customer's zone. A waitlist customer with no email AND no open slot has
+    // simply not been triggered yet — that's the normal waiting state, not a
+    // notification to track here, so we skip them. We keep a row only if it was
+    // already notified (to follow delivery/bounce status) or a slot is now open
+    // in their zone (so a still-missing email shows up as an oversight to fix).
+    if (!notified && !zoneHasSlot) continue
+
     rows.push({
       orderName: o.name,
       customerName: customerName(o),
       email,
       zone: zone || null,
       createdAt: o.createdAt || null,
-      zoneHasSlot: zone ? zonesWithSlot.has(zone) : false,
-      notified: !!match,
+      zoneHasSlot,
+      notified,
       lastEvent: match?.last_event || null,
       sentAt: match?.created_at || null,
       resendId: match?.id || null,
