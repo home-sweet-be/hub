@@ -9,7 +9,7 @@ import LivraisonsPlanifier from './pages/LivraisonsPlanifier'
 import LivraisonsReservations from './pages/LivraisonsReservations'
 import LivraisonsSemaine from './pages/LivraisonsSemaine'
 import Compta from './pages/Compta'
-import Emails from './pages/Emails'
+import Notifications from './pages/Notifications'
 import Rapports from './pages/Rapports'
 import PlanificationLivraison from './pages/PlanificationLivraison'
 import './App.css'
@@ -138,16 +138,16 @@ function Shell() {
         </div>
 
         <NavLink
-          to="/emails"
+          to="/notifications"
           className={({ isActive }) =>
             'hub-header__emails' + (isActive ? ' is-active' : '')
           }
-          aria-label="Emails envoyés"
-          title="Emails envoyés"
+          aria-label="Notifications"
+          title="Notifications"
         >
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <rect x="3" y="5" width="18" height="14" rx="2" />
-            <path d="m3 7 9 6 9-6" />
+            <path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9" />
+            <path d="M13.73 21a2 2 0 0 1-3.46 0" />
           </svg>
         </NavLink>
 
@@ -225,7 +225,8 @@ export default function App() {
             <Route path="semaine" element={<LivraisonsSemaine />} />
           </Route>
           <Route path="compta" element={<Compta />} />
-          <Route path="emails" element={<Emails />} />
+          <Route path="notifications" element={<Notifications />} />
+          <Route path="emails" element={<Navigate to="/notifications" replace />} />
           <Route path="factures" element={<Navigate to="/commandes" replace />} />
           <Route path="rapports" element={<Rapports />} />
           <Route path="*" element={<Navigate to="/commandes" replace />} />
