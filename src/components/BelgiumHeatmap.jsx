@@ -252,11 +252,37 @@ export default function BelgiumHeatmap({
         popupRef.current?.remove()
       })
 
+      map.resize()
       setReady(true)
     })
 
     mapRef.current = map
+
+    // The map can be created before its container has its final size — e.g.
+    // when navigating to this tab inside the Shopify iframe — which leaves it
+    // rendered grey and never recovering. Resize it whenever the container
+    // changes size, plus a few times shortly after mount.
+    const ro = new ResizeObserver(() => {
+      try {
+        map.resize()
+      } catch {
+        // ignore
+      }
+    })
+    if (containerRef.current) ro.observe(containerRef.current)
+    const resizeTimers = [60, 250, 600, 1200].map((ms) =>
+      setTimeout(() => {
+        try {
+          map.resize()
+        } catch {
+          // ignore
+        }
+      }, ms)
+    )
+
     return () => {
+      ro.disconnect()
+      resizeTimers.forEach(clearTimeout)
       popupRef.current?.remove()
       map.remove()
       mapRef.current = null
