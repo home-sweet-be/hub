@@ -73,7 +73,13 @@ function Shell() {
     const post = () => {
       const el = document.querySelector('.hub-shell')
       if (!el) return
-      const h = Math.ceil(el.getBoundingClientRect().height)
+      const h = Math.max(
+        Math.ceil(el.getBoundingClientRect().height),
+        el.scrollHeight || 0
+      )
+      // Never collapse the iframe: a tiny height measured mid-transition (e.g.
+      // while the Planifier map is still laying out) would leave the embed grey.
+      if (h < 100) return
       if (Math.abs(h - lastH) < 2) return
       lastH = h
       try {
@@ -96,6 +102,37 @@ function Shell() {
       document.documentElement.classList.remove('is-iframed')
     }
   }, [])
+
+  // Re-post the height after every in-app navigation. Heavy pages (the map on
+  // "Planifier") finish laying out a few frames late; without these re-measures
+  // an early/too-small height posted mid-transition leaves the iframe collapsed
+  // (grey) until the next click/refresh.
+  useEffect(() => {
+    if (window === window.parent) return
+    const post = () => {
+      const el = document.querySelector('.hub-shell')
+      if (!el) return
+      const h = Math.max(
+        Math.ceil(el.getBoundingClientRect().height),
+        el.scrollHeight || 0
+      )
+      if (h < 100) return
+      try {
+        window.parent.postMessage(
+          { type: 'homesweet:hub-height', height: h },
+          '*'
+        )
+      } catch {
+        // ignore
+      }
+    }
+    const raf = requestAnimationFrame(post)
+    const timers = [120, 400, 900, 1600].map((ms) => setTimeout(post, ms))
+    return () => {
+      cancelAnimationFrame(raf)
+      timers.forEach(clearTimeout)
+    }
+  }, [location.pathname])
 
   return (
     <ReloadContext.Provider value={{ reloadKey, reloading, triggerReload }}>
