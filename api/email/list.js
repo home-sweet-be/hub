@@ -43,9 +43,14 @@ export default async function handler(req, res) {
       })
       const json = await r.json().catch(() => ({}))
       if (!r.ok) {
+        // Surface Resend's actual reason so the UI can show it. A common cause
+        // is a "Sending access" API key, which cannot list emails — that needs
+        // a "Full access" key.
+        const reason =
+          json?.message || json?.name || `HTTP ${r.status}`
         return res
           .status(r.status)
-          .json({ error: 'Resend list failed', details: json })
+          .json({ error: `Resend: ${reason}`, status: r.status, details: json })
       }
 
       const page = Array.isArray(json.data) ? json.data : []

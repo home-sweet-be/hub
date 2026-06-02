@@ -151,6 +151,43 @@
   to { transform: rotate(360deg); }
 }
 
+.hub-header__emails {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  margin-left: auto;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  background: rgba(255, 255, 255, 0.5);
+  color: var(--text);
+  cursor: pointer;
+  text-decoration: none;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  transition: background 0.15s ease, transform 0.08s ease;
+}
+
+.hub-header__emails:hover {
+  background: rgba(255, 255, 255, 0.8);
+}
+
+.hub-header__emails:active {
+  transform: scale(0.94);
+}
+
+.hub-header__emails.is-active {
+  background: #1c1a17;
+  border-color: #1c1a17;
+  color: #fff;
+}
+
+.hub-header__emails svg {
+  width: 18px;
+  height: 18px;
+}
+
 .hub-header__burger {
   display: none;
   align-items: center;

@@ -19,7 +19,6 @@ const MODULES = [
   { to: '/logistique', label: 'Logistique', icon: '📦' },
   { to: '/livraisons', label: 'Livraisons', icon: '🛋️' },
   { to: '/compta', label: 'Compta', icon: '💶' },
-  { to: '/emails', label: 'Emails', icon: '✉️' },
   { to: '/rapports', label: 'Rapports', icon: '📊' },
 ]
 
@@ -137,6 +136,20 @@ function Shell() {
           <span role="img" aria-label="wave">👋</span>
           <span>Bienvenue Alessandro</span>
         </div>
+
+        <NavLink
+          to="/emails"
+          className={({ isActive }) =>
+            'hub-header__emails' + (isActive ? ' is-active' : '')
+          }
+          aria-label="Emails envoyés"
+          title="Emails envoyés"
+        >
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <rect x="3" y="5" width="18" height="14" rx="2" />
+            <path d="m3 7 9 6 9-6" />
+          </svg>
+        </NavLink>
 
         <button
           type="button"
