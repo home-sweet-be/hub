@@ -343,9 +343,12 @@ export default function Fournisseurs() {
     XLSX.utils.book_append_sheet(wb, ws, activeDef.label.slice(0, 31))
 
     // Build the .xlsx ourselves and download with the official Excel MIME type
-    // so the OS reliably opens it with Excel (writeFile can mistype the blob).
+    // so the OS reliably opens it with Excel. We never use XLSX.writeFile here:
+    // when bundled it guesses the format from the extension and throws
+    // "unknown file extension". write({type:'array'}) returns an ArrayBuffer,
+    // which we wrap in a Uint8Array for maximum Blob compatibility.
     const buf = XLSX.write(wb, { bookType: 'xlsx', type: 'array' })
-    const blob = new Blob([buf], {
+    const blob = new Blob([new Uint8Array(buf)], {
       type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
     })
     const today = new Date().toISOString().slice(0, 10)
