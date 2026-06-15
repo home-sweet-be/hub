@@ -6,6 +6,16 @@ import { useReload } from '../lib/reload'
 const MONTHS_BACK = 12
 const MAX_PAGES = 40
 const VAT_RATE = 0.21
+// Fallback when an order has neither a product cost nor a cout_backfill
+// metafield: estimate COGS at 50% of the order's HT revenue.
+const FALLBACK_COST_RATIO = 0.5
+
+// Resolve an order's COGS (HT): metafield override > line-item cost > estimate.
+function resolveOrderCogs({ costBackfill, lineCogs, revenueHt }) {
+  if (costBackfill != null) return { cogs: costBackfill, source: 'backfill' }
+  if (lineCogs > 0) return { cogs: lineCogs, source: 'product' }
+  return { cogs: revenueHt * FALLBACK_COST_RATIO, source: 'estimate' }
+}
 
 const MONTH_LABELS = [
   'janvier', 'février', 'mars', 'avril', 'mai', 'juin',
@@ -203,25 +213,25 @@ function OrdersBreakdown({ rows }) {
                 ) : (
                   r.name
                 )}
-                {r.noCost && (
-                  <span
-                    className="calrent__detail-warn"
-                    title="Aucun coût produit renseigné dans Shopify pour cette commande"
-                  >
-                    ⚠️
-                  </span>
-                )}
               </td>
               <td>{formatDate(r.date)}</td>
               <td className="num">{formatPrice(r.revenueHt)}</td>
               <td className="num">
                 {formatPrice(r.cogs)}
-                {r.backfilled && (
+                {r.costSource === 'backfill' && (
                   <span
                     className="calrent__detail-backfill"
                     title="Coût saisi manuellement (métachamp custom.cout_backfill)"
                   >
                     ✎
+                  </span>
+                )}
+                {r.costSource === 'estimate' && (
+                  <span
+                    className="calrent__detail-est"
+                    title="Coût estimé à 50% du HT (aucun coût produit ni backfill)"
+                  >
+                    ≈
                   </span>
                 )}
               </td>
@@ -361,8 +371,11 @@ export default function Calendrier() {
           revenueHt += lineTtc / (1 + VAT_RATE)
           lineCogs += unitCost * qty
         }
-        // Order-level backfill (custom.cout_backfill) overrides the line cost.
-        const cogs = o.costBackfill != null ? o.costBackfill : lineCogs
+        const { cogs } = resolveOrderCogs({
+          costBackfill: o.costBackfill,
+          lineCogs,
+          revenueHt,
+        })
         bucket.revenueTtc += revenueTtc
         bucket.revenueHt += revenueHt
         bucket.cogs += cogs
@@ -412,9 +425,12 @@ export default function Calendrier() {
           revenueHt += lineTtc / (1 + VAT_RATE)
           lineCogs += unitCost * qty
         }
-        const backfilled = o.costBackfill != null
-        const cogs = backfilled ? o.costBackfill : lineCogs
-        if (revenueTtc === 0 && cogs === 0) continue
+        if (revenueTtc === 0) continue
+        const { cogs, source } = resolveOrderCogs({
+          costBackfill: o.costBackfill,
+          lineCogs,
+          revenueHt,
+        })
         const margeBrute = revenueHt - cogs
         arr.push({
           id: o.id,
@@ -425,8 +441,7 @@ export default function Calendrier() {
           cogs,
           margeBrute,
           margeBrutePct: pct(margeBrute, revenueHt),
-          backfilled,
-          noCost: !backfilled && revenueTtc > 0 && cogs === 0,
+          costSource: source, // 'backfill' | 'product' | 'estimate'
         })
       }
       for (const arr of m.values()) {
