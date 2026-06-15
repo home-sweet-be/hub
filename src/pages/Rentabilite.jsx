@@ -1,6 +1,7 @@
 import { Fragment, useCallback, useEffect, useMemo, useState } from 'react'
 import OrdersTableSkeleton from '../components/OrdersTableSkeleton'
 import { useReload } from '../lib/reload'
+import Calendrier from './RentabiliteCalendrier'
 
 const MAX_PAGES = 12
 
@@ -597,13 +598,6 @@ function CalculateurMarge() {
       )}
     </>
   )
-}
-
-/* ============================================================ */
-/*  Tab: Calendrier (placeholder — à venir)                     */
-/* ============================================================ */
-function Calendrier() {
-  return null
 }
 
 /* ============================================================ */
