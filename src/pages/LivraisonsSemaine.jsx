@@ -239,68 +239,32 @@ export default function LivraisonsSemaine() {
                     </div>
                   </aside>
 
-                  <div className="semaine__body">
-                    <div className="semaine__top">
-                      <div className="semaine__top-left">
-                        {order?.adminUrl ? (
-                          <a
-                            href={order.adminUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="semaine__order"
-                            title="Ouvrir dans Shopify"
-                          >
-                            {order.name}
-                          </a>
-                        ) : (
-                          <span className="semaine__order">
-                            {booking.shopify_order_name}
-                          </span>
-                        )}
-                        <span className="semaine__customer">{name || '—'}</span>
+                  <div className="semaine__col semaine__col--id">
+                    {order?.adminUrl ? (
+                      <a
+                        href={order.adminUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="semaine__order"
+                        title="Ouvrir dans Shopify"
+                      >
+                        {order.name}
+                      </a>
+                    ) : (
+                      <span className="semaine__order">
+                        {booking.shopify_order_name}
+                      </span>
+                    )}
+                    <span className="semaine__customer">{name || '—'}</span>
+                    {order?.shippingAddress && (
+                      <div className="semaine__address">
+                        <span aria-hidden="true">📍</span>
+                        <span>{formatAddress(order.shippingAddress)}</span>
                       </div>
-                      <div className="semaine__top-right">
-                        <span
-                          className={`semaine__tier semaine__tier--${tier}`}
-                        >
-                          {TIER_LABEL[tier]}
-                        </span>
-                        {booking.monte_charge_required && (
-                          <span className="semaine__badge semaine__badge--mc">
-                            🛗 Monte-charges
-                          </span>
-                        )}
-                        {zone && (
-                          <span className="semaine__zone">
-                            <ZoneFlag code={zoneCode(zone)} />
-                            <span>{zone.replace(/^[A-Z]{2}-/, '').replace(/-/g, ' ')}</span>
-                          </span>
-                        )}
-                      </div>
-                    </div>
+                    )}
+                  </div>
 
-                    <div className="semaine__meta">
-                      {order?.shippingAddress && (
-                        <div className="semaine__address">
-                          <span aria-hidden="true">📍</span>
-                          <span>{formatAddress(order.shippingAddress)}</span>
-                        </div>
-                      )}
-
-                      <div className="semaine__contact">
-                        {order?.email && (
-                          <a href={`mailto:${order.email}`} className="semaine__chip">
-                            ✉️ {order.email}
-                          </a>
-                        )}
-                        {order?.phone && (
-                          <a href={`tel:${order.phone}`} className="semaine__chip">
-                            📞 {order.phone}
-                          </a>
-                        )}
-                      </div>
-                    </div>
-
+                  <div className="semaine__col semaine__col--product">
                     {items.length > 0 && (
                       <ul className="semaine__items">
                         {items.map((li) => (
@@ -332,6 +296,38 @@ export default function LivraisonsSemaine() {
                         ))}
                       </ul>
                     )}
+                  </div>
+
+                  <div className="semaine__col semaine__col--side">
+                    <div className="semaine__tags">
+                      <span className={`semaine__tier semaine__tier--${tier}`}>
+                        {TIER_LABEL[tier]}
+                      </span>
+                      {booking.monte_charge_required && (
+                        <span className="semaine__badge semaine__badge--mc">
+                          🛗 Monte-charges
+                        </span>
+                      )}
+                      {zone && (
+                        <span className="semaine__zone">
+                          <ZoneFlag code={zoneCode(zone)} />
+                          <span>{zone.replace(/^[A-Z]{2}-/, '').replace(/-/g, ' ')}</span>
+                        </span>
+                      )}
+                    </div>
+
+                    <div className="semaine__contact">
+                      {order?.email && (
+                        <a href={`mailto:${order.email}`} className="semaine__chip">
+                          ✉️ {order.email}
+                        </a>
+                      )}
+                      {order?.phone && (
+                        <a href={`tel:${order.phone}`} className="semaine__chip">
+                          📞 {order.phone}
+                        </a>
+                      )}
+                    </div>
                   </div>
                 </article>
               )
