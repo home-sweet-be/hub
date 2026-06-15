@@ -24,7 +24,7 @@ Note : les routes `/api/*` ne tournent **pas** sous `npm run dev` seul — utili
 ## Architecture clé
 - **Shopify = source de vérité** pour commandes / clients / produits / stock. Le hub lit via GraphQL (principalement) et REST.
 - **Les tags Shopify portent l'état** des commandes (machine à états, voir ci-dessous).
-- **Supabase ne stocke que** les créneaux (`delivery_slots`) et réservations (`delivery_bookings`). Aucune commande en base.
+- **Supabase ne stocke que** : créneaux (`delivery_slots`), réservations (`delivery_bookings`), et coûts mensuels (`monthly_costs` — pour Rentabilité → Calendrier). Aucune commande en base. Schéma géré à la main dans Supabase (pas de dossier migrations ; cf. `db/*.sql` pour les scripts à exécuter).
 - **Embed iframe** : `App.jsx` mesure `.hub-shell` et `postMessage('homesweet:hub-height')` au parent pour ajuster la hauteur (évite double scrollbar / iframe grise).
 
 ### Tags Shopify = états de commande
@@ -55,7 +55,8 @@ Modules sidebar : Commandes · Logistique · Livraisons · Compta · Rapports.
 - `/livraisons` → `waitinglist` (WaitingList) / `planifier` (planning carte) / `semaine` (agenda hebdo)
 - `/compta` — compta mensuelle
 - `/notifications` — réconciliation emails (Suivi) + renvoi manuel. `/emails` redirige ici.
-- `/rapports` — meilleures ventes + calculateur de marge
+- `/rapports` — meilleures ventes
+- `/rentabilite` — onglets **Calendrier** (rentabilité par mois sur 12 mois, coûts marketing + frais fixes éditables stockés dans `monthly_costs`) et **Calculateur** (marge par commande / par produit)
 - `/planification-livraison` — **page publique** de réservation client (hors shell)
 
 ## API (`api/`)
