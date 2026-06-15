@@ -12,6 +12,7 @@ import LivraisonsSemaine from './pages/LivraisonsSemaine'
 import Compta from './pages/Compta'
 import Notifications from './pages/Notifications'
 import Rapports from './pages/Rapports'
+import Rentabilite from './pages/Rentabilite'
 import PlanificationLivraison from './pages/PlanificationLivraison'
 import './App.css'
 
@@ -21,6 +22,7 @@ const MODULES = [
   { to: '/livraisons', label: 'Livraisons', icon: '🛋️' },
   { to: '/compta', label: 'Compta', icon: '💶' },
   { to: '/rapports', label: 'Rapports', icon: '📊' },
+  { to: '/rentabilite', label: 'Rentabilité', icon: '📈' },
 ]
 
 function Shell() {
@@ -269,6 +271,7 @@ export default function App() {
           <Route path="emails" element={<Navigate to="/notifications" replace />} />
           <Route path="factures" element={<Navigate to="/commandes" replace />} />
           <Route path="rapports" element={<Rapports />} />
+          <Route path="rentabilite" element={<Rentabilite />} />
           <Route path="*" element={<Navigate to="/commandes" replace />} />
         </Route>
       </Routes>
