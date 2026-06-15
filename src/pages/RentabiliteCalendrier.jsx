@@ -80,7 +80,7 @@ function CostEditor({ monthKey, marketingRow, fixedRows, onPatch, onPersist, onA
       <div className="calrent__editor-col">
         <div className="calrent__editor-title">Coûts marketing</div>
         <div className="calrent__cost-row calrent__cost-row--marketing">
-          <span className="calrent__cost-label">📣 Facebook</span>
+          <span className="calrent__cost-label">📣 Meta</span>
           <div className="calrent__amount">
             <input
               type="number"
@@ -102,7 +102,7 @@ function CostEditor({ monthKey, marketingRow, fixedRows, onPatch, onPersist, onA
         </div>
       </div>
 
-      <div className="calrent__editor-col">
+      <div className="calrent__editor-col calrent__editor-col--fixed">
         <div className="calrent__editor-title">Frais fixes mensuels</div>
         {fixedRows.length === 0 && (
           <div className="calrent__cost-empty">Aucun frais fixe pour ce mois.</div>
@@ -341,7 +341,7 @@ export default function Calendrier() {
             .insert({
               month: monthKey,
               category: 'marketing',
-              label: 'Facebook',
+              label: 'Meta',
               amount: fields.amount ?? 0,
             })
             .select('id, month, category, label, amount')

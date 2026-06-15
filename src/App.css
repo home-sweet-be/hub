@@ -6586,7 +6586,7 @@ a.semaine__order:hover {
 .calrent__editor {
   display: grid;
   grid-template-columns: minmax(220px, 1fr) minmax(260px, 1.4fr);
-  gap: 28px;
+  gap: 64px;
   padding: 16px 20px 20px;
 }
 
@@ -6594,6 +6594,13 @@ a.semaine__order:hover {
   display: flex;
   flex-direction: column;
   gap: 8px;
+}
+
+/* Push the fixed-costs column further from the marketing column, with a
+   subtle divider so the two groups read as clearly separate. */
+.calrent__editor-col--fixed {
+  padding-left: 40px;
+  border-left: 1px solid rgba(28, 28, 30, 0.1);
 }
 
 .calrent__editor-title {
@@ -6688,6 +6695,10 @@ a.semaine__order:hover {
   .calrent__editor {
     grid-template-columns: 1fr;
     gap: 18px;
+  }
+  .calrent__editor-col--fixed {
+    padding-left: 0;
+    border-left: none;
   }
 }
 
