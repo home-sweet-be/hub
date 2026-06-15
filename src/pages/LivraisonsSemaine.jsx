@@ -240,21 +240,22 @@ export default function LivraisonsSemaine() {
                   </aside>
 
                   <div className="semaine__col semaine__col--id">
-                    {order?.adminUrl ? (
-                      <a
-                        href={order.adminUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="semaine__order"
-                        title="Ouvrir dans Shopify"
-                      >
-                        {order.name}
-                      </a>
-                    ) : (
-                      <span className="semaine__order">
-                        {booking.shopify_order_name}
+                    <div className="semaine__tags">
+                      <span className={`semaine__tier semaine__tier--${tier}`}>
+                        {TIER_LABEL[tier]}
                       </span>
-                    )}
+                      {booking.monte_charge_required && (
+                        <span className="semaine__badge semaine__badge--mc">
+                          🛗 Monte-charges
+                        </span>
+                      )}
+                      {zone && (
+                        <span className="semaine__zone">
+                          <ZoneFlag code={zoneCode(zone)} />
+                          <span>{zone.replace(/^[A-Z]{2}-/, '').replace(/-/g, ' ')}</span>
+                        </span>
+                      )}
+                    </div>
                     <span className="semaine__customer">{name || '—'}</span>
                     {order?.shippingAddress && (
                       <div className="semaine__address">
@@ -299,22 +300,21 @@ export default function LivraisonsSemaine() {
                   </div>
 
                   <div className="semaine__col semaine__col--side">
-                    <div className="semaine__tags">
-                      <span className={`semaine__tier semaine__tier--${tier}`}>
-                        {TIER_LABEL[tier]}
+                    {order?.adminUrl ? (
+                      <a
+                        href={order.adminUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="semaine__order"
+                        title="Ouvrir dans Shopify"
+                      >
+                        {order.name}
+                      </a>
+                    ) : (
+                      <span className="semaine__order">
+                        {booking.shopify_order_name}
                       </span>
-                      {booking.monte_charge_required && (
-                        <span className="semaine__badge semaine__badge--mc">
-                          🛗 Monte-charges
-                        </span>
-                      )}
-                      {zone && (
-                        <span className="semaine__zone">
-                          <ZoneFlag code={zoneCode(zone)} />
-                          <span>{zone.replace(/^[A-Z]{2}-/, '').replace(/-/g, ' ')}</span>
-                        </span>
-                      )}
-                    </div>
+                    )}
 
                     <div className="semaine__contact">
                       {order?.email && (

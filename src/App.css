@@ -5862,7 +5862,7 @@ body:has(.plani),
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
-  justify-content: flex-end;
+  justify-content: flex-start;
 }
 
 .semaine__card:hover {
