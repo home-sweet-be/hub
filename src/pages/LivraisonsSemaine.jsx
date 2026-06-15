@@ -125,10 +125,14 @@ export default function LivraisonsSemaine() {
       }
 
       const slotMap = new Map(slots.map((s) => [s.id, s]))
+      // Hide a delivery 2h after its slot end time (not just once the day is
+      // over) — a morning slot drops off the list in the early afternoon.
+      const hideBefore = Date.now() - 2 * 60 * 60 * 1000
       const entries = bookings
         .map((b) => {
           const slot = slotMap.get(b.slot_id)
           if (!slot) return null
+          if (new Date(slot.ends_at).getTime() < hideBefore) return null
           const order = ordersByName.get(
             String(b.shopify_order_name).replace(/^#/, '')
           )
