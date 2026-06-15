@@ -32,11 +32,11 @@ create policy "monthly_costs anon all"
 
 -- ----------------------------------------------------------------
 --  Backfill the last 12 months (relative to today):
---    5000 € marketing (Facebook) + 1000 € fixed ("Divers") / month.
+--    5000 € marketing (Meta) + fixed costs: Divers 2000 € + Loyer 1000 €.
 --  Guarded so re-running the script doesn't duplicate rows.
 -- ----------------------------------------------------------------
 insert into public.monthly_costs (month, category, label, amount)
-select gs::date, 'marketing', 'Facebook', 5000
+select gs::date, 'marketing', 'Meta', 5000
 from generate_series(
   date_trunc('month', now()) - interval '11 months',
   date_trunc('month', now()),
@@ -47,12 +47,13 @@ where not exists (
 );
 
 insert into public.monthly_costs (month, category, label, amount)
-select gs::date, 'fixed', 'Divers', 1000
+select gs::date, 'fixed', f.label, f.amount
 from generate_series(
   date_trunc('month', now()) - interval '11 months',
   date_trunc('month', now()),
   interval '1 month'
 ) as gs
+cross join (values ('Divers', 2000), ('Loyer', 1000)) as f(label, amount)
 where not exists (
   select 1 from public.monthly_costs where category = 'fixed'
 );
