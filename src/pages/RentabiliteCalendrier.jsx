@@ -40,6 +40,15 @@ function formatPrice(amount, frac = 0) {
   }).format(n)
 }
 
+function formatDate(iso) {
+  if (!iso) return ''
+  return new Date(iso).toLocaleDateString('fr-BE', {
+    day: '2-digit',
+    month: '2-digit',
+    year: '2-digit',
+  })
+}
+
 function effectiveQuantity(li) {
   return li.currentQuantity ?? li.quantity ?? 0
 }
@@ -151,6 +160,79 @@ function CostEditor({ monthKey, marketingRow, fixedRows, onPatch, onPersist, onA
           + Ajouter un coût
         </button>
       </div>
+    </div>
+  )
+}
+
+/* ============================================================ */
+/*  Per-month orders breakdown (control / reconciliation)       */
+/* ============================================================ */
+function OrdersBreakdown({ rows }) {
+  if (!rows.length) {
+    return <div className="calrent__detail-empty">Aucune commande ce mois-ci.</div>
+  }
+  const totals = rows.reduce(
+    (acc, r) => {
+      acc.revenueHt += r.revenueHt
+      acc.cogs += r.cogs
+      acc.margeBrute += r.margeBrute
+      return acc
+    },
+    { revenueHt: 0, cogs: 0, margeBrute: 0 }
+  )
+  return (
+    <div className="calrent__detail">
+      <table className="calrent__detail-table">
+        <thead>
+          <tr>
+            <th>Commande</th>
+            <th>Date</th>
+            <th className="num">CA HT</th>
+            <th className="num">Coût march.</th>
+            <th className="num">Marge brute</th>
+          </tr>
+        </thead>
+        <tbody>
+          {rows.map((r) => (
+            <tr key={r.id}>
+              <td className="calrent__detail-order">
+                {r.adminUrl ? (
+                  <a href={r.adminUrl} target="_blank" rel="noopener noreferrer">
+                    {r.name}
+                  </a>
+                ) : (
+                  r.name
+                )}
+                {r.noCost && (
+                  <span
+                    className="calrent__detail-warn"
+                    title="Aucun coût produit renseigné dans Shopify pour cette commande"
+                  >
+                    ⚠️
+                  </span>
+                )}
+              </td>
+              <td>{formatDate(r.date)}</td>
+              <td className="num">{formatPrice(r.revenueHt)}</td>
+              <td className="num">{formatPrice(r.cogs)}</td>
+              <td className="num">
+                {formatPrice(r.margeBrute)}
+                <span className="calrent-table__pct">
+                  {Math.round(r.margeBrutePct)}%
+                </span>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+        <tfoot>
+          <tr>
+            <td colSpan={2}>{rows.length} commande{rows.length > 1 ? 's' : ''}</td>
+            <td className="num">{formatPrice(totals.revenueHt)}</td>
+            <td className="num">{formatPrice(totals.cogs)}</td>
+            <td className="num">{formatPrice(totals.margeBrute)}</td>
+          </tr>
+        </tfoot>
+      </table>
     </div>
   )
 }
@@ -285,6 +367,53 @@ export default function Calendrier() {
     }
     return m
   }, [costs, months])
+
+  // Per-order breakdown for each month (for the control dropdown).
+  const ordersDetailByMonth = useMemo(() => {
+    const m = new Map()
+    for (const key of months) m.set(key, [])
+    if (orders) {
+      for (const o of orders) {
+        const d = new Date(o.createdAt)
+        const key = monthKeyOf(new Date(d.getFullYear(), d.getMonth(), 1))
+        const arr = m.get(key)
+        if (!arr) continue
+        let revenueHt = 0
+        let revenueTtc = 0
+        let cogs = 0
+        for (const li of o.lineItems || []) {
+          const qty = effectiveQuantity(li)
+          if (qty <= 0 || isSample(li)) continue
+          const lineTtc = Number(
+            li.discountedTotalSet?.shopMoney?.amount ||
+              (li.originalUnitPriceSet?.shopMoney?.amount || 0) * qty
+          )
+          if (Number.isNaN(lineTtc)) continue
+          const unitCost = Number(li.variant?.inventoryItem?.unitCost?.amount) || 0
+          revenueTtc += lineTtc
+          revenueHt += lineTtc / (1 + VAT_RATE)
+          cogs += unitCost * qty
+        }
+        if (revenueTtc === 0 && cogs === 0) continue
+        const margeBrute = revenueHt - cogs
+        arr.push({
+          id: o.id,
+          name: o.name,
+          adminUrl: o.adminUrl,
+          date: o.createdAt,
+          revenueHt,
+          cogs,
+          margeBrute,
+          margeBrutePct: pct(margeBrute, revenueHt),
+          noCost: revenueTtc > 0 && cogs === 0,
+        })
+      }
+      for (const arr of m.values()) {
+        arr.sort((a, b) => new Date(b.date) - new Date(a.date))
+      }
+    }
+    return m
+  }, [orders, months])
 
   // Per-month derived rows + 12-month totals.
   const rows = useMemo(() => {
@@ -423,7 +552,11 @@ export default function Calendrier() {
               </thead>
               <tbody>
                 {rows.map((r) => {
-                  const open = expanded === r.key
+                  const isOrders =
+                    expanded?.key === r.key && expanded.mode === 'orders'
+                  const isCosts =
+                    expanded?.key === r.key && expanded.mode === 'costs'
+                  const open = isOrders || isCosts
                   const marketingRow = costs.find(
                     (c) => c.month === r.key && c.category === 'marketing'
                   )
@@ -434,10 +567,25 @@ export default function Calendrier() {
                     <Fragment key={r.key}>
                       <tr
                         className={
-                          'calrent-table__row' + (open ? ' is-open' : '')
+                          'calrent-table__row calrent-table__row--clickable' +
+                          (open ? ' is-open' : '')
+                        }
+                        onClick={() =>
+                          setExpanded(
+                            isOrders ? null : { key: r.key, mode: 'orders' }
+                          )
                         }
                       >
                         <td className="calrent-table__month">
+                          <span
+                            className={
+                              'calrent-table__chevron' +
+                              (isOrders ? ' is-open' : '')
+                            }
+                            aria-hidden="true"
+                          >
+                            ▸
+                          </span>
                           {monthLabel(r.key)}
                         </td>
                         <td className="num">{formatPrice(r.revenueHt)}</td>
@@ -469,15 +617,29 @@ export default function Calendrier() {
                           <button
                             type="button"
                             className="calrent-table__toggle"
-                            onClick={() => setExpanded(open ? null : r.key)}
-                            aria-expanded={open}
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              setExpanded(
+                                isCosts ? null : { key: r.key, mode: 'costs' }
+                              )
+                            }}
+                            aria-expanded={isCosts}
                             title="Éditer les coûts du mois"
                           >
-                            {open ? '×' : '✎'}
+                            {isCosts ? '×' : '✎'}
                           </button>
                         </td>
                       </tr>
-                      {open && (
+                      {isOrders && (
+                        <tr className="calrent-table__detail-row">
+                          <td colSpan={8}>
+                            <OrdersBreakdown
+                              rows={ordersDetailByMonth.get(r.key) || []}
+                            />
+                          </td>
+                        </tr>
+                      )}
+                      {isCosts && (
                         <tr className="calrent-table__editor-row">
                           <td colSpan={8}>
                             <CostEditor

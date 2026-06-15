@@ -6528,9 +6528,92 @@ a.semaine__order:hover {
   background: rgba(10, 132, 255, 0.04);
 }
 
+.calrent-table__row--clickable {
+  cursor: pointer;
+}
+
+.calrent-table__row--clickable:hover td {
+  background: rgba(28, 28, 30, 0.03);
+}
+
 .calrent-table__month {
   font-weight: 600;
   text-transform: capitalize;
+}
+
+.calrent-table__chevron {
+  display: inline-block;
+  margin-right: 8px;
+  color: var(--text-soft);
+  font-size: 11px;
+  transition: transform 0.15s;
+}
+
+.calrent-table__chevron.is-open {
+  transform: rotate(90deg);
+}
+
+/* per-month orders breakdown */
+.calrent-table__detail-row td {
+  padding: 0;
+  background: rgba(28, 28, 30, 0.02);
+}
+
+.calrent__detail {
+  padding: 6px 18px 14px;
+}
+
+.calrent__detail-empty {
+  padding: 16px 18px;
+  color: var(--text-soft);
+  font-size: 13px;
+}
+
+.calrent__detail-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.calrent__detail-table th {
+  text-align: left;
+  padding: 6px 10px;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-soft);
+  border-bottom: 1px solid rgba(28, 28, 30, 0.08);
+}
+
+.calrent__detail-table td {
+  padding: 6px 10px;
+  border-bottom: 1px solid rgba(28, 28, 30, 0.05);
+  font-variant-numeric: tabular-nums;
+}
+
+.calrent__detail-table .num {
+  text-align: right;
+}
+
+.calrent__detail-order a {
+  color: #0050b3;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.calrent__detail-order a:hover {
+  text-decoration: underline;
+}
+
+.calrent__detail-warn {
+  margin-left: 6px;
+  font-size: 11px;
+}
+
+.calrent__detail-table tfoot td {
+  font-weight: 700;
+  border-bottom: none;
+  border-top: 2px solid rgba(28, 28, 30, 0.12);
 }
 
 .calrent-table__pct {
