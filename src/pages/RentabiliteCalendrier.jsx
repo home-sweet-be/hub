@@ -602,11 +602,13 @@ export default function Calendrier() {
                           </span>
                           {monthLabel(r.key)}
                         </td>
-                        <td className="num">{formatPrice(r.revenueHt)}</td>
+                        <td className="num calrent-table__ca">
+                          {formatPrice(r.revenueHt)}
+                        </td>
                         <td className="num">{formatPrice(r.cogs)}</td>
-                        <td className="num">
+                        <td className="num calrent-table__marge">
                           {formatPrice(r.margeBrute)}
-                          <span className="calrent-table__pct">
+                          <span className="calrent-table__pct calrent-table__pct--bubble">
                             {Math.round(r.margeBrutePct)}%
                           </span>
                         </td>

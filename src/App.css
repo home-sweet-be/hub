@@ -6615,6 +6615,27 @@ a.semaine__order:hover {
   font-weight: 600;
 }
 
+/* CA HT — bold, dark blue */
+.calrent-table__ca {
+  font-weight: 700;
+  color: #003a8c;
+}
+
+/* Marge brute — bright blue */
+.calrent-table__marge {
+  color: #0a84ff;
+  font-weight: 600;
+}
+
+/* Marge brute % as a rounded badge */
+.calrent-table__pct--bubble {
+  padding: 1px 8px;
+  border-radius: 999px;
+  background: rgba(10, 132, 255, 0.14);
+  color: #0050b3;
+  font-weight: 700;
+}
+
 .calrent-table__cost {
   color: #b35900;
 }
