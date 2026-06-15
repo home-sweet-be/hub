@@ -176,85 +176,63 @@ function CostEditor({ monthKey, marketingRow, fixedRows, onPatch, onPersist, onA
 
 /* ============================================================ */
 /*  Per-month orders breakdown (control / reconciliation)       */
+/*  Rendered as rows of the MAIN table so the CA HT / Coût      */
+/*  march. / Marge brute columns line up with the month rows.   */
 /* ============================================================ */
-function OrdersBreakdown({ rows }) {
+function OrdersBreakdownRows({ rows, monthKey }) {
   if (!rows.length) {
-    return <div className="calrent__detail-empty">Aucune commande ce mois-ci.</div>
+    return (
+      <tr className="calrent-table__order-row">
+        <td colSpan={8} className="calrent__detail-empty">
+          Aucune commande ce mois-ci.
+        </td>
+      </tr>
+    )
   }
-  const totals = rows.reduce(
-    (acc, r) => {
-      acc.revenueHt += r.revenueHt
-      acc.cogs += r.cogs
-      acc.margeBrute += r.margeBrute
-      return acc
-    },
-    { revenueHt: 0, cogs: 0, margeBrute: 0 }
-  )
-  return (
-    <div className="calrent__detail">
-      <table className="calrent__detail-table">
-        <thead>
-          <tr>
-            <th>Commande</th>
-            <th>Date</th>
-            <th className="num">CA HT</th>
-            <th className="num">Coût march.</th>
-            <th className="num">Marge brute</th>
-          </tr>
-        </thead>
-        <tbody>
-          {rows.map((r) => (
-            <tr key={r.id}>
-              <td className="calrent__detail-order">
-                {r.adminUrl ? (
-                  <a href={r.adminUrl} target="_blank" rel="noopener noreferrer">
-                    {r.name}
-                  </a>
-                ) : (
-                  r.name
-                )}
-              </td>
-              <td>{formatDate(r.date)}</td>
-              <td className="num">{formatPrice(r.revenueHt)}</td>
-              <td className="num">
-                {formatPrice(r.cogs)}
-                {r.costSource === 'backfill' && (
-                  <span
-                    className="calrent__detail-backfill"
-                    title="Coût saisi manuellement (métachamp custom.cout_backfill)"
-                  >
-                    ✎
-                  </span>
-                )}
-                {r.costSource === 'estimate' && (
-                  <span
-                    className="calrent__detail-est"
-                    title="Coût estimé à 50% du HT (aucun coût produit ni backfill)"
-                  >
-                    ≈
-                  </span>
-                )}
-              </td>
-              <td className="num">
-                {formatPrice(r.margeBrute)}
-                <span className="calrent-table__pct">
-                  {Math.round(r.margeBrutePct)}%
-                </span>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-        <tfoot>
-          <tr>
-            <td colSpan={2}>{rows.length} commande{rows.length > 1 ? 's' : ''}</td>
-            <td className="num">{formatPrice(totals.revenueHt)}</td>
-            <td className="num">{formatPrice(totals.cogs)}</td>
-            <td className="num">{formatPrice(totals.margeBrute)}</td>
-          </tr>
-        </tfoot>
-      </table>
-    </div>
-  )
+  return rows.map((r) => (
+    <tr key={`${monthKey}-${r.id}`} className="calrent-table__order-row">
+      <td className="calrent-table__order-name">
+        {r.adminUrl ? (
+          <a href={r.adminUrl} target="_blank" rel="noopener noreferrer">
+            {r.name}
+          </a>
+        ) : (
+          r.name
+        )}
+        <span className="calrent-table__order-date">{formatDate(r.date)}</span>
+      </td>
+      <td className="num">{formatPrice(r.revenueHt)}</td>
+      <td className="num">
+        {formatPrice(r.cogs)}
+        {r.costSource === 'backfill' && (
+          <span
+            className="calrent__detail-backfill"
+            title="Coût saisi manuellement (métachamp custom.cout_backfill)"
+          >
+            ✎
+          </span>
+        )}
+        {r.costSource === 'estimate' && (
+          <span
+            className="calrent__detail-est"
+            title="Coût estimé à 50% du HT (aucun coût produit ni backfill)"
+          >
+            ≈
+          </span>
+        )}
+      </td>
+      <td className="num">
+        {formatPrice(r.margeBrute)}
+        <span className="calrent-table__pct">
+          {Math.round(r.margeBrutePct)}%
+        </span>
+      </td>
+      <td className="num" />
+      <td className="num" />
+      <td className="num" />
+      <td />
+    </tr>
+  ))
 }
 
 /* ============================================================ */
@@ -667,13 +645,10 @@ export default function Calendrier() {
                         </td>
                       </tr>
                       {isOrders && (
-                        <tr className="calrent-table__detail-row">
-                          <td colSpan={8}>
-                            <OrdersBreakdown
-                              rows={ordersDetailByMonth.get(r.key) || []}
-                            />
-                          </td>
-                        </tr>
+                        <OrdersBreakdownRows
+                          monthKey={r.key}
+                          rows={ordersDetailByMonth.get(r.key) || []}
+                        />
                       )}
                       {isCosts && (
                         <tr className="calrent-table__editor-row">
