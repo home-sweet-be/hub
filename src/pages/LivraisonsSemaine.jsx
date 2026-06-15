@@ -279,12 +279,27 @@ export default function LivraisonsSemaine() {
                       </div>
                     </div>
 
-                    {order?.shippingAddress && (
-                      <div className="semaine__address">
-                        <span aria-hidden="true">📍</span>
-                        <span>{formatAddress(order.shippingAddress)}</span>
+                    <div className="semaine__meta">
+                      {order?.shippingAddress && (
+                        <div className="semaine__address">
+                          <span aria-hidden="true">📍</span>
+                          <span>{formatAddress(order.shippingAddress)}</span>
+                        </div>
+                      )}
+
+                      <div className="semaine__contact">
+                        {order?.email && (
+                          <a href={`mailto:${order.email}`} className="semaine__chip">
+                            ✉️ {order.email}
+                          </a>
+                        )}
+                        {order?.phone && (
+                          <a href={`tel:${order.phone}`} className="semaine__chip">
+                            📞 {order.phone}
+                          </a>
+                        )}
                       </div>
-                    )}
+                    </div>
 
                     {items.length > 0 && (
                       <ul className="semaine__items">
@@ -317,19 +332,6 @@ export default function LivraisonsSemaine() {
                         ))}
                       </ul>
                     )}
-
-                    <div className="semaine__contact">
-                      {order?.email && (
-                        <a href={`mailto:${order.email}`} className="semaine__chip">
-                          ✉️ {order.email}
-                        </a>
-                      )}
-                      {order?.phone && (
-                        <a href={`tel:${order.phone}`} className="semaine__chip">
-                          📞 {order.phone}
-                        </a>
-                      )}
-                    </div>
                   </div>
                 </article>
               )
