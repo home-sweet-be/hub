@@ -391,14 +391,6 @@ export default function Calendrier() {
               <span>Marge brute (12 mois)</span>
               <strong>{formatPrice(totals.margeBrute)}</strong>
             </div>
-            <div className="calrent__summary-item">
-              <span>Marketing</span>
-              <strong>−{formatPrice(totals.marketing)}</strong>
-            </div>
-            <div className="calrent__summary-item">
-              <span>Frais fixes</span>
-              <strong>−{formatPrice(totals.fixed)}</strong>
-            </div>
             <div
               className={
                 'calrent__summary-item calrent__summary-item--net' +
