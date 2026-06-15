@@ -455,13 +455,14 @@ export default function Calendrier() {
     return rows.reduce(
       (acc, r) => {
         acc.revenueHt += r.revenueHt
+        acc.cogs += r.cogs
         acc.margeBrute += r.margeBrute
         acc.marketing += r.marketing
         acc.fixed += r.fixed
         acc.net += r.net
         return acc
       },
-      { revenueHt: 0, margeBrute: 0, marketing: 0, fixed: 0, net: 0 }
+      { revenueHt: 0, cogs: 0, margeBrute: 0, marketing: 0, fixed: 0, net: 0 }
     )
   }, [rows])
 
@@ -531,7 +532,15 @@ export default function Calendrier() {
         <>
           <div className="calrent__summary">
             <div className="calrent__summary-item">
-              <span>Marge brute (12 mois)</span>
+              <span>CA HT</span>
+              <strong>{formatPrice(totals.revenueHt)}</strong>
+            </div>
+            <div className="calrent__summary-item">
+              <span>Coût marchandise</span>
+              <strong>{formatPrice(totals.cogs)}</strong>
+            </div>
+            <div className="calrent__summary-item">
+              <span>Marge brute</span>
               <strong>{formatPrice(totals.margeBrute)}</strong>
             </div>
             <div
