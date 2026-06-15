@@ -600,17 +600,47 @@ function CalculateurMarge() {
 }
 
 /* ============================================================ */
+/*  Tab: Calendrier (placeholder — à venir)                     */
+/* ============================================================ */
+function Calendrier() {
+  return null
+}
+
+/* ============================================================ */
 /*  Main page                                                   */
 /* ============================================================ */
+const MAIN_TABS = [
+  { id: 'calendrier', label: 'Calendrier' },
+  { id: 'calculateur', label: 'Calculateur' },
+]
+
 export default function Rentabilite() {
+  const [mainTab, setMainTab] = useState('calendrier')
+
   return (
     <div className="page rapports">
       <header className="rapports__head">
         <h1 className="rapports__title">Rentabilité</h1>
       </header>
 
+      <nav className="rapports__subpages" aria-label="Sections">
+        {MAIN_TABS.map((t) => (
+          <button
+            key={t.id}
+            type="button"
+            className={
+              'rapports__subpage' + (mainTab === t.id ? ' is-active' : '')
+            }
+            onClick={() => setMainTab(t.id)}
+          >
+            {t.label}
+          </button>
+        ))}
+      </nav>
+
       <section className="rapports__panel">
-        <CalculateurMarge />
+        {mainTab === 'calendrier' && <Calendrier />}
+        {mainTab === 'calculateur' && <CalculateurMarge />}
       </section>
     </div>
   )
