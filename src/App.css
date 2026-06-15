@@ -5824,7 +5824,10 @@ body:has(.plani),
 
 .semaine__card {
   display: grid;
-  grid-template-columns: 84px minmax(150px, 1fr) minmax(170px, 1.3fr) auto;
+  /* Fixed id + side columns so the product column starts at the SAME x on
+     every row (each card is its own grid; an `auto`/`fr` id column would make
+     the product start drift per row depending on email length). */
+  grid-template-columns: 84px 260px minmax(0, 1fr) 210px;
   align-items: center;
   gap: 18px;
   padding: 12px 18px;
@@ -6040,12 +6043,14 @@ a.semaine__order:hover {
   display: inline-flex;
   align-items: center;
   gap: 4px;
+  max-width: 100%;
   font-size: 12px;
   color: var(--text-soft);
   text-decoration: none;
   padding: 4px 9px;
   border-radius: 999px;
   background: rgba(28, 28, 30, 0.05);
+  word-break: break-word;
 }
 
 .semaine__chip:hover {
