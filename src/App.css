@@ -5827,7 +5827,7 @@ body:has(.plani),
   /* Fixed id + side columns so the product column starts at the SAME x on
      every row (each card is its own grid; an `auto`/`fr` id column would make
      the product start drift per row depending on email length). */
-  grid-template-columns: 84px 290px minmax(0, 1fr) 210px;
+  grid-template-columns: 84px 390px minmax(0, 1fr) 210px;
   align-items: center;
   gap: 18px;
   padding: 12px 18px;
