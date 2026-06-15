@@ -6488,6 +6488,14 @@ a.semaine__order:hover {
   color: var(--text-soft);
 }
 
+/* Visual gap separating the totals row from the month rows */
+.calrent-table__spacer td {
+  height: 30px;
+  padding: 0;
+  background: transparent;
+  border: none;
+}
+
 /* table */
 .calrent-table {
   width: 100%;

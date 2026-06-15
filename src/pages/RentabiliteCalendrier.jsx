@@ -572,6 +572,9 @@ export default function Calendrier() {
                   </td>
                   <td />
                 </tr>
+                <tr className="calrent-table__spacer" aria-hidden="true">
+                  <td colSpan={8} />
+                </tr>
                 {rows.map((r) => {
                   const isOrders =
                     expanded?.key === r.key && expanded.mode === 'orders'
