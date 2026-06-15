@@ -214,7 +214,17 @@ function OrdersBreakdown({ rows }) {
               </td>
               <td>{formatDate(r.date)}</td>
               <td className="num">{formatPrice(r.revenueHt)}</td>
-              <td className="num">{formatPrice(r.cogs)}</td>
+              <td className="num">
+                {formatPrice(r.cogs)}
+                {r.backfilled && (
+                  <span
+                    className="calrent__detail-backfill"
+                    title="Coût saisi manuellement (métachamp custom.cout_backfill)"
+                  >
+                    ✎
+                  </span>
+                )}
+              </td>
               <td className="num">
                 {formatPrice(r.margeBrute)}
                 <span className="calrent-table__pct">
@@ -335,6 +345,9 @@ export default function Calendrier() {
         const key = monthKeyOf(new Date(d.getFullYear(), d.getMonth(), 1))
         const bucket = m.get(key)
         if (!bucket) continue
+        let revenueTtc = 0
+        let revenueHt = 0
+        let lineCogs = 0
         for (const li of o.lineItems || []) {
           const qty = effectiveQuantity(li)
           if (qty <= 0 || isSample(li)) continue
@@ -344,10 +357,15 @@ export default function Calendrier() {
           )
           if (Number.isNaN(lineTtc)) continue
           const unitCost = Number(li.variant?.inventoryItem?.unitCost?.amount) || 0
-          bucket.revenueTtc += lineTtc
-          bucket.revenueHt += lineTtc / (1 + VAT_RATE)
-          bucket.cogs += unitCost * qty
+          revenueTtc += lineTtc
+          revenueHt += lineTtc / (1 + VAT_RATE)
+          lineCogs += unitCost * qty
         }
+        // Order-level backfill (custom.cout_backfill) overrides the line cost.
+        const cogs = o.costBackfill != null ? o.costBackfill : lineCogs
+        bucket.revenueTtc += revenueTtc
+        bucket.revenueHt += revenueHt
+        bucket.cogs += cogs
       }
     }
     return m
@@ -380,7 +398,7 @@ export default function Calendrier() {
         if (!arr) continue
         let revenueHt = 0
         let revenueTtc = 0
-        let cogs = 0
+        let lineCogs = 0
         for (const li of o.lineItems || []) {
           const qty = effectiveQuantity(li)
           if (qty <= 0 || isSample(li)) continue
@@ -392,8 +410,10 @@ export default function Calendrier() {
           const unitCost = Number(li.variant?.inventoryItem?.unitCost?.amount) || 0
           revenueTtc += lineTtc
           revenueHt += lineTtc / (1 + VAT_RATE)
-          cogs += unitCost * qty
+          lineCogs += unitCost * qty
         }
+        const backfilled = o.costBackfill != null
+        const cogs = backfilled ? o.costBackfill : lineCogs
         if (revenueTtc === 0 && cogs === 0) continue
         const margeBrute = revenueHt - cogs
         arr.push({
@@ -405,7 +425,8 @@ export default function Calendrier() {
           cogs,
           margeBrute,
           margeBrutePct: pct(margeBrute, revenueHt),
-          noCost: revenueTtc > 0 && cogs === 0,
+          backfilled,
+          noCost: !backfilled && revenueTtc > 0 && cogs === 0,
         })
       }
       for (const arr of m.values()) {

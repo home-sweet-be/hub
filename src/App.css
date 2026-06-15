@@ -6610,6 +6610,13 @@ a.semaine__order:hover {
   font-size: 11px;
 }
 
+.calrent__detail-backfill {
+  margin-left: 5px;
+  font-size: 10px;
+  color: #0050b3;
+  opacity: 0.7;
+}
+
 .calrent__detail-table tfoot td {
   font-weight: 700;
   border-bottom: none;

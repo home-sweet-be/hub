@@ -13,6 +13,7 @@ const QUERY = `
           tags
           totalPriceSet { shopMoney { amount currencyCode } }
           displayFinancialStatus
+          coutBackfill: metafield(namespace: "custom", key: "cout_backfill") { value }
           shippingAddress {
             name
             address1
@@ -136,6 +137,14 @@ export default async function handler(req, res) {
           total: o.totalPriceSet?.shopMoney?.amount,
           currency: o.totalPriceSet?.shopMoney?.currencyCode,
           financialStatus: o.displayFinancialStatus,
+          // Order-level manual cost backfill (HT) from the custom.cout_backfill
+          // metafield — overrides the per-line-item cost when present.
+          costBackfill: (() => {
+            const raw = o.coutBackfill?.value
+            if (raw == null || raw === '') return null
+            const n = parseFloat(String(raw).replace(',', '.'))
+            return Number.isFinite(n) ? n : null
+          })(),
           shippingAddress: o.shippingAddress,
           customer: o.customer
             ? {
