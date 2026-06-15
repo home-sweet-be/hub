@@ -25,6 +25,12 @@ function effectiveQuantity(li) {
   return li.currentQuantity ?? li.quantity ?? 0
 }
 
+// Textile samples ("Échantillons de textile") are excluded from the margin
+// calculator — they aren't representative products/lines for profitability.
+function isSample(item) {
+  return /[ée]chantillon/i.test(item?.title || '')
+}
+
 async function fetchAllPaged(buildUrl, key) {
   const all = []
   let after = null
@@ -137,7 +143,7 @@ function CalculateurMarge() {
     if (!products || tab !== 'par-produit') return []
     const term = search.trim().toLowerCase()
     return products
-      .filter((p) => p.variant && p.variant.price > 0)
+      .filter((p) => p.variant && p.variant.price > 0 && !isSample(p))
       .map((p) => {
         const v = p.variant
         const priceTtc = v.price
@@ -187,7 +193,7 @@ function CalculateurMarge() {
     const out = []
     for (const o of sortedOrders) {
       const items = (o.lineItems || []).filter(
-        (li) => effectiveQuantity(li) > 0
+        (li) => effectiveQuantity(li) > 0 && !isSample(li)
       )
       if (items.length === 0) continue
       const customerName =
