@@ -6464,53 +6464,28 @@ a.semaine__order:hover {
   gap: 16px;
 }
 
-.calrent__summary {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 10px 22px;
-  padding: 14px 18px;
-  background: rgba(28, 28, 30, 0.025);
-  border: 1px solid rgba(28, 28, 30, 0.07);
-  border-radius: 14px;
-}
-
-.calrent__summary-item {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.calrent__summary-item span {
-  font-size: 11px;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  color: var(--text-soft);
-}
-
-.calrent__summary-item strong {
-  font-size: 18px;
-  font-variant-numeric: tabular-nums;
-  letter-spacing: -0.01em;
-}
-
-.calrent__summary-item--net {
-  margin-left: auto;
-  padding-left: 22px;
-  border-left: 1px solid rgba(28, 28, 30, 0.1);
-}
-
-.calrent__summary-item--net strong {
-  color: #1a7f37;
-}
-
-.calrent__summary-item--net.is-negative strong {
-  color: #c0392b;
-}
-
 .calrent__trunc {
+  margin: 0;
   font-size: 12px;
   color: #b35900;
+}
+
+/* Totals row (12-month summary) — aligned with the table columns */
+.calrent-table__totals td {
+  background: rgba(10, 132, 255, 0.06);
+  font-weight: 700;
+  font-size: 15px;
+  padding-top: 13px;
+  padding-bottom: 13px;
+  border-bottom: 2px solid rgba(28, 28, 30, 0.14);
+  font-variant-numeric: tabular-nums;
+}
+
+.calrent-table__totals-label {
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-size: 12px;
+  color: var(--text-soft);
 }
 
 /* table */

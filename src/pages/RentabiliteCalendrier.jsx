@@ -530,34 +530,11 @@ export default function Calendrier() {
 
       {ready && (
         <>
-          <div className="calrent__summary">
-            <div className="calrent__summary-item">
-              <span>CA HT</span>
-              <strong>{formatPrice(totals.revenueHt)}</strong>
-            </div>
-            <div className="calrent__summary-item">
-              <span>Coût marchandise</span>
-              <strong>{formatPrice(totals.cogs)}</strong>
-            </div>
-            <div className="calrent__summary-item">
-              <span>Marge brute</span>
-              <strong>{formatPrice(totals.margeBrute)}</strong>
-            </div>
-            <div
-              className={
-                'calrent__summary-item calrent__summary-item--net' +
-                (totals.net < 0 ? ' is-negative' : '')
-              }
-            >
-              <span>Résultat net</span>
-              <strong>{formatPrice(totals.net)}</strong>
-            </div>
-            {truncated && (
-              <span className="calrent__trunc" title="Trop de commandes : données limitées">
-                ⚠️ données limitées
-              </span>
-            )}
-          </div>
+          {truncated && (
+            <p className="calrent__trunc">
+              ⚠️ Trop de commandes : données limitées.
+            </p>
+          )}
 
           <div className="compta-table-wrap">
             <table className="compta-table calrent-table">
@@ -574,6 +551,27 @@ export default function Calendrier() {
                 </tr>
               </thead>
               <tbody>
+                <tr className="calrent-table__totals">
+                  <td className="calrent-table__totals-label">Total 12 mois</td>
+                  <td className="num calrent-table__ca">
+                    {formatPrice(totals.revenueHt)}
+                  </td>
+                  <td className="num">{formatPrice(totals.cogs)}</td>
+                  <td className="num calrent-table__marge">
+                    {formatPrice(totals.margeBrute)}
+                  </td>
+                  <td className="num" />
+                  <td className="num" />
+                  <td
+                    className={
+                      'num calrent-table__net' +
+                      (totals.net < 0 ? ' is-negative' : '')
+                    }
+                  >
+                    {formatPrice(totals.net)}
+                  </td>
+                  <td />
+                </tr>
                 {rows.map((r) => {
                   const isOrders =
                     expanded?.key === r.key && expanded.mode === 'orders'
