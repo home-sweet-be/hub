@@ -921,6 +921,12 @@
   border-bottom: none;
 }
 
+/* Bordure gauche turquoise sur les commandes ayant eu un acompte.
+   Pilotée uniquement par le cache deposit_orders (aucun fetch Shopify). */
+.reception-table tbody tr.is-deposit td:first-child {
+  border-left: 3px solid #06b6d4;
+}
+
 .reception-table tbody tr:hover {
   background: rgba(255, 255, 255, 0.45);
 }

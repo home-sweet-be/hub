@@ -4,6 +4,7 @@ import ZoneModal from '../components/ZoneModal'
 import AddressModal from '../components/AddressModal'
 import OrdersTableSkeleton from '../components/OrdersTableSkeleton'
 import { useReload } from '../lib/reload'
+import { fetchDepositOrderNumbers } from '../lib/depositSync'
 
 const ZONE_TAG_PATTERN = /^(BE|FR|LU|NL|DE|LIV)(-|$)/i
 
@@ -89,7 +90,21 @@ export default function Commandes() {
   const [error, setError] = useState(null)
   const [zoneEditing, setZoneEditing] = useState(null)
   const [addressViewing, setAddressViewing] = useState(null)
+  const [depositSet, setDepositSet] = useState(() => new Set())
   const { reloadKey } = useReload()
+
+  // Numéros de commande ayant eu un acompte, lus UNIQUEMENT depuis le cache
+  // Supabase deposit_orders (aucun fetch Shopify ici) — sert à tester que la DB
+  // est bien remplie en marquant ces commandes d'une bordure turquoise.
+  useEffect(() => {
+    let alive = true
+    fetchDepositOrderNumbers().then((set) => {
+      if (alive) setDepositSet(set)
+    })
+    return () => {
+      alive = false
+    }
+  }, [reloadKey])
 
   const load = useCallback(() => {
     setOrders(null)
@@ -164,6 +179,7 @@ export default function Commandes() {
                   )}
                   {sorted.flatMap((o) => {
                     const zone = extractZone(o)
+                    const isDeposit = depositSet.has(o.name)
                     const items = activeLineItems(o)
                     if (items.length === 0) return []
 
@@ -204,6 +220,7 @@ export default function Commandes() {
                         span > 1 && !isFirst ? 'is-row-cont' : '',
                         isSubLine ? 'is-row-sub' : '',
                         isSubLine && isLast ? 'is-row-sub--last' : '',
+                        isDeposit ? 'is-deposit' : '',
                       ]
                         .filter(Boolean)
                         .join(' ')
