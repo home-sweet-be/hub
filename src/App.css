@@ -6844,14 +6844,15 @@ a.semaine__order:hover {
 }
 
 .reception-facture-btn {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
   background: #1c1a17;
-  color: #fff;
   text-decoration: none;
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 0.02em;
-  padding: 7px 14px;
+  font-size: 15px;
+  line-height: 1;
   border-radius: 8px;
   transition: background 0.15s ease, transform 0.05s ease;
 }

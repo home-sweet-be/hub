@@ -414,8 +414,9 @@ export default function Commandes() {
                                 rel="noopener noreferrer"
                                 className="reception-facture-btn"
                                 title="Aperçu de la facture"
+                                aria-label="Aperçu de la facture"
                               >
-                                Facture
+                                📄
                               </a>
                             </td>
                           )}
