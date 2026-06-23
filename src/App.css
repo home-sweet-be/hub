@@ -6825,9 +6825,22 @@ a.semaine__order:hover {
 /* ============================================================ */
 /*  Facture — bouton dans Commandes + page d'aperçu             */
 /* ============================================================ */
+/* Colonne Facture épinglée à droite, pour rester visible malgré la largeur
+   de la table (scroll horizontal). */
+.reception-table thead th:last-child,
+.reception-table tbody tr:not(.is-row-cont) .reception-facture-cell {
+  position: sticky;
+  right: 0;
+  z-index: 2;
+  box-shadow: -8px 0 12px -8px rgba(28, 28, 30, 0.18);
+}
+.reception-table thead th:last-child {
+  background: rgba(248, 248, 252, 0.97);
+}
 .reception-facture-cell {
   text-align: center;
   white-space: nowrap;
+  background: rgba(248, 248, 252, 0.97);
 }
 
 .reception-facture-btn {
