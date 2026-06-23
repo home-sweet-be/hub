@@ -138,16 +138,32 @@ function downloadCsv(filename, csv) {
 const PAYMENT_FILTERS = [
   { id: 'all', label: 'Toutes les commandes' },
   { id: 'full', label: 'Paiement complet en ligne' },
-  { id: 'depo', label: 'Acompte en ligne + solde cash' },
+  { id: 'depo', label: 'Acompte (tag depo)' },
+  { id: 'acompte', label: 'A eu un acompte (paiements)' },
 ]
 
 function hasDepoTag(o) {
   return (o.tags || []).some((t) => /^depo$/i.test(t))
 }
 
+// Détecte un acompte sans dépendre du tag depo : une commande a eu un acompte
+// si elle a été encaissée en plusieurs versements (acompte + solde, trace
+// permanente même une fois PAID) OU si l'acompte est versé et le solde encore
+// dû (PARTIALLY_PAID). Nécessite les transactions (?withTx=1).
+function hadDeposit(o) {
+  const paid = (o.transactions || []).filter(
+    (t) => (t.kind === 'SALE' || t.kind === 'CAPTURE') && t.status === 'SUCCESS'
+  )
+  const installments = new Set(
+    paid.map((t) => (t.processedAt || '').slice(0, 10))
+  ).size
+  return installments >= 2 || o.financialStatus === 'PARTIALLY_PAID'
+}
+
 function matchPaymentFilter(o, filterId) {
   if (filterId === 'full') return !hasDepoTag(o)
   if (filterId === 'depo') return hasDepoTag(o)
+  if (filterId === 'acompte') return hadDeposit(o)
   return true
 }
 
@@ -171,7 +187,7 @@ export default function Compta() {
         const r = await fetch(
           '/api/shopify/receptions?q=' +
             encodeURIComponent(q) +
-            '&first=250'
+            '&first=250&withTx=1'
         )
         if (!r.ok) throw new Error(`HTTP ${r.status}`)
         const data = await r.json()
@@ -209,6 +225,7 @@ export default function Compta() {
       all: sortedAll.length,
       full: sortedAll.filter((o) => !hasDepoTag(o)).length,
       depo: sortedAll.filter(hasDepoTag).length,
+      acompte: sortedAll.filter(hadDeposit).length,
     }),
     [sortedAll]
   )
