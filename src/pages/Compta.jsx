@@ -139,7 +139,6 @@ function downloadCsv(filename, csv) {
 const PAYMENT_FILTERS = [
   { id: 'all', label: 'Toutes les commandes' },
   { id: 'full', label: 'Paiement complet en ligne' },
-  { id: 'depo', label: 'Acompte (tag depo)' },
   { id: 'acompte', label: 'A eu un acompte (paiements)' },
 ]
 
@@ -152,7 +151,6 @@ function hasDepoTag(o) {
 // les transactions ici : simple test d'appartenance par numéro de commande.
 function matchPaymentFilter(o, filterId, depositSet) {
   if (filterId === 'full') return !hasDepoTag(o)
-  if (filterId === 'depo') return hasDepoTag(o)
   if (filterId === 'acompte') return depositSet.has(o.name)
   return true
 }
@@ -227,7 +225,6 @@ export default function Compta() {
     () => ({
       all: sortedAll.length,
       full: sortedAll.filter((o) => !hasDepoTag(o)).length,
-      depo: sortedAll.filter(hasDepoTag).length,
       acompte: sortedAll.filter((o) => depositSet.has(o.name)).length,
     }),
     [sortedAll, depositSet]
