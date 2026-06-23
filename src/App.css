@@ -6888,7 +6888,7 @@ a.semaine__order:hover {
   justify-content: flex-end;
   margin-bottom: 14px;
 }
-.facture-print {
+.facture-download {
   background: #1c1a17;
   color: #fff;
   border: none;
@@ -6898,8 +6898,12 @@ a.semaine__order:hover {
   font-weight: 600;
   cursor: pointer;
 }
-.facture-print:hover {
+.facture-download:hover:not(:disabled) {
   background: #000;
+}
+.facture-download:disabled {
+  opacity: 0.6;
+  cursor: default;
 }
 
 .facture {

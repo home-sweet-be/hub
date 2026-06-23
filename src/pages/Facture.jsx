@@ -39,6 +39,7 @@ export default function Facture() {
   const { orderName } = useParams()
   const [order, setOrder] = useState(null)
   const [error, setError] = useState(null)
+  const [downloading, setDownloading] = useState(false)
 
   useEffect(() => {
     const name = String(orderName || '').replace(/^#/, '')
@@ -123,6 +124,44 @@ export default function Facture() {
     )
   }
 
+  const downloadPdf = async () => {
+    const el = document.getElementById('facture')
+    if (!el || downloading) return
+    setDownloading(true)
+    try {
+      const [{ default: html2canvas }, { jsPDF }] = await Promise.all([
+        import('html2canvas'),
+        import('jspdf'),
+      ])
+      const canvas = await html2canvas(el, {
+        scale: 2,
+        backgroundColor: '#ffffff',
+        useCORS: true,
+      })
+      const pdf = new jsPDF({ unit: 'mm', format: 'a4' })
+      const pageH = 297
+      const imgW = 210
+      const imgH = (canvas.height * imgW) / canvas.width
+      const imgData = canvas.toDataURL('image/png')
+      let position = 0
+      let remaining = imgH
+      pdf.addImage(imgData, 'PNG', 0, position, imgW, imgH)
+      remaining -= pageH
+      while (remaining > 0) {
+        position -= pageH
+        pdf.addPage()
+        pdf.addImage(imgData, 'PNG', 0, position, imgW, imgH)
+        remaining -= pageH
+      }
+      pdf.save(`Facture-${String(order.name).replace(/^#/, '')}.pdf`)
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.error('PDF export failed:', e)
+    } finally {
+      setDownloading(false)
+    }
+  }
+
   const {
     currency,
     items,
@@ -144,8 +183,13 @@ export default function Facture() {
   return (
     <div className="facture-page">
       <div className="facture-toolbar">
-        <button type="button" className="facture-print" onClick={() => window.print()}>
-          Imprimer / Enregistrer en PDF
+        <button
+          type="button"
+          className="facture-download"
+          onClick={downloadPdf}
+          disabled={downloading}
+        >
+          {downloading ? 'Génération…' : 'Télécharger la facture (PDF)'}
         </button>
       </div>
 
