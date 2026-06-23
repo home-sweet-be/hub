@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import OrdersTableSkeleton from '../components/OrdersTableSkeleton'
 import { useReload } from '../lib/reload'
+import { fetchDepositOrderNumbers } from '../lib/depositSync'
 
 const MONTHS_FR = [
   'Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin',
@@ -146,24 +147,13 @@ function hasDepoTag(o) {
   return (o.tags || []).some((t) => /^depo$/i.test(t))
 }
 
-// Détecte un acompte sans dépendre du tag depo : une commande a eu un acompte
-// si elle a été encaissée en plusieurs versements (acompte + solde, trace
-// permanente même une fois PAID) OU si l'acompte est versé et le solde encore
-// dû (PARTIALLY_PAID). Nécessite les transactions (?withTx=1).
-function hadDeposit(o) {
-  const paid = (o.transactions || []).filter(
-    (t) => (t.kind === 'SALE' || t.kind === 'CAPTURE') && t.status === 'SUCCESS'
-  )
-  const installments = new Set(
-    paid.map((t) => (t.processedAt || '').slice(0, 10))
-  ).size
-  return installments >= 2 || o.financialStatus === 'PARTIALLY_PAID'
-}
-
-function matchPaymentFilter(o, filterId) {
+// « A eu un acompte » s'appuie sur le cache deposit_orders (rempli au
+// chargement du hub, cf. lib/depositSync), donc on ne recharge/recalcule plus
+// les transactions ici : simple test d'appartenance par numéro de commande.
+function matchPaymentFilter(o, filterId, depositSet) {
   if (filterId === 'full') return !hasDepoTag(o)
   if (filterId === 'depo') return hasDepoTag(o)
-  if (filterId === 'acompte') return hadDeposit(o)
+  if (filterId === 'acompte') return depositSet.has(o.name)
   return true
 }
 
@@ -174,7 +164,20 @@ export default function Compta() {
   const [ordersByMonth, setOrdersByMonth] = useState({}) // {idx: orders[]}
   const [loadingIdx, setLoadingIdx] = useState(null)
   const [error, setError] = useState(null)
+  const [depositSet, setDepositSet] = useState(() => new Set())
   const { reloadKey } = useReload()
+
+  // Numéros de commande ayant eu un acompte, depuis le cache deposit_orders
+  // (rempli au chargement du hub). Rechargé à chaque rafraîchissement.
+  useEffect(() => {
+    let alive = true
+    fetchDepositOrderNumbers().then((set) => {
+      if (alive) setDepositSet(set)
+    })
+    return () => {
+      alive = false
+    }
+  }, [reloadKey])
 
   const load = useCallback(
     async (idx) => {
@@ -187,7 +190,7 @@ export default function Compta() {
         const r = await fetch(
           '/api/shopify/receptions?q=' +
             encodeURIComponent(q) +
-            '&first=250&withTx=1'
+            '&first=250'
         )
         if (!r.ok) throw new Error(`HTTP ${r.status}`)
         const data = await r.json()
@@ -225,14 +228,15 @@ export default function Compta() {
       all: sortedAll.length,
       full: sortedAll.filter((o) => !hasDepoTag(o)).length,
       depo: sortedAll.filter(hasDepoTag).length,
-      acompte: sortedAll.filter(hadDeposit).length,
+      acompte: sortedAll.filter((o) => depositSet.has(o.name)).length,
     }),
-    [sortedAll]
+    [sortedAll, depositSet]
   )
 
   const sorted = useMemo(
-    () => sortedAll.filter((o) => matchPaymentFilter(o, paymentFilter)),
-    [sortedAll, paymentFilter]
+    () =>
+      sortedAll.filter((o) => matchPaymentFilter(o, paymentFilter, depositSet)),
+    [sortedAll, paymentFilter, depositSet]
   )
 
   const total = useMemo(

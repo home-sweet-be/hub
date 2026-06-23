@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route, Navigate, NavLink, Outlet, useLocation } 
 import { useCallback, useEffect, useRef, useState } from 'react'
 import logo from './assets/homesweet.png'
 import { ReloadContext } from './lib/reload'
+import { syncDepositOrders } from './lib/depositSync'
 import ErrorBoundary from './components/ErrorBoundary'
 import Commandes from './pages/Commandes'
 import Logistique from './pages/Logistique'
@@ -49,6 +50,12 @@ function Shell() {
   useEffect(() => {
     setDrawerOpen(false)
   }, [location.pathname])
+
+  // Rafraîchit le cache des commandes à acompte (deposit_orders) au chargement
+  // et à chaque rafraîchissement manuel. Best-effort, non bloquant.
+  useEffect(() => {
+    syncDepositOrders()
+  }, [reloadKey])
 
   // Lock body scroll while drawer is open
   useEffect(() => {
