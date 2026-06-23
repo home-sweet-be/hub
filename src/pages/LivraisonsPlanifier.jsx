@@ -238,7 +238,7 @@ export default function LivraisonsPlanifier() {
   const coveredZones = useMemo(() => {
     const set = new Set()
     for (const r of zonePriorities?.rows || []) {
-      if (r.coverage !== null && r.coverage >= r.count) set.add(r.zone)
+      if (r.coverage !== null && r.coverage > 0) set.add(r.zone)
     }
     return set
   }, [zonePriorities])
@@ -467,16 +467,13 @@ export default function LivraisonsPlanifier() {
               const status =
                 cov === null
                   ? 'loading'
-                  : cov >= z.count
-                  ? 'covered'
                   : cov > 0
-                  ? 'partial'
+                  ? 'covered'
                   : 'none'
               const coveredFraction =
                 cov === null || z.count === 0
                   ? 0
                   : Math.min(cov, z.count) / z.count
-              const missing = cov === null ? null : Math.max(0, z.count - cov)
               return (
                 <li
                   key={z.zone}
@@ -515,7 +512,6 @@ export default function LivraisonsPlanifier() {
                   >
                     {status === 'loading' && '…'}
                     {status === 'covered' && '✓ couvert'}
-                    {status === 'partial' && `−${missing} à planifier`}
                     {status === 'none' && 'à planifier'}
                   </span>
                 </li>
