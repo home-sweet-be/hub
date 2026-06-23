@@ -1,6 +1,8 @@
 const API_VERSION = process.env.SHOPIFY_API_VERSION || '2025-04'
 
-const QUERY = `
+// withTx ajoute les transactions + montants reçus/dus (diagnostic paiements,
+// activé via ?withTx=1). Off par défaut pour ne pas alourdir la liste normale.
+const buildQuery = (withTx) => `
   query receptions($first: Int!, $query: String!, $after: String) {
     orders(first: $first, query: $query, sortKey: CREATED_AT, reverse: true, after: $after) {
       edges {
@@ -13,6 +15,17 @@ const QUERY = `
           tags
           totalPriceSet { shopMoney { amount currencyCode } }
           displayFinancialStatus
+          ${withTx ? `
+          totalReceivedSet { shopMoney { amount } }
+          totalOutstandingSet { shopMoney { amount } }
+          transactions(first: 20) {
+            kind
+            status
+            gateway
+            processedAt
+            amountSet { shopMoney { amount } }
+          }
+          ` : ''}
           coutBackfill: metafield(namespace: "custom", key: "cout_backfill") { value }
           shippingAddress {
             name
@@ -86,6 +99,7 @@ export default async function handler(req, res) {
 
   const first = Math.min(Number(req.query.first) || 250, 250)
   const after = req.query.after || null
+  const withTx = !!req.query.withTx
   const filter =
     req.query.q ||
     '(tag:SentToSupplier OR tag:ProduitEnStock) AND NOT tag:removed AND NOT fulfillment_status:fulfilled AND NOT financial_status:refunded AND NOT financial_status:partially_refunded AND total_price:>1'
@@ -100,7 +114,7 @@ export default async function handler(req, res) {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          query: QUERY,
+          query: buildQuery(withTx),
           variables: { first, query: filter, after },
         }),
       }
@@ -159,6 +173,13 @@ export default async function handler(req, res) {
             : null,
           shippingLine: o.shippingLines?.edges?.[0]?.node || null,
           lineItems: (o.lineItems?.edges || []).map((le) => le.node),
+          ...(withTx
+            ? {
+                received: o.totalReceivedSet?.shopMoney?.amount,
+                outstanding: o.totalOutstandingSet?.shopMoney?.amount,
+                transactions: o.transactions || [],
+              }
+            : {}),
         }
       })
       .filter((o) => Number(o.total) > 1)
