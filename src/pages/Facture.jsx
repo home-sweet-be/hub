@@ -4,13 +4,14 @@ import logo from '../assets/homesweet.png'
 
 const VAT_RATE = 0.21
 
-// ⚠️ À COMPLÉTER avec les vraies coordonnées légales HomeSweet (n° TVA/BCE,
-// adresse du siège, IBAN). Ces valeurs apparaissent telles quelles sur la facture.
+// Coordonnées légales de l'émetteur de la facture.
+// ⚠️ IBAN encore à compléter.
 const SELLER = {
   name: 'HomeSweet',
-  legalName: 'HomeSweet',
-  address: ['Adresse du siège — à compléter', '1000 Bruxelles', 'Belgique'],
-  vat: 'BE 0XXX.XXX.XXX',
+  legalName: 'SILK ROAD INVEST',
+  address: ['54 Rue du Bon Pasteur Box A01', '1140 Evere', 'Belgique'],
+  company: '1003.835.578',
+  vat: 'BE1003835578',
   iban: 'BE00 0000 0000 0000 0000',
   email: 'contact@home-sweet.be',
   site: 'home-sweet.be',
@@ -78,12 +79,33 @@ export default function Facture() {
           totalTtc,
         }
       })
-    const subtotalTtc = items.reduce((s, i) => s + i.totalTtc, 0)
+    // Livraison (port) — ligne séparée, prix TTC depuis le shipping line Shopify.
+    const ship = order.shippingLine
+    const shipTtc = Number(ship?.discountedPriceSet?.shopMoney?.amount || 0)
+    const shipping = ship
+      ? {
+          title: ship.title || 'Livraison',
+          totalTtc: shipTtc,
+          totalHt: shipTtc / (1 + VAT_RATE),
+        }
+      : null
+
+    const productsTtc = items.reduce((s, i) => s + i.totalTtc, 0)
+    const subtotalTtc = productsTtc + shipTtc
     const totalHt = subtotalTtc / (1 + VAT_RATE)
     const tva = subtotalTtc - totalHt
     const received = Number(order.received || 0)
     const outstanding = Number(order.outstanding || 0)
-    return { currency, items, subtotalTtc, totalHt, tva, received, outstanding }
+    return {
+      currency,
+      items,
+      shipping,
+      subtotalTtc,
+      totalHt,
+      tva,
+      received,
+      outstanding,
+    }
   }, [order])
 
   if (error) {
@@ -101,8 +123,16 @@ export default function Facture() {
     )
   }
 
-  const { currency, items, subtotalTtc, totalHt, tva, received, outstanding } =
-    computed
+  const {
+    currency,
+    items,
+    shipping,
+    subtotalTtc,
+    totalHt,
+    tva,
+    received,
+    outstanding,
+  } = computed
   const hasDeposit = received > 0 && outstanding > 0
   const cust = order.customer
   const addr = order.shippingAddress
@@ -128,6 +158,7 @@ export default function Facture() {
               {SELLER.address.map((l, i) => (
                 <span key={i}>{l}</span>
               ))}
+              <span>N° entreprise : {SELLER.company}</span>
               <span>TVA : {SELLER.vat}</span>
               <span>{SELLER.email} · {SELLER.site}</span>
             </div>
@@ -188,6 +219,25 @@ export default function Facture() {
                 <td className="num">{formatMoney(it.totalHt, currency)}</td>
               </tr>
             ))}
+            {shipping && (
+              <tr>
+                <td>
+                  <div className="facture__item-title">Livraison</div>
+                  <div className="facture__item-variant">{shipping.title}</div>
+                </td>
+                <td className="num">1</td>
+                <td className="num">
+                  {shipping.totalTtc > 0
+                    ? formatMoney(shipping.totalHt, currency)
+                    : 'Offerte'}
+                </td>
+                <td className="num">
+                  {shipping.totalTtc > 0
+                    ? formatMoney(shipping.totalHt, currency)
+                    : formatMoney(0, currency)}
+                </td>
+              </tr>
+            )}
           </tbody>
         </table>
 

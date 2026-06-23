@@ -51,6 +51,7 @@ const buildQuery = (withTx) => `
               node {
                 title
                 code
+                discountedPriceSet { shopMoney { amount currencyCode } }
               }
             }
           }
