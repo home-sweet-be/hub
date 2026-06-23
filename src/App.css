@@ -4660,6 +4660,42 @@ body:has(.plani),
   max-width: 520px;
 }
 
+.plani__card--balance {
+  text-align: center;
+  max-width: 520px;
+}
+
+.plani__balance-badge {
+  font-size: 40px;
+  line-height: 1;
+  margin-bottom: 10px;
+}
+
+.plani__balance-amount {
+  color: #b42318;
+  white-space: nowrap;
+}
+
+.plani__balance-notice {
+  margin: 8px 0 26px;
+  text-align: left;
+  background: #fff7ed;
+  border: 1px solid #fed7aa;
+  border-radius: 14px;
+  padding: 18px 20px;
+}
+
+.plani__balance-notice p {
+  margin: 0 0 12px;
+  color: #4a4a4f;
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+.plani__balance-notice p:last-child {
+  margin-bottom: 0;
+}
+
 .plani__card--loading {
   text-align: center;
   max-width: 460px;

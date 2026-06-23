@@ -30,6 +30,12 @@ function fmtTime(date) {
   return date.toLocaleTimeString('fr-BE', { hour: '2-digit', minute: '2-digit' })
 }
 
+function formatMoney(amount, currency = 'EUR') {
+  const n = Number(amount)
+  if (Number.isNaN(n)) return ''
+  return new Intl.NumberFormat('fr-BE', { style: 'currency', currency }).format(n)
+}
+
 function fmtFullDate(d) {
   return `${DAY_LABELS_BY_DOW[d.getDay()]} ${d.getDate()} ${MONTH_LABELS[d.getMonth()]}`
 }
@@ -194,6 +200,19 @@ export default function PlanificationLivraison() {
     }
   }, [])
 
+  // Décide de l'étape après l'auth (et après l'écran solde) : quiz de
+  // préparation pour Confort/Premium, sinon directement le choix du créneau.
+  const proceedToScheduling = (ord) => {
+    const tier = shippingTierKey(ord?.shippingLine)
+    if (tier === 'confort' || tier === 'premium') {
+      setQuizStep('rdc')
+      setMonteChargeRequired(false)
+      setStep('quiz')
+    } else {
+      setStep('pick')
+    }
+  }
+
   // ---- Step 1: verify order ----
   const submitAuth = async (e, overrides) => {
     e?.preventDefault?.()
@@ -260,17 +279,11 @@ export default function PlanificationLivraison() {
           slot: existing.delivery_slots,
         })
         setStep('already-booked')
+      } else if (Number(data.order?.outstanding) > 0) {
+        // Commande à acompte : afficher l'écran « solde en espèces » avant tout.
+        setStep('balance')
       } else {
-        // Confort/Premium shipping → run the inline delivery quiz first.
-        // Standard (and unknown) shipping → straight to slot picker.
-        const tier = shippingTierKey(data.order?.shippingLine)
-        if (tier === 'confort' || tier === 'premium') {
-          setQuizStep('rdc')
-          setMonteChargeRequired(false)
-          setStep('quiz')
-        } else {
-          setStep('pick')
-        }
+        proceedToScheduling(data.order)
       }
     } catch (err) {
       // eslint-disable-next-line no-console
@@ -494,6 +507,45 @@ export default function PlanificationLivraison() {
               Besoin d'aide ? Écrivez-nous à{' '}
               <a href="mailto:contact@home-sweet.be">contact@home-sweet.be</a>.
             </p>
+          </section>
+        )}
+
+        {step === 'balance' && order && (
+          <section className="plani__card plani__card--balance">
+            <div className="plani__balance-badge" aria-hidden="true">💶</div>
+            <h1 className="plani__title">Solde à régler à la livraison</h1>
+            <p className="plani__lead">
+              Il reste{' '}
+              <strong className="plani__balance-amount">
+                {formatMoney(order.outstanding, order.currency)}
+              </strong>{' '}
+              à payer sur votre commande {order.name}.
+            </p>
+            <div className="plani__balance-notice">
+              <p>
+                Ce solde se règle{' '}
+                <strong>en ESPÈCES UNIQUEMENT</strong>, directement à votre
+                livreur le jour de la livraison{' '}
+                <strong>(paiement à la livraison — cash on delivery)</strong>.
+              </p>
+              <p>
+                Les paiements par <strong>carte bancaire</strong> et par{' '}
+                <strong>virement</strong> ne sont pas acceptés à la livraison.
+              </p>
+              <p>
+                Merci de bien vouloir{' '}
+                <strong>préparer le montant exact à l'avance</strong>, avant la
+                date de livraison — à défaut, la livraison pourrait être
+                annulée.
+              </p>
+            </div>
+            <button
+              type="button"
+              className="plani__cta"
+              onClick={() => proceedToScheduling(order)}
+            >
+              J'ai compris, continuer
+            </button>
           </section>
         )}
 

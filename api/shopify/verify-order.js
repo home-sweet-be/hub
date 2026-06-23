@@ -12,6 +12,8 @@ const QUERY = `
           email
           createdAt
           tags
+          displayFinancialStatus
+          totalOutstandingSet { shopMoney { amount currencyCode } }
           customer {
             id
             firstName
@@ -177,6 +179,11 @@ export default async function handler(req, res) {
         lon: matched.shippingAddress?.longitude || null,
         shippingLine:
           matched.shippingLines?.edges?.[0]?.node?.title || null,
+        // Reste dû (solde à payer à la livraison en espèces si > 0).
+        outstanding:
+          Number(matched.totalOutstandingSet?.shopMoney?.amount) || 0,
+        currency:
+          matched.totalOutstandingSet?.shopMoney?.currencyCode || 'EUR',
       },
     })
   } catch (err) {
