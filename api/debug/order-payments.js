@@ -1,4 +1,5 @@
-// api/_debug/order-payments.js — endpoint de diagnostic TEMPORAIRE.
+// api/debug/order-payments.js — endpoint de diagnostic TEMPORAIRE.
+//   Appel : /api/debug/order-payments?name=1636&key=hs-debug-2026
 //
 // But : lire le statut financier + montants + transactions d'une commande,
 // pour vérifier comment les acomptes sont enregistrés dans Shopify et si la
