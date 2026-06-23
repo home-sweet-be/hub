@@ -57,6 +57,13 @@ function Shell() {
     syncDepositOrders()
   }, [reloadKey])
 
+  // Re-sync périodique tant que le hub reste ouvert (toutes les 30 min), pour
+  // garder le cache frais sur les longues sessions sans action manuelle.
+  useEffect(() => {
+    const id = setInterval(() => syncDepositOrders(), 30 * 60 * 1000)
+    return () => clearInterval(id)
+  }, [])
+
   // Lock body scroll while drawer is open
   useEffect(() => {
     if (!drawerOpen) return
