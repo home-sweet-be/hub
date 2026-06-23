@@ -15,6 +15,7 @@ import Notifications from './pages/Notifications'
 import Rapports from './pages/Rapports'
 import Rentabilite from './pages/Rentabilite'
 import PlanificationLivraison from './pages/PlanificationLivraison'
+import Facture from './pages/Facture'
 import './App.css'
 
 const MODULES = [
@@ -268,6 +269,7 @@ export default function App() {
     <BrowserRouter>
       <Routes>
         <Route path="planification-livraison" element={<PlanificationLivraison />} />
+        <Route path="facture/:orderName" element={<Facture />} />
         <Route element={<Shell />}>
           <Route index element={<Navigate to="/commandes" replace />} />
           <Route path="commandes" element={<Commandes />} />

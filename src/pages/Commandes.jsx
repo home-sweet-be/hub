@@ -167,12 +167,13 @@ export default function Commandes() {
                     <th>Date</th>
                     <th className="num">Total</th>
                     <th>Paiement</th>
+                    <th aria-label="facture" />
                   </tr>
                 </thead>
                 <tbody>
                   {sorted.length === 0 && (
                     <tr>
-                      <td colSpan={10} className="reception-table__empty">
+                      <td colSpan={11} className="reception-table__empty">
                         Aucune commande.
                       </td>
                     </tr>
@@ -403,6 +404,19 @@ export default function Commandes() {
                               >
                                 {(o.financialStatus || '—').toUpperCase()}
                               </span>
+                            </td>
+                          )}
+                          {isFirst && (
+                            <td rowSpan={span} className="reception-facture-cell">
+                              <a
+                                href={`/facture/${o.name.replace(/^#/, '')}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="reception-facture-btn"
+                                title="Aperçu de la facture"
+                              >
+                                Facture
+                              </a>
                             </td>
                           )}
                         </tr>
