@@ -3147,50 +3147,37 @@
   border: 1px solid rgba(28, 28, 30, 0.1);
 }
 
-.zone-priorities__pill-wrap {
-  position: relative;
-  display: inline-flex;
+.zone-priorities__pill {
   cursor: default;
 }
 
-.zone-priorities__tooltip {
-  position: absolute;
-  bottom: calc(100% + 8px);
-  right: 0;
-  z-index: 30;
+/* Zone orders tooltip — rendered in a portal on <body>, position: fixed.
+   Anchored to the pill's top-right corner, floating just above it. */
+.zone-tip {
+  position: fixed;
+  z-index: 1000;
+  transform: translate(-100%, calc(-100% - 8px));
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  min-width: 150px;
-  max-width: 240px;
+  gap: 8px;
+  min-width: 160px;
+  max-width: 260px;
   padding: 10px 12px;
   background: #fff;
   border: 1px solid rgba(28, 28, 30, 0.1);
   border-radius: 10px;
-  box-shadow: 0 8px 24px rgba(28, 28, 30, 0.16);
-  opacity: 0;
-  visibility: hidden;
-  transform: translateY(4px);
-  transition: opacity 0.15s ease, transform 0.15s ease, visibility 0.15s;
+  box-shadow: 0 10px 30px rgba(28, 28, 30, 0.18);
+  animation: zone-tip-in 0.14s ease;
 }
 
-/* Transparent bridge so the pointer can travel from pill to tooltip */
-.zone-priorities__tooltip::after {
-  content: '';
-  position: absolute;
-  top: 100%;
-  left: 0;
-  right: 0;
-  height: 8px;
+@keyframes zone-tip-in {
+  from {
+    opacity: 0;
+    transform: translate(-100%, calc(-100% - 4px));
+  }
 }
 
-.zone-priorities__pill-wrap:hover .zone-priorities__tooltip {
-  opacity: 1;
-  visibility: visible;
-  transform: translateY(0);
-}
-
-.zone-priorities__tooltip-title {
+.zone-tip__title {
   font-size: 11px;
   font-weight: 600;
   color: var(--text-muted);
@@ -3198,26 +3185,27 @@
   letter-spacing: 0.02em;
 }
 
-.zone-priorities__tooltip-orders {
+.zone-tip__orders {
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
 }
 
-.zone-priorities__tooltip-order {
+.zone-tip__order {
   font-size: 12.5px;
   font-weight: 600;
   color: var(--text);
   font-variant-numeric: tabular-nums;
   text-decoration: none;
-  padding: 2px 7px;
+  padding: 2px 8px;
   border-radius: 6px;
   background: rgba(28, 28, 30, 0.05);
   border: 1px solid rgba(28, 28, 30, 0.08);
-  transition: background 0.15s ease, color 0.15s ease;
+  transition: background 0.15s ease, color 0.15s ease,
+    border-color 0.15s ease;
 }
 
-a.zone-priorities__tooltip-order:hover {
+a.zone-tip__order:hover {
   background: rgba(0, 122, 255, 0.12);
   color: #0059c9;
   border-color: rgba(0, 122, 255, 0.28);
@@ -3250,7 +3238,7 @@ a.zone-priorities__tooltip-order:hover {
     grid-column: 1 / -1;
     margin-top: 4px;
   }
-  .zone-priorities__pill-wrap {
+  .zone-priorities__pill {
     grid-column: 1 / -1;
     justify-self: start;
     margin-top: 2px;

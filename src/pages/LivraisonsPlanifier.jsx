@@ -1,4 +1,5 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { supabase } from '../lib/supabase'
 import SlotModal from '../components/SlotModal'
 import { ZoneFlag, zoneCode } from '../components/ZoneFlag'
@@ -82,6 +83,25 @@ export default function LivraisonsPlanifier() {
   // Brief toast shown after a slot is created, reporting how many waiting-list
   // customers were notified by email.
   const [notifyToast, setNotifyToast] = useState(null)
+  // Hover tooltip listing the orders of a zone row (rendered in a portal so it
+  // isn't clipped by the scrollable .hub-main__inner container).
+  const [zoneTip, setZoneTip] = useState(null)
+  const zoneTipTimer = useRef(null)
+
+  const openZoneTip = useCallback((orders, el) => {
+    if (zoneTipTimer.current) clearTimeout(zoneTipTimer.current)
+    const r = el.getBoundingClientRect()
+    setZoneTip({ orders, top: r.top, left: r.right })
+  }, [])
+
+  const scheduleCloseZoneTip = useCallback(() => {
+    if (zoneTipTimer.current) clearTimeout(zoneTipTimer.current)
+    zoneTipTimer.current = setTimeout(() => setZoneTip(null), 120)
+  }, [])
+
+  const cancelCloseZoneTip = useCallback(() => {
+    if (zoneTipTimer.current) clearTimeout(zoneTipTimer.current)
+  }, [])
 
   const refreshPriorities = useCallback(() => {
     setPriorityVersion((v) => v + 1)
@@ -509,49 +529,19 @@ export default function LivraisonsPlanifier() {
                     </div>
                   </div>
                   <span className="zone-priorities__count">{z.count}</span>
-                  <span className="zone-priorities__pill-wrap">
-                    <span
-                      className={
-                        'zone-priorities__pill zone-priorities__pill--' + status
-                      }
-                    >
-                      {status === 'loading' && '…'}
-                      {status === 'covered' && '✓ couvert'}
-                      {status === 'none' && 'à planifier'}
-                    </span>
-                    {z.orders.length > 0 && (
-                      <span
-                        className="zone-priorities__tooltip"
-                        role="tooltip"
-                      >
-                        <span className="zone-priorities__tooltip-title">
-                          {z.orders.length} commande
-                          {z.orders.length > 1 ? 's' : ''} en attente
-                        </span>
-                        <span className="zone-priorities__tooltip-orders">
-                          {z.orders.map((o) =>
-                            o.adminUrl ? (
-                              <a
-                                key={o.name}
-                                href={o.adminUrl}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="zone-priorities__tooltip-order"
-                              >
-                                {o.name}
-                              </a>
-                            ) : (
-                              <span
-                                key={o.name}
-                                className="zone-priorities__tooltip-order"
-                              >
-                                {o.name}
-                              </span>
-                            )
-                          )}
-                        </span>
-                      </span>
-                    )}
+                  <span
+                    className={
+                      'zone-priorities__pill zone-priorities__pill--' + status
+                    }
+                    onMouseEnter={(e) =>
+                      z.orders.length > 0 &&
+                      openZoneTip(z.orders, e.currentTarget)
+                    }
+                    onMouseLeave={scheduleCloseZoneTip}
+                  >
+                    {status === 'loading' && '…'}
+                    {status === 'covered' && '✓ couvert'}
+                    {status === 'none' && 'à planifier'}
                   </span>
                 </li>
               )
@@ -569,6 +559,41 @@ export default function LivraisonsPlanifier() {
         </div>
         </div>
       </section>
+
+      {zoneTip &&
+        createPortal(
+          <div
+            className="zone-tip"
+            style={{ top: zoneTip.top, left: zoneTip.left }}
+            onMouseEnter={cancelCloseZoneTip}
+            onMouseLeave={scheduleCloseZoneTip}
+          >
+            <div className="zone-tip__title">
+              {zoneTip.orders.length} commande
+              {zoneTip.orders.length > 1 ? 's' : ''} en attente
+            </div>
+            <div className="zone-tip__orders">
+              {zoneTip.orders.map((o) =>
+                o.adminUrl ? (
+                  <a
+                    key={o.name}
+                    href={o.adminUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="zone-tip__order"
+                  >
+                    {o.name}
+                  </a>
+                ) : (
+                  <span key={o.name} className="zone-tip__order">
+                    {o.name}
+                  </span>
+                )
+              )}
+            </div>
+          </div>,
+          document.body
+        )}
 
       <SlotModal
         open={!!editing}
