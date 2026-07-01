@@ -195,6 +195,14 @@ export default function BelgiumHeatmap({
             'confort', 2.4,
             1.6,
           ],
+          // Booked orders are dimmed so the map highlights who's left to plan
+          'circle-opacity': ['case', ['==', ['get', 'booked'], 1], 0.3, 1],
+          'circle-stroke-opacity': [
+            'case',
+            ['==', ['get', 'booked'], 1],
+            0.3,
+            1,
+          ],
         },
       })
       map.addLayer({
@@ -212,6 +220,7 @@ export default function BelgiumHeatmap({
         },
         paint: {
           'text-color': '#fff',
+          'text-opacity': 0.3,
         },
       })
 
