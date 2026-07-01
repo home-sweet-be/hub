@@ -203,6 +203,7 @@ export default function LivraisonsPlanifier() {
   const zonePriorities = useMemo(() => {
     if (!waitingOrders) return null
     const counts = new Map()
+    const ordersByZone = new Map()
     let unknown = 0
     for (const o of waitingOrders) {
       const zone = extractZone(o)
@@ -211,6 +212,8 @@ export default function LivraisonsPlanifier() {
         continue
       }
       counts.set(zone, (counts.get(zone) || 0) + 1)
+      if (!ordersByZone.has(zone)) ordersByZone.set(zone, [])
+      ordersByZone.get(zone).push({ name: o.name, adminUrl: o.adminUrl })
     }
 
     const coverageFor = (zone) => {
@@ -229,6 +232,7 @@ export default function LivraisonsPlanifier() {
         zone,
         count,
         coverage: coverageFor(zone),
+        orders: ordersByZone.get(zone) || [],
       }))
       .sort((a, b) => b.count - a.count)
 
@@ -505,14 +509,49 @@ export default function LivraisonsPlanifier() {
                     </div>
                   </div>
                   <span className="zone-priorities__count">{z.count}</span>
-                  <span
-                    className={
-                      'zone-priorities__pill zone-priorities__pill--' + status
-                    }
-                  >
-                    {status === 'loading' && '…'}
-                    {status === 'covered' && '✓ couvert'}
-                    {status === 'none' && 'à planifier'}
+                  <span className="zone-priorities__pill-wrap">
+                    <span
+                      className={
+                        'zone-priorities__pill zone-priorities__pill--' + status
+                      }
+                    >
+                      {status === 'loading' && '…'}
+                      {status === 'covered' && '✓ couvert'}
+                      {status === 'none' && 'à planifier'}
+                    </span>
+                    {z.orders.length > 0 && (
+                      <span
+                        className="zone-priorities__tooltip"
+                        role="tooltip"
+                      >
+                        <span className="zone-priorities__tooltip-title">
+                          {z.orders.length} commande
+                          {z.orders.length > 1 ? 's' : ''} en attente
+                        </span>
+                        <span className="zone-priorities__tooltip-orders">
+                          {z.orders.map((o) =>
+                            o.adminUrl ? (
+                              <a
+                                key={o.name}
+                                href={o.adminUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="zone-priorities__tooltip-order"
+                              >
+                                {o.name}
+                              </a>
+                            ) : (
+                              <span
+                                key={o.name}
+                                className="zone-priorities__tooltip-order"
+                              >
+                                {o.name}
+                              </span>
+                            )
+                          )}
+                        </span>
+                      </span>
+                    )}
                   </span>
                 </li>
               )
