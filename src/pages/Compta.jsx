@@ -379,13 +379,14 @@ export default function Compta() {
           )}
         </div>
 
-        {isLoading && <OrdersTableSkeleton columns={6} rows={8} />}
+        {isLoading && <OrdersTableSkeleton columns={7} rows={8} />}
 
         {orders && (
           <div className="compta-table-wrap">
             <table className="compta-table">
               <thead>
                 <tr>
+                  <th>Commande</th>
                   <th>Date</th>
                   <th className="num">Montant</th>
                   <th>Client</th>
@@ -398,7 +399,7 @@ export default function Compta() {
                 {sorted.length === 0 && (
                   <tr>
                     <td
-                      colSpan={6}
+                      colSpan={7}
                       className="reception-table__empty"
                     >
                       Aucune commande sur ce mois.
@@ -409,6 +410,29 @@ export default function Compta() {
                   const items = visibleLineItems(o)
                   return (
                     <tr key={o.id}>
+                      <td className="reception-num">
+                        {o.adminUrl ? (
+                          <a
+                            href={o.adminUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="reception-num__link"
+                            title="Ouvrir dans Shopify Admin"
+                          >
+                            <span className="reception-num__icon-wrap">
+                              <img
+                                src="/shopify-icon.png"
+                                alt=""
+                                aria-hidden="true"
+                                className="reception-num__icon"
+                              />
+                            </span>
+                            {o.name.replace(/^#/, '')}
+                          </a>
+                        ) : (
+                          o.name.replace(/^#/, '')
+                        )}
+                      </td>
                       <td className="reception-date">
                         {formatDate(o.createdAt)}
                       </td>
