@@ -66,6 +66,30 @@ function activeLineItems(order) {
   return (order.lineItems || []).filter((li) => effectiveQuantity(li) > 0)
 }
 
+// Line item « tissu personnalisé » : repéré par le titre (insensible à la
+// casse), pas la variante. Masqué partout et son montant est retranché du
+// total de la commande, comme s'il n'avait pas été ajouté.
+function isTissuLineItem(li) {
+  return /tissu/i.test(li.title || '')
+}
+
+// Line items affichés : actifs, hors tissu personnalisé.
+function visibleLineItems(order) {
+  return activeLineItems(order).filter((li) => !isTissuLineItem(li))
+}
+
+// Total de la commande hors line items tissu personnalisé.
+function orderDisplayTotal(o) {
+  const gross = Number(o.total) || 0
+  const tissu = activeLineItems(o)
+    .filter(isTissuLineItem)
+    .reduce((s, li) => {
+      const n = parseFloat(li.discountedTotalSet?.shopMoney?.amount)
+      return s + (Number.isFinite(n) ? n : 0)
+    }, 0)
+  return Math.max(0, gross - tissu)
+}
+
 function shortAddress(addr) {
   if (!addr) return '—'
   const line = [addr.address1, addr.zip, addr.city, addr.country]
@@ -100,12 +124,12 @@ function buildCsv(orders) {
     return [
       formatDate(o.createdAt),
       o.name,
-      Number(o.total || 0)
+      orderDisplayTotal(o)
         .toFixed(2)
         .replace('.', ','),
       o.currency || 'EUR',
       customerName(o.customer),
-      activeLineItems(o)
+      visibleLineItems(o)
         .map((li) => `${effectiveQuantity(li)}× ${li.title}`)
         .join(' | '),
       o.financialStatus || '',
@@ -249,7 +273,7 @@ export default function Compta() {
   )
 
   const total = useMemo(
-    () => sorted.reduce((s, o) => s + (Number(o.total) || 0), 0),
+    () => sorted.reduce((s, o) => s + orderDisplayTotal(o), 0),
     [sorted]
   )
 
@@ -382,14 +406,14 @@ export default function Compta() {
                   </tr>
                 )}
                 {sorted.map((o) => {
-                  const items = activeLineItems(o)
+                  const items = visibleLineItems(o)
                   return (
                     <tr key={o.id}>
                       <td className="reception-date">
                         {formatDate(o.createdAt)}
                       </td>
                       <td className="num">
-                        {formatPrice(o.total, o.currency)}
+                        {formatPrice(orderDisplayTotal(o), o.currency)}
                       </td>
                       <td>
                         {customerName(o.customer) ? (
