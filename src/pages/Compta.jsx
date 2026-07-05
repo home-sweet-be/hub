@@ -146,11 +146,23 @@ function hasDepoTag(o) {
   return (o.tags || []).some((t) => /^depo$/i.test(t))
 }
 
+// Commande ne contenant QUE des échantillons de textile (aucun vrai produit) :
+// exclue du filtre « Paiement complet en ligne ».
+function isSamplesOnly(o) {
+  const items = activeLineItems(o)
+  if (items.length === 0) return false
+  return items.every((li) =>
+    /échantillons?\s+de\s+textile/i.test(
+      (li.title || '').normalize('NFC')
+    )
+  )
+}
+
 // « A eu un acompte » s'appuie sur le cache deposit_orders (rempli au
 // chargement du hub, cf. lib/depositSync), donc on ne recharge/recalcule plus
 // les transactions ici : simple test d'appartenance par numéro de commande.
 function matchPaymentFilter(o, filterId, depositSet) {
-  if (filterId === 'full') return !hasDepoTag(o)
+  if (filterId === 'full') return !hasDepoTag(o) && !isSamplesOnly(o)
   if (filterId === 'acompte') return depositSet.has(o.name)
   return true
 }
@@ -224,7 +236,7 @@ export default function Compta() {
   const counts = useMemo(
     () => ({
       all: sortedAll.length,
-      full: sortedAll.filter((o) => !hasDepoTag(o)).length,
+      full: sortedAll.filter((o) => !hasDepoTag(o) && !isSamplesOnly(o)).length,
       acompte: sortedAll.filter((o) => depositSet.has(o.name)).length,
     }),
     [sortedAll, depositSet]
