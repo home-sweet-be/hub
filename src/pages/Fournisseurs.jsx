@@ -69,6 +69,47 @@ function activeLineItems(order) {
   return order.lineItems.filter((li) => effectiveQuantity(li) > 0)
 }
 
+function isTextureAttr(a) {
+  return !!(a?.key && !a.key.startsWith('_') && /texture/i.test(a.key) && a.value)
+}
+
+// Lors d'une réédition de commande, Shopify retire l'ancien line item
+// (currentQuantity 0) et en recrée un nouveau — sans toujours recopier ses
+// customAttributes. La texture personnalisée (« Texture: ROSE MAUVE ARAGON 62 »)
+// se retrouve alors uniquement sur la ligne retirée, et on ne sait plus quel
+// tissu envoyer au fournisseur. On la ré-attache ici à la ligne active
+// correspondante (même variante), pour que les tableaux Fournisseurs l'affichent.
+function enrichRemovedTextures(order) {
+  const lineItems = order?.lineItems
+  if (!Array.isArray(lineItems)) return order
+
+  // Textures présentes sur les lignes retirées, en file d'attente par variante.
+  const removedByVariant = new Map()
+  for (const li of lineItems) {
+    if (effectiveQuantity(li) > 0) continue
+    const key = li.variant?.id || li.sku || li.title
+    for (const attr of li.customAttributes || []) {
+      if (!isTextureAttr(attr)) continue
+      if (!removedByVariant.has(key)) removedByVariant.set(key, [])
+      removedByVariant.get(key).push(attr)
+    }
+  }
+  if (removedByVariant.size === 0) return order
+
+  const nextLineItems = lineItems.map((li) => {
+    if (effectiveQuantity(li) <= 0) return li
+    if ((li.customAttributes || []).some(isTextureAttr)) return li
+    const queue = removedByVariant.get(li.variant?.id || li.sku || li.title)
+    if (!queue || queue.length === 0) return li
+    const recovered = queue.shift()
+    return {
+      ...li,
+      customAttributes: [...(li.customAttributes || []), recovered],
+    }
+  })
+  return { ...order, lineItems: nextLineItems }
+}
+
 function isMainLineItem(li) {
   if (li?.title && /[ée]chantillon/i.test(li.title)) return true
   if (li?.image?.url) return true
@@ -151,7 +192,7 @@ export default function Fournisseurs() {
         if (!r.ok) throw new Error(`HTTP ${r.status} ${await r.text()}`)
         return r.json()
       })
-      .then((data) => setOrders(data.orders || []))
+      .then((data) => setOrders((data.orders || []).map(enrichRemovedTextures)))
       .catch((e) => setError(e.message))
   }, [])
 
