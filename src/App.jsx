@@ -16,6 +16,7 @@ import Rapports from './pages/Rapports'
 import Rentabilite from './pages/Rentabilite'
 import PlanificationLivraison from './pages/PlanificationLivraison'
 import Facture from './pages/Facture'
+import Facturation from './pages/Facturation'
 import './App.css'
 
 const MODULES = [
@@ -25,6 +26,7 @@ const MODULES = [
   { to: '/compta', label: 'Compta', icon: '💶' },
   { to: '/rapports', label: 'Rapports', icon: '📊' },
   { to: '/rentabilite', label: 'Rentabilité', icon: '📈' },
+  { to: '/facturation', label: 'Facturation', icon: '📄' },
 ]
 
 function Shell() {
@@ -288,6 +290,7 @@ export default function App() {
           <Route path="factures" element={<Navigate to="/commandes" replace />} />
           <Route path="rapports" element={<Rapports />} />
           <Route path="rentabilite" element={<Rentabilite />} />
+          <Route path="facturation" element={<Facturation />} />
           <Route path="*" element={<Navigate to="/commandes" replace />} />
         </Route>
       </Routes>

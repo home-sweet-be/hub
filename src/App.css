@@ -312,6 +312,121 @@
 }
 
 /* =========================================================
+   Facturation (recherche de commande → facture)
+   ========================================================= */
+
+.facturation-search {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 22px 0 8px;
+  max-width: 620px;
+}
+
+.facturation-search__icon {
+  position: absolute;
+  margin-left: 14px;
+  width: 18px;
+  height: 18px;
+  color: var(--text-muted);
+  pointer-events: none;
+}
+
+.facturation-search__input {
+  flex: 1;
+  padding: 12px 14px 12px 42px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  background: rgba(255, 255, 255, 0.55);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  font-size: 15px;
+  color: inherit;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.facturation-search__input:focus {
+  outline: none;
+  border-color: rgba(10, 132, 255, 0.6);
+  box-shadow: 0 0 0 3px rgba(10, 132, 255, 0.18);
+}
+
+.facturation-search__input::placeholder {
+  color: var(--text-muted);
+}
+
+.facturation-error {
+  margin-top: 16px;
+  color: #c0392b;
+  font-size: 14px;
+}
+
+.facturation-empty {
+  margin-top: 20px;
+  color: var(--text-muted);
+  font-size: 15px;
+}
+
+.facturation-results {
+  list-style: none;
+  margin: 22px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-width: 760px;
+}
+
+.facturation-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 18px;
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  background: rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+.facturation-card__main {
+  flex: 1;
+  min-width: 0;
+}
+
+.facturation-card__num {
+  font-weight: 700;
+  font-size: 16px;
+}
+
+.facturation-card__cust {
+  font-size: 14px;
+  margin-top: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.facturation-card__meta {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+.facturation-card__total {
+  font-weight: 700;
+  font-size: 15px;
+  white-space: nowrap;
+}
+
+.facturation-card__btn {
+  flex-shrink: 0;
+  text-decoration: none;
+}
+
+/* =========================================================
    Orders table
    ========================================================= */
 
