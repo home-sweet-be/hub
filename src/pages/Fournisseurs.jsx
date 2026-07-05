@@ -73,6 +73,14 @@ function isTextureAttr(a) {
   return !!(a?.key && !a.key.startsWith('_') && /texture/i.test(a.key) && a.value)
 }
 
+// Valeur de la texture personnalisée d'un line item (ex. « ROSE MAUVE ARAGON 62 »),
+// une fois les customAttributes enrichis par enrichRemovedTextures. Affichée comme
+// une variante (liste) et accolée au SKU (tableau fournisseur), plutôt qu'en sous-ligne.
+function textureValue(li) {
+  const a = (li.customAttributes || []).find(isTextureAttr)
+  return a?.value || null
+}
+
 // Lors d'une réédition de commande, Shopify retire l'ancien line item
 // (currentQuantity 0) et en recrée un nouveau — sans toujours recopier ses
 // customAttributes. La texture personnalisée (« Texture: ROSE MAUVE ARAGON 62 »)
@@ -612,7 +620,11 @@ export default function Fournisseurs() {
                                 </div>
                                 {(li.sku || li.variant?.sku) && (
                                   <div className="reception-cart__sku">
-                                    <span>{li.sku || li.variant?.sku}</span>
+                                    <span>
+                                      {[li.sku || li.variant?.sku, textureValue(li)]
+                                        .filter(Boolean)
+                                        .join(' ')}
+                                    </span>
                                   </div>
                                 )}
                               </div>
@@ -621,6 +633,7 @@ export default function Fournisseurs() {
                           for (const attr of li.customAttributes || []) {
                             if (!attr.key || attr.key.startsWith('_')) continue
                             if (!attr.value) continue
+                            if (isTextureAttr(attr)) continue // accolée au SKU
                             out.push(
                               <div
                                 className="reception-cart__product is-sub"
@@ -771,6 +784,7 @@ export default function Fournisseurs() {
                       for (const attr of li.customAttributes || []) {
                         if (!attr.key || attr.key.startsWith('_')) continue
                         if (!attr.value) continue
+                        if (isTextureAttr(attr)) continue // affichée comme variante
                         rows.push({ kind: 'attr', attr })
                       }
                     })
@@ -886,12 +900,19 @@ export default function Fournisseurs() {
                                 <span className="reception-article__title">
                                   {li.title}
                                 </span>
-                                {li.variantTitle &&
-                                  !/texture/i.test(li.variantTitle) && (
+                                {(() => {
+                                  const variant =
+                                    textureValue(li) ||
+                                    (li.variantTitle &&
+                                    !/texture/i.test(li.variantTitle)
+                                      ? li.variantTitle
+                                      : null)
+                                  return variant ? (
                                     <span className="reception-article__variant">
-                                      {li.variantTitle}
+                                      {variant}
                                     </span>
-                                  )}
+                                  ) : null
+                                })()}
                               </>
                             )}
                           </td>
