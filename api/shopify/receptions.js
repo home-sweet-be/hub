@@ -14,6 +14,7 @@ const buildQuery = (withTx) => `
           createdAt
           tags
           totalPriceSet { shopMoney { amount currencyCode } }
+          currentTotalPriceSet { shopMoney { amount currencyCode } }
           displayFinancialStatus
           ${withTx ? `
           totalReceivedSet { shopMoney { amount } }
@@ -149,8 +150,15 @@ export default async function handler(req, res) {
           phone: o.phone,
           createdAt: o.createdAt,
           tags: o.tags,
-          total: o.totalPriceSet?.shopMoney?.amount,
-          currency: o.totalPriceSet?.shopMoney?.currencyCode,
+          // Total courant (après édition / retour d'articles) plutôt que le
+          // total figé à la création : les line items retirés (currentQuantity
+          // à 0) ne sont plus comptés. Repli sur totalPriceSet si absent.
+          total:
+            o.currentTotalPriceSet?.shopMoney?.amount ??
+            o.totalPriceSet?.shopMoney?.amount,
+          currency:
+            o.currentTotalPriceSet?.shopMoney?.currencyCode ??
+            o.totalPriceSet?.shopMoney?.currencyCode,
           financialStatus: o.displayFinancialStatus,
           // Order-level manual cost backfill (HT) from the custom.cout_backfill
           // metafield — overrides the per-line-item cost when present.
