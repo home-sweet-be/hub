@@ -220,7 +220,7 @@ export default function Compta() {
       setLoadingIdx(idx)
       setError(null)
       try {
-        const q = `created_at:>=${ymd(m.start)} AND created_at:<${ymd(m.end)} AND status:open AND NOT tag:removed AND NOT financial_status:refunded AND NOT financial_status:partially_refunded`
+        const q = `created_at:>=${ymd(m.start)} AND created_at:<${ymd(m.end)} AND NOT tag:removed AND NOT financial_status:refunded AND NOT financial_status:partially_refunded`
         const r = await fetch(
           '/api/shopify/receptions?q=' +
             encodeURIComponent(q) +
