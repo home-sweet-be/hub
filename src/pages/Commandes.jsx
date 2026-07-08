@@ -1,10 +1,11 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { ZoneFlag, zoneCode } from '../components/ZoneFlag'
 import ZoneModal from '../components/ZoneModal'
 import AddressModal from '../components/AddressModal'
 import OrdersTableSkeleton from '../components/OrdersTableSkeleton'
 import { useReload } from '../lib/reload'
 import { fetchDepositOrderNumbers } from '../lib/depositSync'
+import { autoTagOrdersByLocation } from '../lib/autoZoneTag'
 
 const ZONE_TAG_PATTERN = /^(BE|FR|LU|NL|DE|LIV)(-|$)/i
 
@@ -92,6 +93,7 @@ export default function Commandes() {
   const [addressViewing, setAddressViewing] = useState(null)
   const [depositSet, setDepositSet] = useState(() => new Set())
   const { reloadKey } = useReload()
+  const autoTagRunning = useRef(false)
 
   // Numéros de commande ayant eu un acompte, lus UNIQUEMENT depuis le cache
   // Supabase deposit_orders (aucun fetch Shopify ici) — sert à tester que la DB
@@ -105,6 +107,30 @@ export default function Commandes() {
       alive = false
     }
   }, [reloadKey])
+
+  // Auto-tag de zone par géolocalisation : pour les commandes sans zone, on pose
+  // le tag déduit de la lat/lon, puis on fusionne le résultat dans l'état local
+  // (pas de rechargement → pas de boucle, le badge s'affiche aussitôt).
+  const runAutoTag = useCallback(async (list) => {
+    if (autoTagRunning.current) return
+    autoTagRunning.current = true
+    try {
+      const tagged = await autoTagOrdersByLocation(list)
+      if (tagged.size > 0) {
+        setOrders((prev) =>
+          prev
+            ? prev.map((o) =>
+                tagged.has(o.id)
+                  ? { ...o, tags: [...(o.tags || []), tagged.get(o.id)] }
+                  : o
+              )
+            : prev
+        )
+      }
+    } finally {
+      autoTagRunning.current = false
+    }
+  }, [])
 
   const load = useCallback(() => {
     setOrders(null)
@@ -123,9 +149,13 @@ export default function Commandes() {
         if (!r.ok) throw new Error(`HTTP ${r.status} ${await r.text()}`)
         return r.json()
       })
-      .then((data) => setOrders(data.orders || []))
+      .then((data) => {
+        const list = data.orders || []
+        setOrders(list)
+        runAutoTag(list)
+      })
       .catch((e) => setError(e.message))
-  }, [])
+  }, [runAutoTag])
 
   useEffect(() => {
     load()
