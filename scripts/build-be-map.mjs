@@ -1,12 +1,16 @@
 // One-shot: simplify the user's delivery-zone GeoJSON (public/geoexample.json)
 // and emit a small JS module of SVG paths for the heatmap.
 //
-// Also derives BE-Bruxelles as the hole inside the union of all BE provinces,
-// and adds low-opacity context countries (NL, DE, CH, GB) clipped by viewBox.
+// The 8 outer BE provinces in geoexample.json leave a hole in the middle
+// (Bruxelles + Brabant flamand + Brabant wallon). We fill that hole with the
+// real NUTS-2 boundaries (Eurostat GISCO), each clipped to the hole so their
+// outer edges snap exactly to the surrounding provinces (no slivers).
+// Also adds low-opacity context countries (NL, DE, CH, GB) clipped by viewBox.
 //
 // Inputs:
-//   - public/geoexample.json  (user zones, JSONC-ish)
-//   - ne-countries.json       (Natural Earth 110m, only neighbors used)
+//   - public/geoexample.json        (user zones, JSONC-ish)
+//   - nuts-brabant-brussels.json    (Eurostat GISCO NUTS-2: BE10/BE24/BE31)
+//   - ne-countries.json             (Natural Earth 110m, only neighbors used)
 // Output: src/components/belgiumProvincesPaths.js
 import fs from 'node:fs'
 import polygonClipping from 'polygon-clipping'
@@ -133,7 +137,11 @@ const data = JSON.parse(raw)
   }
 }
 
-// ---- Derive BE-Bruxelles from the hole in the BE provinces union ----
+// ---- Split the central hole into Bruxelles-Capitale + the two Brabants ----
+// The 8 outer provinces leave a hole in the middle = Bruxelles + Brabant
+// flamand + Brabant wallon. We compute that hole, then fill it with the real
+// NUTS-2 boundaries, each intersected with the hole so their outer edges snap
+// exactly to the surrounding provinces (no gaps / overlaps).
 const BE_IDS = ['BEVAN', 'BEVOV', 'BEVWV', 'BEVLI', 'BEWHTO', 'BEWHTE', 'BEWNA', 'BEWLX', 'BEWLG']
 const bePolygons = data.features
   .filter((f) => BE_IDS.includes(f.properties?.id))
@@ -143,38 +151,51 @@ const bePolygons = data.features
       : f.geometry.coordinates
   )
 const union = polygonClipping.union(...bePolygons)
-// Each polygon = [outerRing, hole1, hole2, ...]. Collect holes as Bruxelles.
-const bruxellesRings = []
+// Each union polygon = [outerRing, hole1, hole2, ...]. polygon-clipping returns
+// outer = CCW, holes = CW. Invert each hole so it becomes a normal (CCW) outer
+// ring, then use the collection as a MultiPolygon clip mask.
+const holeMask = []
 for (const poly of union) {
   for (let h = 1; h < poly.length; h++) {
-    // GeoJSON rings: holes are clockwise (CW). polygon-clipping returns
-    // outer = CCW, holes = CW. We invert the hole so it draws as a normal
-    // (filled) outer polygon when treated standalone.
-    bruxellesRings.push([...poly[h]].reverse())
+    holeMask.push([[...poly[h]].reverse()])
   }
 }
-if (bruxellesRings.length > 0) {
-  data.features.push({
-    type: 'Feature',
-    properties: {
-      id: 'BEBRU',
-      name: 'Bruxelles & Brabant',
-      source: 'derived-from-hole',
-    },
-    geometry: {
-      type: bruxellesRings.length === 1 ? 'Polygon' : 'MultiPolygon',
-      coordinates:
-        bruxellesRings.length === 1
-          ? [bruxellesRings[0]]
-          : bruxellesRings.map((r) => [r]),
-    },
-  })
-  ZONE_META.BEBRU = {
-    id: 'brussels',
-    label: 'Bruxelles',
-    zones: ['BE-Bruxelles'],
-    country: 'BE',
+
+const NUTS_PATH = 'nuts-brabant-brussels.json'
+// NUTS_ID (Eurostat) → feature id + metadata + matching Shopify zone tags
+const NUTS_META = {
+  BE10: { id: 'BEBRU', metaId: 'brussels', label: 'Bruxelles', zones: ['BE-Bruxelles'] },
+  BE24: { id: 'BEVBR', metaId: 'brabant-flamand', label: 'Brabant flamand', zones: ['BE-Brabant-Flamand'] },
+  BE31: { id: 'BEWBR', metaId: 'brabant-wallon', label: 'Brabant wallon', zones: ['BE-Brabant-Wallon'] },
+}
+if (holeMask.length > 0 && fs.existsSync(NUTS_PATH)) {
+  const nuts = JSON.parse(fs.readFileSync(NUTS_PATH, 'utf8'))
+  for (const f of nuts.features) {
+    const m = NUTS_META[f.properties?.NUTS_ID]
+    if (!m) continue
+    const subj =
+      f.geometry.type === 'Polygon'
+        ? [f.geometry.coordinates]
+        : f.geometry.coordinates
+    const clipped = polygonClipping.intersection(subj, holeMask)
+    if (!clipped.length) {
+      console.warn(`Empty clip for ${f.properties.NUTS_ID} — skipping`)
+      continue
+    }
+    data.features.push({
+      type: 'Feature',
+      properties: { id: m.id, name: m.label, source: 'nuts-clipped-to-hole' },
+      geometry: { type: 'MultiPolygon', coordinates: clipped },
+    })
+    ZONE_META[m.id] = {
+      id: m.metaId,
+      label: m.label,
+      zones: m.zones,
+      country: 'BE',
+    }
   }
+} else {
+  console.warn(`(no ${NUTS_PATH} or empty hole — Bruxelles/Brabant zones skipped)`)
 }
 
 // ---- Add low-opacity context countries (background, no zones) ----

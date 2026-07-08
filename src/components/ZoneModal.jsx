@@ -5,6 +5,8 @@ import { ZoneFlag } from './ZoneFlag'
 export const ZONES_BY_COUNTRY = {
   Belgique: [
     'BE-Anvers',
+    'BE-Brabant-Flamand',
+    'BE-Brabant-Wallon',
     'BE-Bruxelles',
     'BE-Flandre-Occidentale',
     'BE-Flandre-Orientale',

@@ -37,7 +37,7 @@ Note : les routes `/api/*` ne tournent **pas** sous `npm run dev` seul — utili
 | `removed` | Retirée — exclue de toutes les vues |
 
 ### Tags de zone (géo livraison)
-Format `{PAYS}-{REGION}` posé sur la **commande** ou le **client** (le tag client sert de fallback). Ex : `BE-Bruxelles`, `FR-Nord`, `LU`, `LIV-Externe`. Provinces BE : Anvers, Bruxelles, Flandre-Occidentale/Orientale, Hainaut-Est/Ouest, Limbourg, Liège, Luxembourg, Namur.
+Format `{PAYS}-{REGION}` posé sur la **commande** ou le **client** (le tag client sert de fallback). Ex : `BE-Bruxelles`, `FR-Nord`, `LU`, `LIV-Externe`. Provinces BE : Anvers, Brabant-Flamand, Brabant-Wallon, Bruxelles (= Région de Bruxelles-Capitale seule), Flandre-Occidentale/Orientale, Hainaut-Est/Ouest, Limbourg, Liège, Luxembourg, Namur. La liste canonique des tags est dans `src/components/ZoneModal.jsx` (`ZONES_BY_COUNTRY`) ; la carte (picker + heatmap) vient de `src/components/belgiumProvincesPaths.js`, auto-généré par `node scripts/build-be-map.mjs` (Bruxelles + les 2 Brabants sont découpés dans le « trou » central via les contours NUTS-2 `nuts-brabant-brussels.json`).
 
 ### Attributs custom de commande (Shopify)
 - `Delivery Date` (YYYY-MM-DD) — posé par le planificateur / la page publique
