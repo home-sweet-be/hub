@@ -1537,6 +1537,21 @@
   object-fit: cover;
 }
 
+.zone-modal__gl-map {
+  flex: 1;
+  width: 100%;
+  min-height: 380px;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid rgba(28, 28, 30, 0.1);
+  background: #eef0f3;
+}
+
+.zone-modal__gl-map .mapboxgl-ctrl-logo,
+.zone-modal__gl-map .mapboxgl-ctrl-attrib {
+  display: none !important;
+}
+
 .zone-modal__no-map--full {
   display: flex;
   flex: 1;
@@ -2378,6 +2393,7 @@
   }
 
   .zone-modal__map--full,
+  .zone-modal__gl-map,
   .zone-modal__no-map--full {
     min-height: 220px;
   }

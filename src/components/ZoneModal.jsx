@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { ZoneFlag } from './ZoneFlag'
+import ZoneConfirmMap from './ZoneConfirmMap'
 
 export const ZONES_BY_COUNTRY = {
   Belgique: [
@@ -35,15 +36,6 @@ function zoneLabel(zone) {
   return zone.replace(/^[A-Z]{2}-/, '').replace(/-/g, ' ')
 }
 
-const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_TOKEN
-// Lower = more dezoomed (Mapbox zoom 0-22 scale)
-const MAP_ZOOM = 6
-
-function mapboxStatic(lat, lon, width = 800, height = 500) {
-  if (!MAPBOX_TOKEN) return null
-  return `https://api.mapbox.com/styles/v1/mapbox/streets-v12/static/pin-l+ed2939(${lon},${lat})/${lon},${lat},${MAP_ZOOM}/${width}x${height}@2x?access_token=${MAPBOX_TOKEN}`
-}
-
 function gmapsLink(lat, lon, q) {
   if (lat != null && lon != null) {
     return `https://www.google.com/maps?q=${lat},${lon}`
@@ -66,6 +58,7 @@ export default function ZoneModal({
 }) {
   const [pending, setPending] = useState(false)
   const [error, setError] = useState(null)
+  const [hoveredZone, setHoveredZone] = useState(null)
 
   useEffect(() => {
     if (!open) return
@@ -77,7 +70,10 @@ export default function ZoneModal({
   }, [open, onClose])
 
   useEffect(() => {
-    if (open) setError(null)
+    if (open) {
+      setError(null)
+      setHoveredZone(null)
+    }
   }, [open])
 
   useEffect(() => {
@@ -211,25 +207,10 @@ export default function ZoneModal({
 
         <div className="zone-modal__layout">
           <aside className="zone-modal__address-pane">
-            {hasCoords && mapboxStatic(lat, lon) ? (
-              <a
-                href={gmapsLink(lat, lon, flatAddress)}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="zone-modal__map zone-modal__map--full"
-                title="Ouvrir dans Google Maps"
-              >
-                <img
-                  src={mapboxStatic(lat, lon)}
-                  alt="Carte de l'adresse de livraison"
-                  loading="lazy"
-                />
-              </a>
-            ) : (
-              <div className="zone-modal__no-map zone-modal__no-map--full">
-                Coordonnées GPS indisponibles
-              </div>
-            )}
+            <ZoneConfirmMap
+              address={address}
+              highlightTag={hoveredZone || currentZone}
+            />
           </aside>
 
           <div className="zone-modal__body">
@@ -255,6 +236,10 @@ export default function ZoneModal({
                         'zone-modal__chip' + (active ? ' is-active' : '')
                       }
                       onClick={() => handleSelect(z)}
+                      onMouseEnter={() => setHoveredZone(z)}
+                      onMouseLeave={() => setHoveredZone(null)}
+                      onFocus={() => setHoveredZone(z)}
+                      onBlur={() => setHoveredZone(null)}
                       disabled={pending}
                     >
                       {zoneLabel(z)}

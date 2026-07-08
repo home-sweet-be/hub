@@ -65,7 +65,56 @@ export function zoneFromLatLon(lat, lon) {
   return null
 }
 
-const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_TOKEN
+function ringArea(ring) {
+  let a = 0
+  for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) {
+    a += ring[j][0] * ring[i][1] - ring[i][0] * ring[j][1]
+  }
+  return a / 2
+}
+
+/**
+ * Géométrie GeoJSON d'affichage pour un tag de zone, avec les TROUS reconstruits
+ * (le build aplatit les anneaux ; ici on ré-associe chaque anneau intérieur à
+ * son extérieur pour que, p.ex., Bruxelles apparaisse comme un trou du Brabant
+ * flamand et non comme une surface pleine). Renvoie une Polygon/MultiPolygon
+ * ou null si le tag n'a pas de tracé (ex: LIV-Externe).
+ */
+export function zoneGeometryForTag(tag) {
+  if (!tag) return null
+  const p = BE_PROVINCES.find((z) => z.zones?.[0] === tag)
+  if (!p) return null
+  const rings = ringsOf(p.geometry)
+  if (rings.length === 0) return null
+  if (rings.length === 1) return { type: 'Polygon', coordinates: [rings[0]] }
+  // Le plus grand anneau = extérieur ; les anneaux contenus dedans = trous ;
+  // un anneau disjoint = un autre extérieur (îlot).
+  const sorted = [...rings].sort(
+    (a, b) => Math.abs(ringArea(b)) - Math.abs(ringArea(a))
+  )
+  const outers = []
+  for (const r of sorted) {
+    const [px, py] = r[0]
+    let placed = false
+    for (const o of outers) {
+      if (
+        pointInRing(px, py, o.ring) &&
+        !o.holes.some((h) => pointInRing(px, py, h))
+      ) {
+        o.holes.push(r)
+        placed = true
+        break
+      }
+    }
+    if (!placed) outers.push({ ring: r, holes: [] })
+  }
+  const polys = outers.map((o) => [o.ring, ...o.holes])
+  return polys.length === 1
+    ? { type: 'Polygon', coordinates: polys[0] }
+    : { type: 'MultiPolygon', coordinates: polys }
+}
+
+const MAPBOX_TOKEN = import.meta.env?.VITE_MAPBOX_TOKEN
 
 /**
  * Fallback quand Shopify n'a pas géocodé l'adresse : géocodage direct via
