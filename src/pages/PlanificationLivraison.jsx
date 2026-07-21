@@ -767,7 +767,6 @@ export default function PlanificationLivraison() {
                       réserver ?
                     </p>
                     <div className="plani-quiz__price">
-                      <span className="plani-quiz__price-amount">100 €</span>
                       <span className="plani-quiz__price-detail">
                         à régler <strong>en espèces</strong> le jour de la
                         livraison, directement au livreur.
