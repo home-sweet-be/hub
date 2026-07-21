@@ -74,14 +74,15 @@ function formatAddress(a) {
 
 export default function LivraisonsSemaine() {
   const [tab, setTab] = useState('prochaines')
-  const [days, setDays] = useState(null)
-  const [error, setError] = useState(null)
+  // Un seul état qui mémorise à quel onglet/refresh le résultat correspond, pour
+  // pouvoir dériver `loading` sans jamais faire de setState synchrone dans
+  // l'effet (règle react-hooks/set-state-in-effect).
+  const [result, setResult] = useState({ tab: null, key: null, days: null, error: null })
   const { reloadKey } = useReload()
 
-  const load = useCallback(async (which) => {
+  const load = useCallback(async (which, key) => {
     const isPast = which === 'passees'
-    setDays(null)
-    setError(null)
+    const done = (patch) => setResult({ tab: which, key, days: null, error: null, ...patch })
     try {
       let slots, slotErr
       if (isPast) {
@@ -107,7 +108,7 @@ export default function LivraisonsSemaine() {
       if (slotErr) throw slotErr
 
       if (!slots?.length) {
-        setDays([])
+        done({ days: [] })
         return
       }
 
@@ -120,7 +121,7 @@ export default function LivraisonsSemaine() {
       if (bkErr) throw bkErr
 
       if (!bookings?.length) {
-        setDays([])
+        done({ days: [] })
         return
       }
 
@@ -151,7 +152,7 @@ export default function LivraisonsSemaine() {
       }
 
       if (!paired.length) {
-        setDays([])
+        done({ days: [] })
         return
       }
 
@@ -198,17 +199,22 @@ export default function LivraisonsSemaine() {
         }))
         .sort((a, b) => (isPast ? b.date - a.date : a.date - b.date))
 
-      setDays(grouped)
+      done({ days: grouped })
     } catch (e) {
-      setError(e.message || String(e))
+      done({ error: e.message || String(e) })
     }
   }, [])
 
   useEffect(() => {
-    load(tab)
+    load(tab, reloadKey)
   }, [load, tab, reloadKey])
 
   const isPast = tab === 'passees'
+  // Le résultat courant n'est fiable que s'il correspond à l'onglet + refresh
+  // actifs ; sinon on est en cours de (re)chargement.
+  const loading = result.tab !== tab || result.key !== reloadKey
+  const days = loading ? null : result.days
+  const error = loading ? null : result.error
 
   const subtabs = (
     <div className="semaine__subtabs">
