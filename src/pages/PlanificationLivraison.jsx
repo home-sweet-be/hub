@@ -165,8 +165,6 @@ export default function PlanificationLivraison() {
   const [quizStep, setQuizStep] = useState('rdc')
   const [monteChargeRequired, setMonteChargeRequired] = useState(false)
 
-  const weekEnd = useMemo(() => addDays(weekStart, 7), [weekStart])
-
   // Iframe auto-resize: notify parent of content height changes.
   // Measure only the .plani container (not documentElement) so we don't pick up
   // the iframe's own viewport size, which would create a feedback loop with the
