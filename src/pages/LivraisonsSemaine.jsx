@@ -73,25 +73,37 @@ function formatAddress(a) {
 }
 
 export default function LivraisonsSemaine() {
+  const [tab, setTab] = useState('prochaines')
   const [days, setDays] = useState(null)
   const [error, setError] = useState(null)
   const { reloadKey } = useReload()
 
-  const load = useCallback(async () => {
+  const load = useCallback(async (which) => {
+    const isPast = which === 'passees'
     setDays(null)
     setError(null)
     try {
-      const start = new Date()
-      start.setHours(0, 0, 0, 0)
-      const horizon = new Date(start)
-      horizon.setDate(horizon.getDate() + 7)
-
-      const { data: slots, error: slotErr } = await supabase
-        .from('delivery_slots')
-        .select('id, starts_at, ends_at, zones, capacity')
-        .gte('starts_at', start.toISOString())
-        .lt('starts_at', horizon.toISOString())
-        .order('starts_at', { ascending: true })
+      let slots, slotErr
+      if (isPast) {
+        // Livraisons déjà terminées (créneau clos), les plus récentes d'abord.
+        ;({ data: slots, error: slotErr } = await supabase
+          .from('delivery_slots')
+          .select('id, starts_at, ends_at, zones, capacity')
+          .lt('ends_at', new Date().toISOString())
+          .order('starts_at', { ascending: false })
+          .limit(60))
+      } else {
+        const start = new Date()
+        start.setHours(0, 0, 0, 0)
+        const horizon = new Date(start)
+        horizon.setDate(horizon.getDate() + 7)
+        ;({ data: slots, error: slotErr } = await supabase
+          .from('delivery_slots')
+          .select('id, starts_at, ends_at, zones, capacity')
+          .gte('starts_at', start.toISOString())
+          .lt('starts_at', horizon.toISOString())
+          .order('starts_at', { ascending: true }))
+      }
       if (slotErr) throw slotErr
 
       if (!slots?.length) {
@@ -112,7 +124,39 @@ export default function LivraisonsSemaine() {
         return
       }
 
-      const names = [...new Set(bookings.map((b) => b.shopify_order_name))]
+      const slotMap = new Map(slots.map((s) => [s.id, s]))
+
+      // Associe chaque réservation à son créneau, puis restreint à ce que
+      // l'onglet actif doit montrer.
+      let paired = bookings
+        .map((b) => {
+          const slot = slotMap.get(b.slot_id)
+          return slot ? { booking: b, slot } : null
+        })
+        .filter(Boolean)
+
+      if (isPast) {
+        // Les 10 dernières livraisons, ordre anté-chronologique.
+        paired.sort(
+          (a, b) => new Date(b.slot.starts_at) - new Date(a.slot.starts_at)
+        )
+        paired = paired.slice(0, 10)
+      } else {
+        // Hide a delivery 2h after its slot end time (not just once the day is
+        // over) — a morning slot drops off the list in the early afternoon.
+        const hideBefore = Date.now() - 2 * 60 * 60 * 1000
+        paired = paired.filter(
+          (p) => new Date(p.slot.ends_at).getTime() >= hideBefore
+        )
+      }
+
+      if (!paired.length) {
+        setDays([])
+        return
+      }
+
+      // Ne récupère les commandes Shopify que pour les réservations conservées.
+      const names = [...new Set(paired.map((p) => p.booking.shopify_order_name))]
       const q = names.map((n) => `name:${n.replace(/^#/, '')}`).join(' OR ')
       const r = await fetch(
         `/api/shopify/receptions?q=${encodeURIComponent(q)}&first=100`
@@ -124,21 +168,12 @@ export default function LivraisonsSemaine() {
         ordersByName.set(String(o.name).replace(/^#/, ''), o)
       }
 
-      const slotMap = new Map(slots.map((s) => [s.id, s]))
-      // Hide a delivery 2h after its slot end time (not just once the day is
-      // over) — a morning slot drops off the list in the early afternoon.
-      const hideBefore = Date.now() - 2 * 60 * 60 * 1000
-      const entries = bookings
-        .map((b) => {
-          const slot = slotMap.get(b.slot_id)
-          if (!slot) return null
-          if (new Date(slot.ends_at).getTime() < hideBefore) return null
-          const order = ordersByName.get(
-            String(b.shopify_order_name).replace(/^#/, '')
-          )
-          return { booking: b, slot, order }
-        })
-        .filter(Boolean)
+      const entries = paired.map((p) => ({
+        ...p,
+        order: ordersByName.get(
+          String(p.booking.shopify_order_name).replace(/^#/, '')
+        ),
+      }))
 
       const byDay = new Map()
       for (const e of entries) {
@@ -155,11 +190,13 @@ export default function LivraisonsSemaine() {
       const grouped = [...byDay.values()]
         .map((d) => ({
           ...d,
-          items: d.items.sort(
-            (a, b) => new Date(a.slot.starts_at) - new Date(b.slot.starts_at)
+          items: d.items.sort((a, b) =>
+            isPast
+              ? new Date(b.slot.starts_at) - new Date(a.slot.starts_at)
+              : new Date(a.slot.starts_at) - new Date(b.slot.starts_at)
           ),
         }))
-        .sort((a, b) => a.date - b.date)
+        .sort((a, b) => (isPast ? b.date - a.date : a.date - b.date))
 
       setDays(grouped)
     } catch (e) {
@@ -168,17 +205,42 @@ export default function LivraisonsSemaine() {
   }, [])
 
   useEffect(() => {
-    load()
-  }, [load, reloadKey])
+    load(tab)
+  }, [load, tab, reloadKey])
 
+  const isPast = tab === 'passees'
+
+  const subtabs = (
+    <div className="semaine__subtabs">
+      <button
+        type="button"
+        className={`semaine__subtab${!isPast ? ' is-active' : ''}`}
+        onClick={() => setTab('prochaines')}
+      >
+        Prochaines
+      </button>
+      <button
+        type="button"
+        className={`semaine__subtab${isPast ? ' is-active' : ''}`}
+        onClick={() => setTab('passees')}
+      >
+        Passées
+      </button>
+    </div>
+  )
+
+  let content
   if (error) {
-    return <div className="semaine__error">Erreur : {error}</div>
-  }
-  if (days === null) {
-    return <div className="semaine__loading">Chargement des livraisons…</div>
-  }
-  if (days.length === 0) {
-    return (
+    content = <div className="semaine__error">Erreur : {error}</div>
+  } else if (days === null) {
+    content = <div className="semaine__loading">Chargement des livraisons…</div>
+  } else if (days.length === 0) {
+    content = isPast ? (
+      <div className="semaine__empty">
+        <h3>Aucune livraison passée</h3>
+        <p>Aucune livraison n'a encore été effectuée.</p>
+      </div>
+    ) : (
       <div className="semaine__empty">
         <h3>Aucune livraison planifiée</h3>
         <p>
@@ -187,31 +249,35 @@ export default function LivraisonsSemaine() {
         </p>
       </div>
     )
-  }
-
-  const totalCount = days.reduce((s, d) => s + d.items.length, 0)
-
-  return (
-    <div className="semaine">
-      <div className="semaine__header">
-        <div className="semaine__summary">
-          <span className="semaine__summary-count">{totalCount}</span>
-          <span className="semaine__summary-label">
-            livraison{totalCount > 1 ? 's' : ''} sur les 7 prochains jours
-          </span>
+  } else {
+    const totalCount = days.reduce((s, d) => s + d.items.length, 0)
+    content = (
+      <>
+        <div className="semaine__header">
+          <div className="semaine__summary">
+            <span className="semaine__summary-count">{totalCount}</span>
+            <span className="semaine__summary-label">
+              {isPast
+                ? `dernière${totalCount > 1 ? 's' : ''} livraison${
+                    totalCount > 1 ? 's' : ''
+                  }`
+                : `livraison${totalCount > 1 ? 's' : ''} sur les 7 prochains jours`}
+            </span>
+          </div>
+          {!isPast && (
+            <a
+              href="https://admin.shopify.com/store/homesweetbe/apps/easyroutes"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="semaine__easyroutes"
+              title="Ouvrir EasyRoutes"
+            >
+              <img src="/btn%20easy%20routes.jpg" alt="EasyRoutes" />
+            </a>
+          )}
         </div>
-        <a
-          href="https://admin.shopify.com/store/homesweetbe/apps/easyroutes"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="semaine__easyroutes"
-          title="Ouvrir EasyRoutes"
-        >
-          <img src="/btn%20easy%20routes.jpg" alt="EasyRoutes" />
-        </a>
-      </div>
 
-      {days.map((day) => (
+        {days.map((day) => (
         <section key={ymdLocal(day.date)} className="semaine__day">
           <header className="semaine__day-head">
             <h2 className="semaine__day-title">{dayLabel(day.date)}</h2>
@@ -338,7 +404,15 @@ export default function LivraisonsSemaine() {
             })}
           </div>
         </section>
-      ))}
+        ))}
+      </>
+    )
+  }
+
+  return (
+    <div className="semaine">
+      {subtabs}
+      {content}
     </div>
   )
 }
