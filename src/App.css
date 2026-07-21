@@ -5756,6 +5756,32 @@ body:has(.plani),
   line-height: 1.55;
 }
 
+.plani-quiz__price {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 14px;
+  padding: 12px 16px;
+  background: rgba(255, 149, 0, 0.08);
+  border: 1px solid rgba(255, 149, 0, 0.25);
+  border-radius: 12px;
+}
+
+.plani-quiz__price-amount {
+  flex: none;
+  font-size: 22px;
+  font-weight: 700;
+  color: #b35900;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+}
+
+.plani-quiz__price-detail {
+  font-size: 13px;
+  color: #6b4a14;
+  line-height: 1.45;
+}
+
 .plani-quiz__actions {
   display: flex;
   gap: 10px;

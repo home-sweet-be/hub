@@ -724,6 +724,13 @@ export default function PlanificationLivraison() {
                       acheminer vos colis dans votre logement. Souhaitez-vous le
                       réserver ?
                     </p>
+                    <div className="plani-quiz__price">
+                      <span className="plani-quiz__price-amount">100 €</span>
+                      <span className="plani-quiz__price-detail">
+                        à régler <strong>en espèces</strong> le jour de la
+                        livraison, directement au livreur.
+                      </span>
+                    </div>
                     <div className="plani-quiz__actions plani-quiz__actions--stacked">
                       <button
                         type="button"
@@ -733,7 +740,7 @@ export default function PlanificationLivraison() {
                           setStep('pick')
                         }}
                       >
-                        Oui, je réserve un monte-charges
+                        Oui, je réserve un monte-charges (100 €)
                       </button>
                       <button
                         type="button"
