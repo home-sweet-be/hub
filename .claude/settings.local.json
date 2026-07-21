@@ -35,5 +35,21 @@
       "Bash(ls -la vercel.json)",
       "Bash(cat vercel.json)"
     ]
+  },
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "shell": "bash",
+            "timeout": 30,
+            "statusMessage": "Auto-merge master -> main...",
+            "command": "cmd=$(node -e \"let d='';process.stdin.on('data',c=>d+=c).on('end',()=>{try{console.log((JSON.parse(d).tool_input||{}).command||'')}catch(e){}})\"); echo \"$cmd\" | grep -q 'git commit' || exit 0; b=$(git rev-parse --abbrev-ref HEAD 2>/dev/null); [ \"$b\" = master ] || exit 0; if git push origin master:main >/tmp/hs-main.log 2>&1; then printf '{\"systemMessage\":\"master -> main pushed (Vercel deploy triggered)\"}'; else printf '{\"systemMessage\":\"Auto-merge master->main FAILED (non fast-forward?). See /tmp/hs-main.log\"}'; fi"
+          }
+        ]
+      }
+    ]
   }
 }
