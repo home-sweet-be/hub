@@ -137,17 +137,59 @@ function readPrefillFromUrl() {
   }
 }
 
+// Dev only : `?preview=<ecran>` saute directement a un ecran donne avec une
+// commande factice, pour iterer sur le visuel sans passer par tout le tunnel
+// de reservation. Totalement inerte en production (garde import.meta.env.DEV).
+// Ecrans supportes : rdc | ascenseur | dimensions | ascenseur-taille |
+// monte-charge (etapes du quiz) et balance (ecran solde a la livraison).
+const PREVIEW_QUIZ_STEPS = [
+  'rdc',
+  'ascenseur',
+  'dimensions',
+  'ascenseur-taille',
+  'monte-charge',
+]
+const PREVIEW_ORDER = {
+  id: 'gid://preview',
+  name: '#PREVIEW',
+  zone: 'BE-Bruxelles',
+  customerName: 'Client Test',
+  email: 'test@exemple.com',
+  address: 'Rue de la Loi 16, 1000 Bruxelles, Belgique',
+  lat: 50.8467,
+  lon: 4.3499,
+  shippingLine: 'Livraison Premium',
+  outstanding: 250,
+  currency: 'EUR',
+}
+
+function readPreview() {
+  if (!import.meta.env.DEV) return ''
+  try {
+    return (new URLSearchParams(window.location.search).get('preview') || '').trim()
+  } catch {
+    return ''
+  }
+}
+
 export default function PlanificationLivraison() {
   const initialPrefill = useMemo(() => readPrefillFromUrl(), [])
   const hasPrefill = Boolean(initialPrefill.orderName && initialPrefill.email)
 
-  const [step, setStep] = useState('auth') // auth | pick | done
+  const preview = useMemo(() => readPreview(), [])
+  const previewStep = PREVIEW_QUIZ_STEPS.includes(preview)
+    ? 'quiz'
+    : preview === 'balance'
+      ? 'balance'
+      : null
+
+  const [step, setStep] = useState(previewStep || 'auth') // auth | pick | done
   const [orderName, setOrderName] = useState(initialPrefill.orderName)
   const [email, setEmail] = useState(initialPrefill.email)
   const [verifying, setVerifying] = useState(false)
   const [autoVerifying, setAutoVerifying] = useState(hasPrefill)
   const [authError, setAuthError] = useState(null)
-  const [order, setOrder] = useState(null)
+  const [order, setOrder] = useState(previewStep ? PREVIEW_ORDER : null)
 
   const [weekStart, setWeekStart] = useState(() => startOfToday())
   const [slots, setSlots] = useState(null)
@@ -162,7 +204,9 @@ export default function PlanificationLivraison() {
 
   // Pre-pick delivery quiz (RDC / ascenseur / dimensions / monte-charge).
   // Only shown for non-standard shipping tiers (Confort, Premium).
-  const [quizStep, setQuizStep] = useState('rdc')
+  const [quizStep, setQuizStep] = useState(
+    PREVIEW_QUIZ_STEPS.includes(preview) ? preview : 'rdc'
+  )
   const [monteChargeRequired, setMonteChargeRequired] = useState(false)
 
   // Iframe auto-resize: notify parent of content height changes.
