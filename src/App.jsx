@@ -3,6 +3,8 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import logo from './assets/homesweet.png'
 import { ReloadContext } from './lib/reload'
 import { syncDepositOrders } from './lib/depositSync'
+import { logout } from './lib/hubAuth'
+import AuthGate from './components/AuthGate'
 import ErrorBoundary from './components/ErrorBoundary'
 import Commandes from './pages/Commandes'
 import Logistique from './pages/Logistique'
@@ -155,6 +157,7 @@ function Shell() {
   }, [location.pathname])
 
   return (
+    <AuthGate>
     <ReloadContext.Provider value={{ reloadKey, reloading, triggerReload }}>
     <div className="hub-shell">
       <div className="hub-bg" aria-hidden="true" />
@@ -223,6 +226,23 @@ function Shell() {
             <path d="M3 21v-5h5" />
           </svg>
         </button>
+
+        <button
+          type="button"
+          className="hub-header__reload"
+          onClick={() => {
+            logout()
+            window.location.reload()
+          }}
+          aria-label="Se déconnecter"
+          title="Se déconnecter"
+        >
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+            <path d="M16 17l5-5-5-5" />
+            <path d="M21 12H9" />
+          </svg>
+        </button>
       </header>
 
       <div className="hub-body">
@@ -263,6 +283,7 @@ function Shell() {
       </div>
     </div>
     </ReloadContext.Provider>
+    </AuthGate>
   )
 }
 

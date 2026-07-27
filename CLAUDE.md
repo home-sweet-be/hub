@@ -78,11 +78,14 @@ Modules sidebar : Commandes · Logistique · Livraisons · Compta · Rapports.
 
 ## Variables d'env
 Front (`VITE_`, exposées navigateur) : `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`, `VITE_MAPBOX_TOKEN`.
-Back (serveur uniquement) : `SHOPIFY_STORE_DOMAIN`, `SHOPIFY_ADMIN_TOKEN`, `SHOPIFY_API_VERSION`, `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `RESEND_API_KEY`, `EMAIL_FROM`, `BOOKING_URL`, `BOOKING_NOTIFY_TO`.
+Back (serveur uniquement) : `SHOPIFY_STORE_DOMAIN`, `SHOPIFY_ADMIN_TOKEN`, `SHOPIFY_API_VERSION`, `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `RESEND_API_KEY`, `EMAIL_FROM`, `BOOKING_URL`, `BOOKING_NOTIFY_TO`, `HUB_PASSWORD`, `HUB_AUTH_SECRET`.
 ⚠️ Ne jamais préfixer un secret serveur avec `VITE_` (sinon exposé au navigateur).
 
+## Protection du hub interne (`middleware.js`)
+Routing Middleware Vercel (racine du repo, ne compte pas dans la limite de 12 fonctions Hobby) : exige un token Bearer (HMAC signé, `HUB_AUTH_SECRET`) sur tous les `/api/*` sauf `verify-order`, `order-set-delivery-date`, `email/booking-notify` (utilisés par la page publique de réservation) et `receptions` quand `q=name:...` (utilisé par `/facture/:orderName`, aussi public). Le mot de passe partagé est `HUB_PASSWORD` ; login via `POST /api/__login` (géré par le middleware, virtuel — pas un fichier dans `api/`). Côté front, `lib/hubAuth.js` stocke le token en `localStorage` et l'attache aux `fetch('/api/...')` ; `components/AuthGate.jsx` affiche l'écran de connexion autour du `Shell` (pas autour des pages publiques). Si `HUB_PASSWORD`/`HUB_AUTH_SECRET` ne sont pas posées sur Vercel, le middleware laisse tout passer (fail-open) pour ne pas casser le hub en attendant la config.
+
 ## Composants / lib partagés
-- `lib/supabase.js` (singleton client) · `lib/reload.js` (contexte de refresh global, bouton header)
+- `lib/supabase.js` (singleton client) · `lib/reload.js` (contexte de refresh global, bouton header) · `lib/hubAuth.js` (token de session du hub)
 - `components/` : ZoneModal/ZoneMapPicker/ZoneFlag (zones), SlotModal (créneaux→Supabase), StockAdjustModal (→ inventory/adjust), AddressModal & BelgiumHeatmap (Mapbox), ConfirmModal, ErrorBoundary, OrdersTableSkeleton.
 
 ## Conventions
