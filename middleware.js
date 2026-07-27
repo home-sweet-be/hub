@@ -1,4 +1,3 @@
-import crypto from 'node:crypto'
 import { next } from '@vercel/functions'
 
 // Vercel Routing Middleware — tourne AVANT les fonctions api/*.js, sur une
@@ -6,8 +5,8 @@ import { next } from '@vercel/functions'
 // Protège les endpoints internes du hub par un token partagé ; laisse
 // passer les endpoints utilisés par les pages publiques (réservation
 // client, facture) sans authentification.
+// Runtime Edge (par défaut) : Web Crypto uniquement, pas d'API Node.
 export const config = {
-  runtime: 'nodejs',
   matcher: ['/api/:path*'],
 }
 
@@ -22,24 +21,43 @@ const PUBLIC_API_PATHS = new Set([
   '/api/email/booking-notify',
 ])
 
-function sign(value, secret) {
-  return crypto.createHmac('sha256', secret).update(value).digest('hex')
+const encoder = new TextEncoder()
+
+function toHex(buffer) {
+  return Array.from(new Uint8Array(buffer))
+    .map((b) => b.toString(16).padStart(2, '0'))
+    .join('')
 }
 
-function makeToken(secret) {
+async function sign(value, secret) {
+  const key = await crypto.subtle.importKey(
+    'raw',
+    encoder.encode(secret),
+    { name: 'HMAC', hash: 'SHA-256' },
+    false,
+    ['sign']
+  )
+  const sig = await crypto.subtle.sign('HMAC', key, encoder.encode(value))
+  return toHex(sig)
+}
+
+async function makeToken(secret) {
   const exp = Date.now() + SESSION_TTL_MS
-  return `${exp}.${sign(String(exp), secret)}`
+  return `${exp}.${await sign(String(exp), secret)}`
 }
 
-function verifyToken(token, secret) {
+async function verifyToken(token, secret) {
   if (!token) return false
   const [exp, sig] = String(token).split('.')
   if (!exp || !sig) return false
   if (!Number.isFinite(Number(exp)) || Date.now() > Number(exp)) return false
-  const expected = sign(exp, secret)
-  const a = Buffer.from(expected)
-  const b = Buffer.from(sig)
-  return a.length === b.length && crypto.timingSafeEqual(a, b)
+  const expected = await sign(exp, secret)
+  if (expected.length !== sig.length) return false
+  let diff = 0
+  for (let i = 0; i < expected.length; i += 1) {
+    diff |= expected.charCodeAt(i) ^ sig.charCodeAt(i)
+  }
+  return diff === 0
 }
 
 function unauthorized(message) {
@@ -84,7 +102,7 @@ export default async function middleware(request) {
       return unauthorized('bad request')
     }
     if (supplied !== password) return unauthorized('invalid password')
-    return new Response(JSON.stringify({ token: makeToken(secret) }), {
+    return new Response(JSON.stringify({ token: await makeToken(secret) }), {
       status: 200,
       headers: { 'content-type': 'application/json' },
     })
@@ -92,7 +110,7 @@ export default async function middleware(request) {
 
   const authHeader = request.headers.get('authorization') || ''
   const token = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : ''
-  if (!verifyToken(token, secret)) return unauthorized()
+  if (!(await verifyToken(token, secret))) return unauthorized()
 
   return next()
 }
