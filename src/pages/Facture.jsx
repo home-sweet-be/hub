@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { useParams, useSearchParams } from 'react-router-dom'
 import logo from '../assets/homesweet.png'
 
 const VAT_RATE = 0.21
@@ -37,6 +37,9 @@ function effectiveQuantity(li) {
 
 export default function Facture() {
   const { orderName } = useParams()
+  // Personnalisation « à la volée » venant de /facturation (rien n'est stocké) :
+  // adresse de facturation remplacée + texte libre sous l'adresse.
+  const [searchParams] = useSearchParams()
   const [order, setOrder] = useState(null)
   const [error, setError] = useState(null)
   const [downloading, setDownloading] = useState(false)
@@ -174,11 +177,35 @@ export default function Facture() {
   } = computed
   const hasDeposit = received > 0 && outstanding > 0
   const cust = order.customer
-  const addr = order.shippingAddress
+  const ovAddress = ['a1', 'a2', 'zip', 'city', 'country'].some((k) =>
+    searchParams.has(k)
+  )
+  const addr = ovAddress
+    ? {
+        address1: searchParams.get('a1') || '',
+        address2: searchParams.get('a2') || '',
+        zip: searchParams.get('zip') || '',
+        city: searchParams.get('city') || '',
+        country: searchParams.get('country') || '',
+      }
+    : order.shippingAddress
+  const note = searchParams.get('note') || ''
   const billName =
+    searchParams.get('bn')?.trim() ||
     [cust?.firstName, cust?.lastName].filter(Boolean).join(' ').trim() ||
-    addr?.name ||
+    order.shippingAddress?.name ||
     '—'
+  const addrLines = addr
+    ? [
+        [addr.address1, addr.address2].filter(Boolean).join(', '),
+        [
+          [addr.zip, addr.city].filter(Boolean).join(' '),
+          addr.country,
+        ]
+          .filter(Boolean)
+          .join(', '),
+      ].filter(Boolean)
+    : []
 
   return (
     <div className="facture-page">
@@ -227,17 +254,17 @@ export default function Facture() {
         <section className="facture__bill-to">
           <div className="facture__bill-label">Facturé à</div>
           <div className="facture__bill-name">{billName}</div>
-          {addr && (
+          {addrLines.length > 0 && (
             <div className="facture__bill-addr">
-              {[addr.address1, addr.address2].filter(Boolean).join(', ')}
-              <br />
-              {[addr.zip, addr.city].filter(Boolean).join(' ')}
-              {addr.country ? `, ${addr.country}` : ''}
+              {addrLines.map((l, i) => (
+                <div key={i}>{l}</div>
+              ))}
             </div>
           )}
           {order.email && (
             <div className="facture__bill-addr">{order.email}</div>
           )}
+          {note && <div className="facture__bill-note">{note}</div>}
         </section>
 
         <table className="facture__table">
