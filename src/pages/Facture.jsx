@@ -1,13 +1,13 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useParams, useSearchParams } from 'react-router-dom'
-import logo from '../assets/homesweet.png'
+import logo from '../assets/dazzuro.png'
 
 const VAT_RATE = 0.21
 
 // Coordonnées légales de l'émetteur de la facture.
 // ⚠️ IBAN encore à compléter.
 const SELLER = {
-  name: 'HomeSweet',
+  name: 'Dazzuro',
   legalName: 'SILK ROAD INVEST',
   address: ['54 Rue du Bon Pasteur Box A01', '1140 Evere', 'Belgique'],
   company: '1003.835.578',

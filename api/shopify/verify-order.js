@@ -97,7 +97,7 @@ export default async function handler(req, res) {
     return res.status(400).json({ ok: false, code: 'missing_fields' })
   }
 
-  // Shopify search by order name (HOMESWEET orders have no # prefix)
+  // Shopify search by order name (les commandes Dazzuro n'ont pas de préfixe #)
   const filter = `name:${orderName}`
 
   try {

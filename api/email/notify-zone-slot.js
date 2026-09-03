@@ -2,7 +2,7 @@ import { Resend } from 'resend'
 import { createClient } from '@supabase/supabase-js'
 
 const SHOPIFY_API_VERSION = process.env.SHOPIFY_API_VERSION || '2025-04'
-const FROM = process.env.EMAIL_FROM || 'Home Sweet <livraison@send.home-sweet.be>'
+const FROM = process.env.EMAIL_FROM || 'Dazzuro <livraison@send.home-sweet.be>'
 const BOOKING_URL =
   process.env.PLANI_PUBLIC_URL || 'https://home-sweet.be/pages/planifier-ma-livraison'
 
@@ -136,7 +136,7 @@ function renderEmail({ firstName, orderName, zoneName, slotDate, url }) {
         </p>
         <p style="margin:0;color:#8a8a8e;font-size:12px;line-height:1.5;">
           Si vous avez déjà réservé un créneau, vous pouvez ignorer cet email.<br/>
-          — L'équipe Home Sweet
+          — L'équipe Dazzuro
         </p>
       </div>
     </div>

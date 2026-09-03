@@ -34,7 +34,7 @@ export default function AuthGate({ children }) {
         className="glass glass--panel"
         style={{ width: 320, maxWidth: '90vw', padding: 28, display: 'flex', flexDirection: 'column', gap: 14 }}
       >
-        <h1 style={{ fontSize: 18, marginBottom: 4 }}>HomeSweet Hub</h1>
+        <h1 style={{ fontSize: 18, marginBottom: 4 }}>Dazzuro Hub</h1>
         {error && (
           <div style={{ color: '#c0392b', fontSize: 13 }}>{error}</div>
         )}

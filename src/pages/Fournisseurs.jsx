@@ -383,7 +383,7 @@ export default function Fournisseurs() {
           Order: o.name.replace(/^#/, ''),
           Quantity: effectiveQuantity(li),
           SKU: li.sku || li.variant?.sku || '',
-          'Homesweet name': li.title || '',
+          'Dazzuro name': li.title || '',
           Customer: client,
           Zone: zone,
           City: city,
@@ -397,7 +397,7 @@ export default function Fournisseurs() {
       { wch: 8 }, // Order
       { wch: 9 }, // Quantity
       { wch: 30 }, // SKU
-      { wch: 30 }, // Homesweet name
+      { wch: 30 }, // Dazzuro name
       { wch: 22 }, // Customer
       { wch: 14 }, // Zone
       { wch: 18 }, // City
@@ -406,10 +406,10 @@ export default function Fournisseurs() {
     ]
 
     // Header row: black fill, white bold text. Body: black text, except the
-    // Homesweet name column (less important for the supplier) in grey.
+    // Dazzuro name column (less important for the supplier) in grey.
     // All fonts sized 15 (Excel default 11 + 4).
     const FONT_SZ = 15
-    const NAME_COL = 3 // 0:Order 1:Quantity 2:SKU 3:Homesweet name
+    const NAME_COL = 3 // 0:Order 1:Quantity 2:SKU 3:Dazzuro name
     const headerStyle = {
       fill: { patternType: 'solid', fgColor: { rgb: '000000' } },
       font: { color: { rgb: 'FFFFFF' }, bold: true, sz: FONT_SZ },

@@ -1,6 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate, NavLink, Outlet, useLocation } from 'react-router-dom'
 import { useCallback, useEffect, useRef, useState } from 'react'
-import logo from './assets/homesweet.png'
+import logo from './assets/dazzuro.png'
 import { ReloadContext } from './lib/reload'
 import { syncDepositOrders } from './lib/depositSync'
 import { logout } from './lib/hubAuth'
@@ -188,7 +188,7 @@ function Shell() {
 
         <img
           src={logo}
-          alt="HOMESWEET BRUXELLES"
+          alt="DAZZURO"
           className="hub-header__logo"
         />
 

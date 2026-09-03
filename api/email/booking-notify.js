@@ -5,7 +5,7 @@
 
 import { Resend } from 'resend'
 
-const FROM = process.env.EMAIL_FROM || 'Home Sweet <livraison@send.home-sweet.be>'
+const FROM = process.env.EMAIL_FROM || 'Dazzuro <livraison@send.home-sweet.be>'
 // Accepte plusieurs destinataires séparés par des virgules.
 const NOTIFY_TO = (process.env.BOOKING_NOTIFY_TO || 'direction@home-sweet.be')
   .split(',')
@@ -183,7 +183,7 @@ function customerHtml({
         </p>
 
         <p style="margin:0;color:#8a8a8e;font-size:12px;line-height:1.5;">
-          À très bientôt,<br/>— L’équipe Home Sweet
+          À très bientôt,<br/>— L’équipe Dazzuro
         </p>
       </div>
     </div>
@@ -246,7 +246,7 @@ export default async function handler(req, res) {
         </table>
       </div>
       <p style="text-align:center;color:#b0b0b4;font-size:11px;margin:16px 0 0;">
-        Notification automatique — Home Sweet Hub
+        Notification automatique — Dazzuro Hub
       </p>
     </div>
   </body>
