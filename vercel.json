@@ -8,7 +8,7 @@
       "headers": [
         {
           "key": "Content-Security-Policy",
-          "value": "frame-ancestors 'self' https://home-sweet.be https://www.home-sweet.be https://*.myshopify.com https://*.shopifypreview.com"
+          "value": "frame-ancestors 'self' https://dazzuro.com https://www.dazzuro.com https://home-sweet.be https://www.home-sweet.be https://*.myshopify.com https://*.shopifypreview.com"
         }
       ]
     }
