@@ -1,5 +1,6 @@
 {
   "rewrites": [
+    { "source": "/dimensions", "destination": "/dimensions.html" },
     { "source": "/((?!api/).*)", "destination": "/index.html" }
   ],
   "headers": [
