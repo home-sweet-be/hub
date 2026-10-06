@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import OrdersTableSkeleton from '../components/OrdersTableSkeleton'
 import { useReload } from '../lib/reload'
+import { isLignePersonnalisation, prixDeBase } from '../lib/personnalisation'
 
 const RANGES = [
   { id: 365, label: '365 jours' },
@@ -101,7 +102,7 @@ function MeilleuresVentes() {
     for (const o of orders) {
       for (const li of o.lineItems || []) {
         const qty = effectiveQuantity(li)
-        if (qty <= 0) continue
+        if (qty <= 0 || isLignePersonnalisation(li)) continue
         const vId = li.variant?.id || li.sku || `${o.id}-${li.title}`
         const existing = map.get(vId) || {
           key: vId,
@@ -114,10 +115,10 @@ function MeilleuresVentes() {
           currency: 'EUR',
         }
         existing.qty += qty
-        const lineRevenue = Number(
+        const lineRevenue = prixDeBase(li, Number(
           li.discountedTotalSet?.shopMoney?.amount ||
             (li.originalUnitPriceSet?.shopMoney?.amount || 0) * qty
-        )
+        ))
         if (!Number.isNaN(lineRevenue)) existing.revenue += lineRevenue
         existing.currency =
           li.discountedTotalSet?.shopMoney?.currencyCode ||

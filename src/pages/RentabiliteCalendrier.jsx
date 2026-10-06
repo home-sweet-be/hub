@@ -2,6 +2,7 @@ import { Fragment, useCallback, useEffect, useMemo, useState } from 'react'
 import { supabase } from '../lib/supabase'
 import OrdersTableSkeleton from '../components/OrdersTableSkeleton'
 import { useReload } from '../lib/reload'
+import { isLignePersonnalisation, prixDeBase } from '../lib/personnalisation'
 
 const MONTHS_BACK = 12
 const MAX_PAGES = 40
@@ -338,11 +339,11 @@ export default function Calendrier() {
         let lineCogs = 0
         for (const li of o.lineItems || []) {
           const qty = effectiveQuantity(li)
-          if (qty <= 0 || isSample(li)) continue
-          const lineTtc = Number(
+          if (qty <= 0 || isSample(li) || isLignePersonnalisation(li)) continue
+          const lineTtc = prixDeBase(li, Number(
             li.discountedTotalSet?.shopMoney?.amount ||
               (li.originalUnitPriceSet?.shopMoney?.amount || 0) * qty
-          )
+          ))
           if (Number.isNaN(lineTtc)) continue
           const unitCost = Number(li.variant?.inventoryItem?.unitCost?.amount) || 0
           revenueTtc += lineTtc
@@ -392,11 +393,11 @@ export default function Calendrier() {
         let lineCogs = 0
         for (const li of o.lineItems || []) {
           const qty = effectiveQuantity(li)
-          if (qty <= 0 || isSample(li)) continue
-          const lineTtc = Number(
+          if (qty <= 0 || isSample(li) || isLignePersonnalisation(li)) continue
+          const lineTtc = prixDeBase(li, Number(
             li.discountedTotalSet?.shopMoney?.amount ||
               (li.originalUnitPriceSet?.shopMoney?.amount || 0) * qty
-          )
+          ))
           if (Number.isNaN(lineTtc)) continue
           const unitCost = Number(li.variant?.inventoryItem?.unitCost?.amount) || 0
           revenueTtc += lineTtc

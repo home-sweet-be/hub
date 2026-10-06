@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import OrdersTableSkeleton from '../components/OrdersTableSkeleton'
 import { useReload } from '../lib/reload'
 import { fetchDepositOrderNumbers } from '../lib/depositSync'
+import { isLignePersonnalisation, totalBaseCommande } from '../lib/personnalisation'
 
 const MONTHS_FR = [
   'Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin',
@@ -66,28 +67,23 @@ function activeLineItems(order) {
   return (order.lineItems || []).filter((li) => effectiveQuantity(li) > 0)
 }
 
-// Line item « tissu personnalisé » : repéré par le titre (insensible à la
-// casse), pas la variante. Masqué partout et son montant est retranché du
-// total de la commande, comme s'il n'avait pas été ajouté.
-function isTissuLineItem(li) {
-  return /tissu/i.test(li.title || '')
-}
+// Comptabilité = PRIX DE BASE uniquement : la vente additionnelle de
+// personnalisation de tissu est traitée à part (règles dans
+// lib/personnalisation.js). Les lignes de personnalisation sont masquées, le
+// supplément inclus dans les variantes « Gamme N » est retranché.
+//
+// Avant : toute ligne dont le titre contenait « tissu » était retirée, y compris
+// des meubles vendus en ligne libre (« Giovanni right arms tissu dove 15
+// legacy », 1 499 €), et le supplément des variantes Gamme restait compté.
 
-// Line items affichés : actifs, hors tissu personnalisé.
+// Line items affichés : actifs, hors lignes de personnalisation.
 function visibleLineItems(order) {
-  return activeLineItems(order).filter((li) => !isTissuLineItem(li))
+  return activeLineItems(order).filter((li) => !isLignePersonnalisation(li))
 }
 
-// Total de la commande hors line items tissu personnalisé.
+// Total de la commande au prix de base.
 function orderDisplayTotal(o) {
-  const gross = Number(o.total) || 0
-  const tissu = activeLineItems(o)
-    .filter(isTissuLineItem)
-    .reduce((s, li) => {
-      const n = parseFloat(li.discountedTotalSet?.shopMoney?.amount)
-      return s + (Number.isFinite(n) ? n : 0)
-    }, 0)
-  return Math.max(0, gross - tissu)
+  return totalBaseCommande(o, activeLineItems(o))
 }
 
 function shortAddress(addr) {

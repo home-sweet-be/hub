@@ -2,6 +2,7 @@ import { Fragment, useCallback, useEffect, useMemo, useState } from 'react'
 import OrdersTableSkeleton from '../components/OrdersTableSkeleton'
 import { useReload } from '../lib/reload'
 import Calendrier from './RentabiliteCalendrier'
+import { isLignePersonnalisation, prixDeBase } from '../lib/personnalisation'
 
 const MAX_PAGES = 12
 
@@ -129,6 +130,7 @@ function CalculateurMarge() {
     let total = 0
     for (const o of orders30) {
       for (const li of o.lineItems || []) {
+        if (isLignePersonnalisation(li)) continue
         total += effectiveQuantity(li)
       }
     }
@@ -194,7 +196,7 @@ function CalculateurMarge() {
     const out = []
     for (const o of sortedOrders) {
       const items = (o.lineItems || []).filter(
-        (li) => effectiveQuantity(li) > 0 && !isSample(li)
+        (li) => effectiveQuantity(li) > 0 && !isSample(li) && !isLignePersonnalisation(li)
       )
       if (items.length === 0) continue
       const customerName =
@@ -203,10 +205,10 @@ function CalculateurMarge() {
           .join(' ') || ''
       const enriched = items.map((li) => {
         const qty = effectiveQuantity(li)
-        const lineTtc = Number(
+        const lineTtc = prixDeBase(li, Number(
           li.discountedTotalSet?.shopMoney?.amount ||
             (li.originalUnitPriceSet?.shopMoney?.amount || 0) * qty
-        )
+        ))
         const lineHt = lineTtc / (1 + VAT_RATE)
         const unitCost =
           Number(li.variant?.inventoryItem?.unitCost?.amount) || 0
