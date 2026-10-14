@@ -4,6 +4,14 @@ import logo from './assets/dazzuro.png'
 import { ReloadContext } from './lib/reload'
 import { syncDepositOrders } from './lib/depositSync'
 import { logout } from './lib/hubAuth'
+import {
+  STORES,
+  StoreContext,
+  isStoreScopedPath,
+  loadStoredStore,
+  saveStoredStore,
+  setApiStore,
+} from './lib/store'
 import AuthGate from './components/AuthGate'
 import ErrorBoundary from './components/ErrorBoundary'
 import Commandes from './pages/Commandes'
@@ -37,6 +45,16 @@ function Shell() {
   const [reloadKey, setReloadKey] = useState(0)
   const [reloading, setReloading] = useState(false)
   const reloadTimerRef = useRef(null)
+  const [store, setStoreState] = useState(loadStoredStore)
+  const setStore = useCallback((id) => {
+    setStoreState(id)
+    saveStoredStore(id)
+  }, [])
+  const storeScoped = isStoreScopedPath(location.pathname)
+  // Posé pendant le rendu (et non dans un effet) : les pages lancent leurs
+  // fetch dans leurs propres effets, qui passent AVANT ceux du Shell. Hors
+  // Commandes / Logistique / Rapports, tout reste sur Dazzuro.
+  setApiStore(storeScoped ? store : 'dazzuro')
 
   const triggerReload = useCallback(() => {
     setReloadKey((k) => k + 1)
@@ -159,6 +177,7 @@ function Shell() {
   return (
     <AuthGate>
     <ReloadContext.Provider value={{ reloadKey, reloading, triggerReload }}>
+    <StoreContext.Provider value={{ store, setStore }}>
     <div className="hub-shell">
       <div className="hub-bg" aria-hidden="true" />
 
@@ -275,13 +294,37 @@ function Shell() {
 
         <main className="hub-main">
           <div className="hub-main__inner glass glass--panel">
-            <ErrorBoundary resetKey={location.pathname}>
-              <Outlet />
+            {storeScoped && (
+              <div className="store-tabs" role="tablist" aria-label="Boutique">
+                {STORES.map((s) => (
+                  <button
+                    key={s.id}
+                    type="button"
+                    role="tab"
+                    aria-selected={s.id === store}
+                    className={
+                      'store-tabs__tab store-tabs__tab--' +
+                      s.id +
+                      (s.id === store ? ' is-active' : '')
+                    }
+                    onClick={() => setStore(s.id)}
+                  >
+                    {s.label}
+                  </button>
+                ))}
+              </div>
+            )}
+            <ErrorBoundary resetKey={location.pathname + '|' + store}>
+              {/* La clé remonte la page au changement de boutique : chaque
+                  page recharge ses commandes et repart sur ses onglets par
+                  défaut. */}
+              <Outlet key={storeScoped ? store : 'common'} />
             </ErrorBoundary>
           </div>
         </main>
       </div>
     </div>
+    </StoreContext.Provider>
     </ReloadContext.Provider>
     </AuthGate>
   )

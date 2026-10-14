@@ -1,3 +1,4 @@
+import { resolveStore } from '../../_lib/store.js'
 const API_VERSION = process.env.SHOPIFY_API_VERSION || '2025-04'
 
 const LOCATIONS_QUERY = `
@@ -49,8 +50,8 @@ async function readJsonBody(req) {
   })
 }
 
-async function getLocationId(domain, token) {
-  if (process.env.SHOPIFY_LOCATION_ID) return process.env.SHOPIFY_LOCATION_ID
+async function getLocationId(domain, token, preset) {
+  if (preset) return preset
   const { json } = await shopifyGraphql(domain, token, LOCATIONS_QUERY, {})
   const nodes = (json.data?.locations?.edges || []).map((e) => e.node)
   const active = nodes.find((n) => n.isActive) || nodes[0]
@@ -64,8 +65,9 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' })
   }
 
-  const domain = process.env.SHOPIFY_STORE_DOMAIN
-  const token = process.env.SHOPIFY_ADMIN_TOKEN
+  const shop = resolveStore(req)
+  const domain = shop.domain
+  const token = shop.token
   if (!domain || !token) {
     return res.status(500).json({ error: 'Missing SHOPIFY_STORE_DOMAIN or SHOPIFY_ADMIN_TOKEN' })
   }
@@ -85,7 +87,7 @@ export default async function handler(req, res) {
 
   let locationId
   try {
-    locationId = await getLocationId(domain, token)
+    locationId = await getLocationId(domain, token, shop.locationId)
   } catch (e) {
     return res.status(500).json({ error: e.message })
   }

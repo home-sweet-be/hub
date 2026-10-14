@@ -5,42 +5,34 @@ import AddressModal from '../components/AddressModal'
 import StockAdjustModal from '../components/StockAdjustModal'
 import OrdersTableSkeleton from '../components/OrdersTableSkeleton'
 import { useReload } from '../lib/reload'
+import { suppliersFor, useStore } from '../lib/store'
 
 const ZONE_TAG_PATTERN = /^(BE|FR|LU|NL|DE|LIV)(-|$)/i
 
-const TABS = [
-  {
-    id: 'stock',
-    label: 'EN STOCK',
-    dot: '#34c759',
-    vendor: null,
-    supplierTitle: null,
-    allowStockAdjust: false,
-    filter: (o) => o.tags.includes('ProduitEnStock'),
-  },
-  {
-    id: 'intercommerce',
-    label: 'INTERCOMMERCE',
-    vendor: 'INTERCOMMERCE',
-    supplierTitle: 'intercommerce',
-    allowStockAdjust: true,
-    filter: (o) =>
-      o.tags.includes('SentToSupplier') &&
-      Number(o.total) >= 590 &&
-      o.lineItems.some((li) => isMainLineItem(li) && li.vendor !== 'ELTAP'),
-  },
-  {
-    id: 'eltap',
-    label: 'ELTAP',
-    vendor: 'ELTAP',
-    supplierTitle: 'ELTAP',
-    allowStockAdjust: true,
-    filter: (o) =>
-      o.tags.includes('SentToSupplier') &&
-      Number(o.total) >= 590 &&
-      o.lineItems.some((li) => isMainLineItem(li) && li.vendor === 'ELTAP'),
-  },
-]
+// « En stock » puis un onglet par fournisseur de la boutique active
+// (voir lib/store.js).
+function buildTabs(store) {
+  return [
+    {
+      id: 'stock',
+      label: 'EN STOCK',
+      dot: '#34c759',
+      vendor: null,
+      allowStockAdjust: false,
+      filter: (o) => o.tags.includes('ProduitEnStock'),
+    },
+    ...suppliersFor(store).map((s) => ({
+      id: s.id,
+      label: s.vendor,
+      vendor: s.vendor,
+      allowStockAdjust: true,
+      filter: (o) =>
+        o.tags.includes('SentToSupplier') &&
+        Number(o.total) >= 590 &&
+        o.lineItems.some((li) => isMainLineItem(li) && s.matches(li.vendor)),
+    })),
+  ]
+}
 
 function extractZone(order) {
   const find = (tags) => (tags || []).find((t) => ZONE_TAG_PATTERN.test(t))
@@ -132,7 +124,9 @@ function SamplesThumb() {
 export default function Receptions() {
   const [orders, setOrders] = useState(null)
   const [error, setError] = useState(null)
-  const [activeTab, setActiveTab] = useState('intercommerce')
+  const { store } = useStore()
+  const TABS = useMemo(() => buildTabs(store), [store])
+  const [activeTab, setActiveTab] = useState(() => buildTabs(store)[1].id)
   const [selectedIds, setSelectedIds] = useState(() => new Set())
   const [pending, setPending] = useState(null) // 'adjust' | 'markReady' | null
   const [feedback, setFeedback] = useState(null) // { type, message }

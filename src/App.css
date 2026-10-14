@@ -7503,3 +7503,48 @@ a.semaine__order:hover {
   }
 }
 
+
+/* ── Onglets de boutique (Commandes / Logistique / Rapports) ─────────────
+   Deux moitiés égales en tête de page : Dazzuro | Home Sweet. */
+.store-tabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  padding: 5px;
+  margin: 0 0 22px;
+  border-radius: 16px;
+  background: rgba(28, 28, 30, 0.06);
+}
+
+.store-tabs__tab {
+  min-width: 0;
+  padding: 12px 16px;
+  border: none;
+  border-radius: 12px;
+  background: transparent;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--text-soft);
+  cursor: pointer;
+  transition:
+    background 0.15s ease,
+    color 0.15s ease,
+    box-shadow 0.18s ease;
+}
+
+.store-tabs__tab:hover:not(.is-active) {
+  background: rgba(255, 255, 255, 0.55);
+  color: var(--text);
+}
+
+.store-tabs__tab.is-active {
+  background: #ffffff;
+  color: var(--text);
+  box-shadow: 0 1px 2px rgba(28, 28, 30, 0.06), 0 6px 16px -8px rgba(28, 28, 30, 0.25);
+}
+
+.store-tabs__tab:focus-visible {
+  outline: 2px solid #0a84ff;
+  outline-offset: 2px;
+}

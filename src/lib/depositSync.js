@@ -31,7 +31,10 @@ export async function syncDepositOrders({ days = 180 } = {}) {
     const since = new Date(Date.now() - days * 86400000)
     const q = `created_at:>=${ymd(since)} AND NOT tag:removed`
     const r = await fetch(
-      '/api/shopify/receptions?withTx=1&first=250&q=' + encodeURIComponent(q)
+      // deposit_orders ne suit que Dazzuro : on le force, quel que soit
+      // l'onglet de boutique ouvert au moment du sync.
+      '/api/shopify/receptions?store=dazzuro&withTx=1&first=250&q=' +
+        encodeURIComponent(q)
     )
     if (!r.ok) return
     const data = await r.json()

@@ -4,6 +4,7 @@ import ZoneModal from '../components/ZoneModal'
 import AddressModal from '../components/AddressModal'
 import OrdersTableSkeleton from '../components/OrdersTableSkeleton'
 import { useReload } from '../lib/reload'
+import { useStore } from '../lib/store'
 import { fetchDepositOrderNumbers } from '../lib/depositSync'
 import { autoTagOrdersByLocation } from '../lib/autoZoneTag'
 
@@ -93,12 +94,16 @@ export default function Commandes() {
   const [addressViewing, setAddressViewing] = useState(null)
   const [depositSet, setDepositSet] = useState(() => new Set())
   const { reloadKey } = useReload()
+  const { store } = useStore()
   const autoTagRunning = useRef(false)
 
   // Numéros de commande ayant eu un acompte, lus UNIQUEMENT depuis le cache
   // Supabase deposit_orders (aucun fetch Shopify ici) — sert à tester que la DB
   // est bien remplie en marquant ces commandes d'une bordure turquoise.
+  // Le cache ne couvre que Dazzuro : sur Home Sweet, les numéros de commande
+  // pourraient recouper d'anciens numéros Dazzuro, on n'affiche donc rien.
   useEffect(() => {
+    if (store !== 'dazzuro') return
     let alive = true
     fetchDepositOrderNumbers().then((set) => {
       if (alive) setDepositSet(set)
@@ -106,7 +111,7 @@ export default function Commandes() {
     return () => {
       alive = false
     }
-  }, [reloadKey])
+  }, [reloadKey, store])
 
   // Auto-tag de zone par géolocalisation : pour les commandes sans zone, on pose
   // le tag déduit de la lat/lon, puis on fusionne le résultat dans l'état local

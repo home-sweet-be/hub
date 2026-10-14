@@ -1,3 +1,4 @@
+import { resolveStore } from '../../_lib/store.js'
 const API_VERSION = process.env.SHOPIFY_API_VERSION || '2025-04'
 
 const TAGS_ADD = `
@@ -70,8 +71,9 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' })
   }
 
-  const domain = process.env.SHOPIFY_STORE_DOMAIN
-  const token = process.env.SHOPIFY_ADMIN_TOKEN
+  const shop = resolveStore(req)
+  const domain = shop.domain
+  const token = shop.token
   if (!domain || !token) {
     return res.status(500).json({ error: 'Missing SHOPIFY_STORE_DOMAIN or SHOPIFY_ADMIN_TOKEN' })
   }

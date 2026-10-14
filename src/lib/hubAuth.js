@@ -1,3 +1,5 @@
+import { DEFAULT_STORE, getApiStore } from './store'
+
 const TOKEN_KEY = 'hub_token'
 
 export function getToken() {
@@ -63,7 +65,20 @@ export function installHubAuthFetch() {
   window.__hubAuthFetchInstalled = true
   const nativeFetch = window.fetch.bind(window)
   window.fetch = (input, init = {}) => {
-    const url = typeof input === 'string' ? input : input?.url || ''
+    let url = typeof input === 'string' ? input : input?.url || ''
+    // Boutique active (onglets Dazzuro / Home Sweet) : ajoutée aux appels
+    // /api/* qui ne précisent pas déjà `store=`. Dazzuro reste le défaut
+    // côté serveur, inutile de l'écrire.
+    const store = getApiStore()
+    if (
+      typeof input === 'string' &&
+      url.startsWith('/api/') &&
+      store !== DEFAULT_STORE &&
+      !/[?&]store=/.test(url)
+    ) {
+      url += (url.includes('?') ? '&' : '?') + 'store=' + encodeURIComponent(store)
+      input = url
+    }
     const token = getToken()
     if (token && url.startsWith('/api/')) {
       const headers = new Headers(init.headers || (typeof input !== 'string' ? input.headers : undefined))
