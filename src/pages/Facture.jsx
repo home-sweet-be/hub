@@ -13,8 +13,8 @@ const SELLER = {
   company: '1003.835.578',
   vat: 'BE1003835578',
   iban: 'BE00 0000 0000 0000 0000',
-  email: 'contact@home-sweet.be',
-  site: 'home-sweet.be',
+  email: 'contact@dazzuro.com',
+  site: 'dazzuro.com',
 }
 
 function formatMoney(amount, currency = 'EUR') {

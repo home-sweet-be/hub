@@ -50,7 +50,7 @@ function zoneLabel(z) {
 }
 
 const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_TOKEN
-const SHIPPING_TERMS_URL = 'https://home-sweet.be/pages/livraison'
+const SHIPPING_TERMS_URL = 'https://dazzuro.com/pages/livraison'
 
 function TruckIcon() {
   return (
@@ -292,7 +292,7 @@ export default function PlanificationLivraison() {
           not_ready:
             "Cette commande n'est pas encore prête à être livrée. Vous recevrez un nouvel e-mail dès qu'elle le sera.",
           no_zone:
-            "Impossible de déterminer la zone de livraison pour cette commande. Contactez-nous à contact@home-sweet.be.",
+            "Impossible de déterminer la zone de livraison pour cette commande. Contactez-nous à contact@dazzuro.com.",
           missing_fields: 'Merci de remplir les deux champs.',
         }
         // eslint-disable-next-line no-console
@@ -547,7 +547,7 @@ export default function PlanificationLivraison() {
             </form>
             <p className="plani__help">
               Besoin d'aide ? Écrivez-nous à{' '}
-              <a href="mailto:contact@home-sweet.be">contact@home-sweet.be</a>.
+              <a href="mailto:contact@dazzuro.com">contact@dazzuro.com</a>.
             </p>
           </section>
         )}
@@ -707,7 +707,7 @@ export default function PlanificationLivraison() {
                         Oui
                       </button>
                       <a
-                        href="https://home-sweet.be/collections/canapes"
+                        href="https://dazzuro.com/collections/canapes"
                         target="_blank"
                         rel="noreferrer"
                         className="plani-quiz__btn"
@@ -908,7 +908,7 @@ export default function PlanificationLivraison() {
                 <div className="plani__no-slots-sub">
                   De nouveaux créneaux sont ajoutés chaque semaine — reviens
                   bientôt ou écris-nous à{' '}
-                  <a href="mailto:contact@home-sweet.be">contact@home-sweet.be</a>.
+                  <a href="mailto:contact@dazzuro.com">contact@dazzuro.com</a>.
                 </div>
               </div>
             )}
@@ -1111,13 +1111,13 @@ export default function PlanificationLivraison() {
               <p>
                 Pour toute demande de modification ou d'annulation, écrivez-nous
                 à{' '}
-                <a href="mailto:contact@home-sweet.be">contact@home-sweet.be</a>{' '}
+                <a href="mailto:contact@dazzuro.com">contact@dazzuro.com</a>{' '}
                 ou contactez-nous par téléphone.
               </p>
             </div>
             <a
               className="plani__account-link"
-              href="https://home-sweet.be/account/"
+              href="https://dazzuro.com/account/"
               target="_top"
               rel="noopener"
             >
@@ -1173,11 +1173,11 @@ export default function PlanificationLivraison() {
             <p className="plani__help">
               Un e-mail de confirmation va vous être envoyé. Pour toute
               question, écrivez-nous à{' '}
-              <a href="mailto:contact@home-sweet.be">contact@home-sweet.be</a>.
+              <a href="mailto:contact@dazzuro.com">contact@dazzuro.com</a>.
             </p>
             <a
               className="plani__account-link"
-              href="https://home-sweet.be/account/"
+              href="https://dazzuro.com/account/"
               target="_top"
               rel="noopener"
             >

@@ -11,7 +11,7 @@ const NOTIFY_TO = (process.env.BOOKING_NOTIFY_TO || 'direction@home-sweet.be')
   .split(',')
   .map((s) => s.trim())
   .filter(Boolean)
-const SUPPORT_EMAIL = process.env.SUPPORT_EMAIL || 'contact@home-sweet.be'
+const SUPPORT_EMAIL = process.env.SUPPORT_EMAIL || 'contact@dazzuro.com'
 const SUPPORT_PHONE = (process.env.SUPPORT_PHONE || '+32 71 18 88 63').trim()
 
 async function readJsonBody(req) {

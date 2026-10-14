@@ -24,7 +24,7 @@ const RESEND_PAGES = 10
 
 const FROM = process.env.EMAIL_FROM || 'Dazzuro <livraison@send.home-sweet.be>'
 const BOOKING_URL =
-  process.env.PLANI_PUBLIC_URL || 'https://home-sweet.be/pages/planifier-ma-livraison'
+  process.env.PLANI_PUBLIC_URL || 'https://dazzuro.com/pages/planifier-ma-livraison'
 
 const ORDERS_QUERY = `
   query waitingOrders($first: Int!, $query: String!, $after: String) {
@@ -299,7 +299,7 @@ function renderEmail({ firstName, orderName, zoneName, url }) {
               </a>
             </td>
             <td>
-              <a href="https://home-sweet.be/account" style="display:inline-block;background:#ffffff;color:#1c1a17;text-decoration:none;padding:13px 27px;border:1px solid #1c1a17;border-radius:10px;font-weight:500;font-size:14px;letter-spacing:0.04em;text-transform:uppercase;">
+              <a href="https://dazzuro.com/account" style="display:inline-block;background:#ffffff;color:#1c1a17;text-decoration:none;padding:13px 27px;border:1px solid #1c1a17;border-radius:10px;font-weight:500;font-size:14px;letter-spacing:0.04em;text-transform:uppercase;">
                 Mon compte
               </a>
             </td>
@@ -307,7 +307,7 @@ function renderEmail({ firstName, orderName, zoneName, url }) {
         </table>
         <p style="margin:0 0 14px;color:#4a4a4f;font-size:13px;line-height:1.5;">
           Une question ? Écrivez-nous à
-          <a href="mailto:contact@home-sweet.be" style="color:#1c1a17;">contact@home-sweet.be</a>,
+          <a href="mailto:contact@dazzuro.com" style="color:#1c1a17;">contact@dazzuro.com</a>,
           nous sommes là pour vous aider.
         </p>
         <p style="margin:0;color:#8a8a8e;font-size:12px;line-height:1.5;">
