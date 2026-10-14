@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate, NavLink, Outlet, useLocation } from 'react-router-dom'
 import { useCallback, useEffect, useRef, useState } from 'react'
-import logo from './assets/dazzuro.png'
+import logoDazzuro from './assets/dazzuro.png'
+import logoHomesweet from './assets/homesweet.png'
 import { ReloadContext } from './lib/reload'
 import { syncDepositOrders } from './lib/depositSync'
 import { logout } from './lib/hubAuth'
@@ -28,6 +29,8 @@ import PlanificationLivraison from './pages/PlanificationLivraison'
 import Facture from './pages/Facture'
 import Facturation from './pages/Facturation'
 import './App.css'
+
+const STORE_LOGOS = { dazzuro: logoDazzuro, homesweet: logoHomesweet }
 
 const MODULES = [
   { to: '/commandes', label: 'Commandes', icon: '🧾' },
@@ -205,12 +208,6 @@ function Shell() {
           </svg>
         </button>
 
-        <img
-          src={logo}
-          alt="DAZZURO"
-          className="hub-header__logo"
-        />
-
         <div className="hub-header__greeting">
           <span role="img" aria-label="wave">👋</span>
           <span>Bienvenue Alessandro</span>
@@ -309,7 +306,11 @@ function Shell() {
                     }
                     onClick={() => setStore(s.id)}
                   >
-                    {s.label}
+                    <img
+                      src={STORE_LOGOS[s.id]}
+                      alt={s.label}
+                      className="store-tabs__logo"
+                    />
                   </button>
                 ))}
               </div>

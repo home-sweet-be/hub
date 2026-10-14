@@ -7548,3 +7548,30 @@ a.semaine__order:hover {
   outline: 2px solid #0a84ff;
   outline-offset: 2px;
 }
+
+.store-tabs__tab {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 54px;
+}
+
+/* Logos noirs sur fond transparent : estompés sur l onglet inactif. */
+.store-tabs__logo {
+  display: block;
+  height: 24px;
+  width: auto;
+  max-width: 70%;
+  object-fit: contain;
+  opacity: 0.4;
+  transition: opacity 0.15s ease;
+}
+
+.store-tabs__tab--homesweet .store-tabs__logo {
+  height: 28px;
+}
+
+.store-tabs__tab:hover .store-tabs__logo,
+.store-tabs__tab.is-active .store-tabs__logo {
+  opacity: 1;
+}
